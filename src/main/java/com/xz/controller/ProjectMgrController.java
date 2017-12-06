@@ -88,9 +88,12 @@ public class ProjectMgrController extends BaseController {
 					// 上传
 					file.transferTo(new File(path));
 					if((file.getOriginalFilename()).contains(".xls")){//上传EXCEL文件
+						//线程处理
 						File tfile = new File(path);
-						RecCallable cb = new RecCallable(multiRequest, tfile, null, path, null);
-						threadPool.submit(cb);
+//						RecCallable cb = new RecCallable(multiRequest, tfile, null, path, null);
+//						threadPool.submit(cb);
+//						peojectServices.importProjectData(request, file, null, path,null);
+						peojectServices.importProjectData(request, tfile, null, path, null);
 					}
 				}
 

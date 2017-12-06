@@ -70,16 +70,20 @@ public class PeojectServices {
 		//插入项目详细数据,从第三行还是为详细数据
 		List<String> params = new ArrayList<String>();
 		List<String> marks = new ArrayList<String>();
-		marks.add("?");
-		marks.add("?");
 		StringBuilder sb = new StringBuilder(); 
 		attrList = new ArrayList<Object>();
 		for(int i=0;i<list.size();i++){
-			if(i>2){//从第三行开始
+			if(i>1){//从第三行开始
 				attrList = list.get(i);
 				if(attrList != null && attrList.size() != 0){
 					sb = new StringBuilder();
+					params = new ArrayList<String>();
+					marks = new ArrayList<String>();
 					sb.append(" insert into project_detail(id,project_id ");
+					marks.add("?");
+					marks.add("?");
+					params.add(SortableUUID.randomUUID());
+					params.add(projectId);
 					for(int k =0;k<attrList.size();k++){
 						sb.append(",ext"+(k+1));
 						params.add(attrList.get(k)+"");
