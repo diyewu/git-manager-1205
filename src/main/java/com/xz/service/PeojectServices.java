@@ -3,6 +3,7 @@ package com.xz.service;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -15,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.xz.utils.ExcelReadUtils;
 import com.xz.utils.SortableUUID;
+
 
 @Service
 @Transactional
@@ -45,6 +47,7 @@ public class PeojectServices {
 		}
 		if(StringUtils.isBlank(title)){
 			msg = "格式有误，请确认第一行第一列为项目标题！";
+			insertOperateHistory(request, type, msg);
 			return;
 		}
 		//插入项目主表数据
@@ -55,15 +58,43 @@ public class PeojectServices {
 		//插入项目属性表数据
 		ArrayList<Object> attrList = list.get(1);
 		if(attrList == null || attrList.size() == 0){
+			insertOperateHistory(request, type, msg);
 			msg = "格式有误，请确认第二行数据不能为空！";
+			return;
 		}
 		int attrSize = attrList.size();
 		String attrSql = " insert into project_attribute(id,project_id,attribute_name,attribute_index)VALUES(?,?,?,?) ";
 		for (int i = 0; i < attrSize; i++) {
 			jdbcTemplate.update(attrSql, SortableUUID.randomUUID(),projectId,attrList.get(i)+"",i+1);
 		}
-		
-		
+		//插入项目详细数据,从第三行还是为详细数据
+		List<String> params = new ArrayList<String>();
+		List<String> marks = new ArrayList<String>();
+		marks.add("?");
+		marks.add("?");
+		StringBuilder sb = new StringBuilder(); 
+		attrList = new ArrayList<Object>();
+		for(int i=0;i<list.size();i++){
+			if(i>2){//从第三行开始
+				attrList = list.get(i);
+				if(attrList != null && attrList.size() != 0){
+					sb = new StringBuilder();
+					sb.append(" insert into project_detail(id,project_id ");
+					for(int k =0;k<attrList.size();k++){
+						sb.append(",ext"+(k+1));
+						params.add(attrList.get(k)+"");
+						marks.add("?");
+					}
+					System.out.println(params);
+					sb.append(")values("+StringUtils.join(marks.toArray(), ",")+")");
+					jdbcTemplate.update(sb.toString(), params.toArray());
+				}else{
+					msg = "格式有误，请确认第三行数据不能为空！";
+					insertOperateHistory(request, type, msg);
+					return;
+				}
+			}
+		}
 		
 		
 		
