@@ -8,9 +8,9 @@ server:
 spring:
     datasource:
         name: test
-        url: jdbc:mysql://172.16.1.12:3306/test_deanwu
-        username: demo
-        password: 2wsx3ced4vfr
+        url: jdbc:mysql://127.0.0.1:3306/xzgis
+        username: root
+        password: 123456
         # 使用druid数据源
         type: com.alibaba.druid.pool.DruidDataSource
         driver-class-name: com.mysql.jdbc.Driver
@@ -68,7 +68,9 @@ logging:
     config: classpath:logback-spring.xml
 
 
-
+#custom settings
+custom:
+    clientFileUpladPath: F:\tempfilepath
 
 
 
