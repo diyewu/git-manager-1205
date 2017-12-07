@@ -90,10 +90,10 @@ public class ProjectMgrController extends BaseController {
 					if((file.getOriginalFilename()).contains(".xls")){//上传EXCEL文件
 						//线程处理
 						File tfile = new File(path);
-//						RecCallable cb = new RecCallable(multiRequest, tfile, null, path, null);
-//						threadPool.submit(cb);
-//						peojectServices.importProjectData(request, file, null, path,null);
-						peojectServices.importProjectData(request, tfile, null, path, null);
+						RecCallable cb = new RecCallable(multiRequest, tfile, null, path, null);
+						threadPool.submit(cb);
+//						peojectServices.importProjectData(request, tfile, null, path,null);
+//						peojectServices.importProjectData(request, tfile, null, path, null);
 					}
 				}
 
@@ -117,7 +117,7 @@ public class ProjectMgrController extends BaseController {
     public void listImport(HttpServletRequest request,HttpServletResponse response){
 		String startParam = request.getParameter("start");
 		String limitParam = request.getParameter("limit");
-		String month = request.getParameter("searchMonth");
+		String projectName = request.getParameter("projectName");
 		String startDate = request.getParameter("createDateStart");
 		String endDate = request.getParameter("createDateEnd");
 		int start = 0;
@@ -128,9 +128,7 @@ public class ProjectMgrController extends BaseController {
 		if(StringUtils.isNotBlank(limitParam)){
 			limit = Integer.parseInt(limitParam);
 		}
-//		Page<Map<String, Object>> page = settingService.getImportInfo(month, start, limit, startDate, endDate);
-		Page<Map<String, Object>> page = null;
-//		resultSuccess(null, page.getResult(), page.getTotalCount(),response);
-		resultSuccess(null, null, 0,response);
+		Page<Map<String, Object>> page = peojectServices.getProjectMain(projectName, start, limit, startDate, endDate);
+		resultSuccess(null, page.getResult(), page.getTotalCount(),response);
 	}
 }
