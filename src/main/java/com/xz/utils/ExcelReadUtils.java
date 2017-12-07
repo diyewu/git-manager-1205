@@ -6,9 +6,14 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.NumberFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
@@ -163,34 +168,43 @@ public class ExcelReadUtils {
 		int rowCount = sheet.getLastRowNum();
 		return readRows(sheet, 0, rowCount);
 	}
-
+	//execel自定义时间格式
+	private static short[]  dateFormat = new short[]{14,15,16,17,18,19,20,21,30,31,32,57,58};
+	private static SimpleDateFormat sFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	private static Object readCell(Cell cell) {
 		if (cell == null) {
 			return null;
 		}
-
 		switch (cell.getCellType()) {
 		case Cell.CELL_TYPE_STRING:
 			String str = cell.getRichStringCellValue().getString();
 			return str == null ? null : str.trim();
 
 		case Cell.CELL_TYPE_NUMERIC:
-			if (DateUtil.isCellDateFormatted(cell)) {
-				return cell.getDateCellValue();
+//			System.out.println(cell.getCellStyle().getDataFormat());
+			if (ArrayUtils.contains(dateFormat,cell.getCellStyle().getDataFormat())) {
+				cell.getCellStyle().getDataFormat();
+				return sFormat.format(cell.getDateCellValue());
 			} else {
-				String value = "";
-				String msg = null;
-				try {
-					value = String.valueOf(cell.getNumericCellValue());
-				} catch (Exception e) {
-					e.printStackTrace();
-					msg = e.getMessage();
+//				String value = "";
+//				String msg = null;
+//				try {
+//					value = String.valueOf(cell.getNumericCellValue());
+//				} catch (Exception e) {
+//					e.printStackTrace();
+//					msg = e.getMessage();
+//				}
+//				if(StringUtils.isNotBlank(msg)){
+//					return 0;
+//				}else{
+//					return String.valueOf(cell.getNumericCellValue());
+//				}
+				NumberFormat nf = NumberFormat.getInstance();
+				String s = nf.format(cell.getNumericCellValue());
+				if (s.indexOf(",") >= 0) {
+				    s = s.replace(",", "");
 				}
-				if(StringUtils.isNotBlank(msg)){
-					return 0;
-				}else{
-					return String.valueOf(cell.getNumericCellValue());
-				}
+				return s;
 			}
 
 		case Cell.CELL_TYPE_BOOLEAN:

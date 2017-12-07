@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -14,6 +15,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.xz.common.Page;
 import com.xz.utils.ExcelReadUtils;
 import com.xz.utils.SortableUUID;
 
@@ -103,8 +105,43 @@ public class PeojectServices {
 		
 		
 	}
+	/**
+	 * 插入操作日志
+	 * @param request
+	 * @param type
+	 * @param msg
+	 */
 	public void insertOperateHistory(HttpServletRequest request,String type,String msg){
 		HttpSession session=request.getSession();
 		operateHistoryService.insertOH(request,(String)session.getAttribute("userId") , type, msg,msg==null?1:0);
+	}
+	
+	public Page<Map<String, Object>> getProjectMain(String projectname,int start,int limit,String startDate,String endDate){
+		Page<Map<String, Object>> page = new Page<Map<String, Object>>(start, limit, false);
+		List<Object> params = new ArrayList<Object>();
+		StringBuilder sql = new StringBuilder(" select a.id,a.project_name,a.create_time,b.real_name  ");
+		sql.append(" from project_main a LEFT JOIN user_login b on a.create_user_id = b.id where 1=1 ");
+		if(StringUtils.isNotBlank(projectname)){
+			sql.append(" and a.project_name = ? ");
+			params.add(projectname);
+		}
+		if(StringUtils.isNotBlank(startDate)){
+			sql.append(" and a.create_date >= ? ");
+			params.add(startDate);
+		}
+		if(StringUtils.isNotBlank(endDate)){
+			sql.append(" and a.create_date <= ? ");
+			params.add(endDate);
+		}
+		sql.append(" order by a.create_time ");
+		
+		List<Map<String, Object>> countList = jdbcTemplate.queryForList(sql.toString(),params.toArray());
+		page.setTotalCount(countList.size());
+		sql.append(" limit ?,?");
+		params.add(start);
+		params.add(limit);
+		List<Map<String, Object>> list = jdbcTemplate.queryForList(sql.toString(), params.toArray());
+		page.setResult(list);
+		return page;
 	}
 }

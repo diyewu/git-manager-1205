@@ -10,7 +10,7 @@
    		    }  
    		}); 
    		
-//   		var qrUrl = path + "/setting!";
+//   	var qrUrl = path + "/setting!";
    		var order;
    		var _pageSize = 20;
    		var reader = new Ext.data.JsonReader({
@@ -19,30 +19,20 @@
    			fields : [ {
    				name : 'id',
    				type : 'string'
-   			}, {
-   				name : 'title',
+   			},  {
+   				name : 'project_name',
    				type : 'string'
    			}, {
-   				name : 'description',
+   				name : 'create_time',
    				type : 'string'
    			}, {
-   				name : 'month',
-   				type : 'string'
-   			}, {
-   				name : 'operate_user_name',
-   				type : 'string'
-   			}, {
-   				name : 'create_date',
-   				type : 'string'
-   			}, {
-   				name : 'is_checked',
+   				name : 'real_name',
    				type : 'string'
    			}]
    		});
         store = new Ext.data.Store({
 			url : path +"/projectmgr/listImport",
-			reader : reader,
-			remoteSort : true
+			reader : reader
 		});
 		store.load({params:{start:0,limit:20}})
 //				callback: function(records, options, success){  
@@ -57,7 +47,7 @@
 //	            } 
 //		);
 		
-		store.load({  
+//		store.load({  
 //	        callback: function(records, options, success){   
 //	        	 //该数组存放将要勾选的行的record  
 //		         var arr = [];  
@@ -68,7 +58,7 @@
 //		         }  
 //		         grid.getSelectionModel().selectRows(arr);
 //	        }     
-	    });  
+//	    });  
 		
 		var pagingBar = new Ext.PagingToolbar({
 			store : store,
@@ -84,33 +74,20 @@
             [ 
             	new Ext.grid.RowNumberer(),
             	sm,
-            	{header:"数据年月",align:'center',dataIndex:"month",sortable:true}, 
-	            {header:"标题",align:'center',dataIndex:"title",sortable:true}, 
-	            {header:"已设置比较",align:'center',dataIndex:"is_checked",sortable:true,renderer:function(value, cellmeta, record, rowIndex, columnIndex, store){
-                    if(value==0){
-                        return '是';
-                      } else {
-                        return '否';
-                      }
-	            }} ,
-	            {header:"创建时间",align:'center',dataIndex:"create_date",sortable:true},
-	            {header:"操作人",align:'center',dataIndex:"operate_user_name",sortable:true},
-	            {header:"操作",align:'center',dataIndex:"id",width:50,
+            	{header:"项目名称",align:'center',dataIndex:"project_name",sortable:true}, 
+	            {header:"创建时间",align:'center',dataIndex:"create_time",sortable:true},
+	            {header:"创建人",align:'center',dataIndex:"real_name",sortable:true},
+	            {header:"操作",align:'center',dataIndex:"id",
 	            renderer: function (value, meta, record) {
-//					            			var formatStr = "<input id = 'bt_edit_" + record.get('id')
-//							+ "' onclick=\"showEditRom('" + record.get('id') + "','"
-//							+ record.get('originalRomName') + "','"
-//							+ record.get('version')+"','"
-//							+ record.get('type')+"','"
-//							+ record.get('comment')
-//							+ "');\" type='button' value='编辑' width ='15px'/>&nbsp;&nbsp;"; 
-
-										     var deleteBtn = "<input id = 'bt_delete_" + record.get('id')
+			            	var setBtn = "<input id = 'bt_set_" + record.get('id')
+			            	+ "' onclick=\"showAttrWin('" + record.get('id')
+			            	+ "');\" type='button' value='设置' width ='15px'/>&nbsp;&nbsp;";
+						  var deleteBtn = "<input id = 'bt_delete_" + record.get('id')
 							+ "' onclick=\"deleteRom('" + record.get('id')
 							+ "');\" type='button' value='删除' width ='15px'/>";
 										            			
 //            				var resultStr = String.format(formatStr);
-            				return "<div>" + deleteBtn + "</div>";
+            				return "<div>" + setBtn+deleteBtn + "</div>";
         				  } .createDelegate(this)
 	            } 
             ] 
@@ -157,27 +134,6 @@
     	});
     	
     	
-//    	var endTimeField1 = new ClearableDateTimeField({
-//    		id:"editDateEnd",
-//    		editable : false,
-//    		width : 160
-//    	});
-//    	
-//    	var beginTimeField1 = new ClearableDateTimeField({
-//    		id:"editDateStart",
-//    		editable : false,
-////    		value : initDate,
-//    		width : 160,
-//    	}); 
-//    	this.beginTimeField1 = beginTimeField1;
-//    	
-//    	this.endTimeField1 = endTimeField1;
-//    	beginTimeField1.on('change', function(o, v) {
-//    	});
-//    	beginTimeField1.fireEvent('change', beginTimeField, initDate);
-//    	endTimeField1.on('change', function(o, v) {
-//    	});
-//       
         
         var tbar = new Ext.Toolbar({  
             renderTo : Ext.grid.GridPanel.tbar,// 其中grid是上边创建的grid容器  
@@ -217,7 +173,7 @@
 				handler : function() {
 					showEditRom();
 				}
-			},{
+			}/*,{
 				text : '设置比较年月',
 				iconCls : 'Cog',
 				handler : function() {
@@ -230,7 +186,7 @@
 //					showEditRom();
 					setImportDatabaseMonth(1);
 				}
-			}]
+			}*/]
 
         });  
         grid = new Ext.grid.EditorGridPanel({ 
@@ -542,6 +498,134 @@
     		items : [_importPanel]
     	});
 		newWin.show();
+    }
+    function showAttrWin(projectId){
+    	var sa_pageSize = 100;
+    	var sareader = new Ext.data.JsonReader({
+   			idProperty : 'id',
+   			root : 'data',
+   			fields : [ {
+   				name : 'id',
+   				type : 'string'
+   			},  {
+   				name : 'project_name',
+   				type : 'string'
+   			}, {
+   				name : 'create_time',
+   				type : 'string'
+   			}, {
+   				name : 'real_name',
+   				type : 'string'
+   			}]
+   		});
+       var sastore = new Ext.data.Store({
+			url : path +"/projectmgr/listImport",
+			reader : sareader
+		});
+       sastore.load({params:{start:0,limit:20}})
+		
+		var sapagingBar = new Ext.PagingToolbar({
+			store : sastore,
+			displayInfo : true,
+			pageSize : sa_pageSize,
+			beforePageText : '第',
+			afterPageText : '页，共{0}页',
+			displayMsg : '第{0}到{1}条记录，共{2}条',
+			emptyMsg : "没有记录"
+		});
+		var sasm = new Ext.grid.CheckboxSelectionModel();
+        var sacolumn=new Ext.grid.ColumnModel( 
+            [ 
+            	new Ext.grid.RowNumberer(),
+            	sasm,
+            	{header:"项目名称",align:'center',dataIndex:"project_name",sortable:true}, 
+	            {header:"创建时间",align:'center',dataIndex:"create_time",sortable:true},
+	            {header:"创建人",align:'center',dataIndex:"real_name",sortable:true},
+	            {header:"操作",align:'center',dataIndex:"id",
+	            renderer: function (value, meta, record) {
+		              var setBtn = "<input id = 'bt_set_" + record.get('id')
+		            	+ "' onclick=\"setProject('" + record.get('id')
+		            	+ "');\" type='button' value='设置' width ='15px'/>&nbsp;&nbsp;";
+					  var deleteBtn = "<input id = 'bt_delete_" + record.get('id')
+						+ "' onclick=\"deleteRom('" + record.get('id')
+						+ "');\" type='button' value='删除' width ='15px'/>";
+									            			
+	//            				var resultStr = String.format(formatStr);
+	    				return "<div>" + setBtn+deleteBtn + "</div>";
+					  } .createDelegate(this)
+	            } 
+            ] 
+        ); 
+    	
+        
+        var sagrid_ = new Ext.grid.EditorGridPanel({ 
+			region:'center',
+			border:false,
+			autoHeight:true,
+			viewConfig: {
+	            forceFit: true, //让grid的列自动填满grid的整个宽度，不用一列一列的设定宽度。
+	            emptyText: '系统中还没有任务'
+	        },
+	        sm:sasm,
+            cm:sacolumn, 
+            store:sastore, 
+            autoExpandColumn:0, 
+            loadMask:true, 
+            frame:true, 
+            autoScroll:true, 
+            bbar:sapagingBar
+        });
+    	
+    	var safileForm = new Ext.FormPanel({
+    		layout : "fit",
+    		frame : true,
+    		border : false,
+    		autoHeight : true,
+    		waitMsgTarget : true,
+    		defaults : {
+    			bodyStyle : 'padding:10px'
+    		},
+    		margins : '0 0 0 0',
+    		labelAlign : "left",
+    		labelWidth : 80,
+    		fileUpload : true,
+    		items : [
+    			sagrid_
+    		]
+    	});
+    	
+    	var sa_importPanel = new Ext.Panel({
+    		layout : "fit",
+    		layoutConfig : {
+    			animate : true
+    		},
+    		items : [safileForm]
+    	});
+    	
+    	var sanewWin = new Ext.Window({
+    		width : 800,
+    		title : '设置项目属性',
+    		height : 600,
+    		defaults : {// 表示该窗口中所有子元素的特性
+    			border : false
+    			// 表示所有子元素都不要边框
+    		},
+    		plain : true,// 方角 默认
+    		modal : true,
+    		shim : true,
+    		collapsible : true,// 折叠
+    		closable : true, // 关闭
+    		closeAction: 'close',
+    		resizable : false,// 改变大小
+    		draggable : true,// 拖动
+    		minimizable : false,// 最小化
+    		maximizable : false,// 最大化
+    		animCollapse : true,
+    		constrainHeader : true,
+    		autoHeight : false,
+    		items : [sa_importPanel]
+    	});
+    	sanewWin.show();
     }
     
 function removeByValue(arr, val) {
