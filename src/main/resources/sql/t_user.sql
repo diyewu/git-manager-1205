@@ -242,3 +242,9 @@ CREATE TABLE `user_role` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8 COMMENT='is_delete : 0   未删除 1：已删除';
 
+CREATE TABLE `project_attribute_type` (
+  `id` int(2) NOT NULL,
+  `type_name` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+

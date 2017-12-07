@@ -511,19 +511,34 @@
    				name : 'project_name',
    				type : 'string'
    			}, {
-   				name : 'create_time',
+   				name : 'attribute_name',
    				type : 'string'
    			}, {
-   				name : 'real_name',
+   				name : 'type_name',
+   				type : 'string'
+   			}, {
+   				name : 'attribute_type',
    				type : 'string'
    			}]
    		});
        var sastore = new Ext.data.Store({
-			url : path +"/projectmgr/listImport",
+			url : path +"/projectmgr/listAttr",
 			reader : sareader
 		});
        sastore.load({params:{start:0,limit:20}})
 		
+       var satbar = new Ext.Toolbar({  
+            renderTo : Ext.grid.GridPanel.tbar,// 其中grid是上边创建的grid容器  
+            items :[{
+				text : '保存',
+				iconCls : 'Disk',
+				handler : function() {
+					
+				}
+			}]
+
+        });  
+       
 		var sapagingBar = new Ext.PagingToolbar({
 			store : sastore,
 			displayInfo : true,
@@ -539,29 +554,25 @@
             	new Ext.grid.RowNumberer(),
             	sasm,
             	{header:"项目名称",align:'center',dataIndex:"project_name",sortable:true}, 
-	            {header:"创建时间",align:'center',dataIndex:"create_time",sortable:true},
-	            {header:"创建人",align:'center',dataIndex:"real_name",sortable:true},
-	            {header:"操作",align:'center',dataIndex:"id",
-	            renderer: function (value, meta, record) {
-		              var setBtn = "<input id = 'bt_set_" + record.get('id')
-		            	+ "' onclick=\"setProject('" + record.get('id')
-		            	+ "');\" type='button' value='设置' width ='15px'/>&nbsp;&nbsp;";
-					  var deleteBtn = "<input id = 'bt_delete_" + record.get('id')
-						+ "' onclick=\"deleteRom('" + record.get('id')
-						+ "');\" type='button' value='删除' width ='15px'/>";
-									            			
-	//            				var resultStr = String.format(formatStr);
-	    				return "<div>" + setBtn+deleteBtn + "</div>";
-					  } .createDelegate(this)
+	            {header:"属性名称",align:'center',dataIndex:"attribute_name",sortable:true},
+	            {header:"操作(双击)",align:'center',dataIndex:"type_name",
+	            	editor : new Ext.form.ComboBox({//编辑的时候变成下拉框。
+	                    triggerAction : "all",
+	                    width : 12,
+	                    editable: false,
+	                    store : ["经度","维度","详细地址","图片编号"],
+	                    resizable : true,
+	                    mode : 'local',
+	                    lazyRender : true
+	                   })
 	            } 
             ] 
         ); 
     	
         
         var sagrid_ = new Ext.grid.EditorGridPanel({ 
-			region:'center',
 			border:false,
-			autoHeight:true,
+			stripeRows:true,
 			viewConfig: {
 	            forceFit: true, //让grid的列自动填满grid的整个宽度，不用一列一列的设定宽度。
 	            emptyText: '系统中还没有任务'
@@ -573,36 +584,13 @@
             loadMask:true, 
             frame:true, 
             autoScroll:true, 
+            tbar:satbar,
             bbar:sapagingBar
         });
     	
-    	var safileForm = new Ext.FormPanel({
-    		layout : "fit",
-    		frame : true,
-    		border : false,
-    		autoHeight : true,
-    		waitMsgTarget : true,
-    		defaults : {
-    			bodyStyle : 'padding:10px'
-    		},
-    		margins : '0 0 0 0',
-    		labelAlign : "left",
-    		labelWidth : 80,
-    		fileUpload : true,
-    		items : [
-    			sagrid_
-    		]
-    	});
-    	
-    	var sa_importPanel = new Ext.Panel({
-    		layout : "fit",
-    		layoutConfig : {
-    			animate : true
-    		},
-    		items : [safileForm]
-    	});
     	
     	var sanewWin = new Ext.Window({
+    		layout : "fit",
     		width : 800,
     		title : '设置项目属性',
     		height : 600,
@@ -623,7 +611,7 @@
     		animCollapse : true,
     		constrainHeader : true,
     		autoHeight : false,
-    		items : [sa_importPanel]
+    		items : [sagrid_]
     	});
     	sanewWin.show();
     }
