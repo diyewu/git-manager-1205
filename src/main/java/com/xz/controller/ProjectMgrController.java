@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
@@ -25,6 +24,7 @@ import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 
 import com.xz.common.Page;
 import com.xz.entity.CustomConfig;
+import com.xz.service.PeojectServices;
 
 @RequestMapping("projectmgr")
 @Controller
@@ -32,15 +32,19 @@ public class ProjectMgrController extends BaseController {
 	@Autowired  
     private CustomConfig customConfig; 
 	
+	@Autowired
+	private PeojectServices peojectServices;
 	
 	
 	ExecutorService threadPool = Executors.newCachedThreadPool();
 	class RecCallable implements Callable{
+		HttpServletRequest request;
 		private File file;
 		private String title;
 		private String path;
 		private String createUser;
-		RecCallable(File file,String title,String path,String createUser) {
+		RecCallable(HttpServletRequest request,File file,String title,String path,String createUser) {
+			this.request =request;
 	    	this.file = file;
 	    	this.title = title;
 	    	this.path = path;
@@ -50,7 +54,7 @@ public class ProjectMgrController extends BaseController {
 	    public Object call() throws Exception {
 	    	String resp = "";
 	    	try {
-	    		
+	    		peojectServices.importProjectData(request, file, title, path,createUser);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -84,7 +88,12 @@ public class ProjectMgrController extends BaseController {
 					// 上传
 					file.transferTo(new File(path));
 					if((file.getOriginalFilename()).contains(".xls")){//上传EXCEL文件
-						
+						//线程处理
+						File tfile = new File(path);
+//						RecCallable cb = new RecCallable(multiRequest, tfile, null, path, null);
+//						threadPool.submit(cb);
+//						peojectServices.importProjectData(request, file, null, path,null);
+						peojectServices.importProjectData(request, tfile, null, path, null);
 					}
 				}
 
