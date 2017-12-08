@@ -417,7 +417,7 @@
 	    						success : function(form, action) {
 	    							btn.enable();
 	    							var data = Ext.decode(action.response.responseText);
-	    							console.log(data);
+//	    							console.log(data);
 	    							if(data.i_type == "success"){
 	    								Ext.Msg.alert("success",'上传成功！请耐心等待导入结果，详情请查询“操作记录”信息',function(){  
 		    								newWin.close();
@@ -519,12 +519,33 @@
    			}, {
    				name : 'attribute_type',
    				type : 'string'
+   			}, {
+   				name : 'attribute_active',
+   				type : 'string'
+   			}, {
+   				name : 'project_id',
+   				type : 'string'
    			}]
    		});
+       var sasm = new Ext.grid.CheckboxSelectionModel();
        var sastore = new Ext.data.Store({
 			url : path +"/projectmgr/listAttr",
-			reader : sareader
+			reader : sareader,
+			listeners:{
+				load:function(){
+			       var records=[];//存放选中记录  
+			       for(var i=0;i<sastore.getCount();i++){  
+			        var record = sastore.getAt(i);  
+//			        console.log(record);
+			        if(record.data.attribute_active==1){//根据后台数据判断那些记录默认选中  
+			          records.push(record);  
+			        }  
+			       }  
+			       sasm.selectRecords(records);//执行选中记录  
+				}
+			} 
 		});
+
        sastore.load({params:{start:0,limit:20}})
 		
        var satbar = new Ext.Toolbar({  
@@ -533,7 +554,70 @@
 				text : '保存',
 				iconCls : 'Disk',
 				handler : function() {
-					
+					var arr = [];//声明空数组  
+					var records = sastore.getModifiedRecords();  
+					Ext.each(records,function(record){//遍历行数据数组  
+					    arr.push(record.data);
+					});
+					if (arr === undefined || arr.length == 0) {
+						Ext.Msg.alert('提示', '数据没有改动，请确认。');
+						return;
+					}
+					var json=JSON.stringify(arr);
+					Ext.Ajax.request( {
+						  url : path + "/projectmgr/saveAttrType",
+						  method : 'post',
+						  params : {
+							 json : json
+						  },
+						  success : function(response, options) {
+						   var o = Ext.util.JSON.decode(response.responseText);
+						   if(o.i_type && "success"== o.i_type){
+							   Ext.Msg.alert('提示', '设置成功'); 
+						   }else{
+						   	   Ext.Msg.alert('提示', o.i_msg); 
+						   }
+						  },
+						  failure : function() {
+						  	
+						  }
+			 		});
+				}
+			},{
+				text : '勾选设置筛选条件',
+				iconCls : 'Accept',
+				handler : function() {
+					var arr = [];//声明空数组  
+					var rows= sagrid_.getSelectionModel().getSelections();
+//					arr.push(rows.data);
+					if (arr === undefined || arr.length == 0) {
+						Ext.Msg.alert('提示', '没有勾选数据，请确认。');
+						return;
+					}
+					var projectId = rows[0].date.project_id;
+					Ext.each(rows,function(row){//遍历行数据数组  
+					    arr.push(row.data);
+					});
+					var json=JSON.stringify(arr);
+					Ext.Ajax.request( {
+						  url : path + "/projectmgr/setAttrActive",
+						  method : 'post',
+						  params : {
+							 json : json,
+							 projectId:projectId
+						  },
+						  success : function(response, options) {
+						   var o = Ext.util.JSON.decode(response.responseText);
+						   if(o.i_type && "success"== o.i_type){
+							   Ext.Msg.alert('提示', '设置成功'); 
+						   }else{
+						   	   Ext.Msg.alert('提示', o.i_msg); 
+						   }
+						  },
+						  failure : function() {
+						  	
+						  }
+			 		});
 				}
 			}]
 
@@ -548,7 +632,18 @@
 			displayMsg : '第{0}到{1}条记录，共{2}条',
 			emptyMsg : "没有记录"
 		});
-		var sasm = new Ext.grid.CheckboxSelectionModel();
+		
+		//数据库动态取下拉框数据
+		var typeStore = new Ext.data.Store({
+			proxy: new Ext.data.HttpProxy({
+				url : path + "/projectmgr/getAttrType"
+			}),
+			reader: new Ext.data.JsonReader({
+				root : 'data',
+				fields:['value','text']
+			})
+		});
+		typeStore.load();
         var sacolumn=new Ext.grid.ColumnModel( 
             [ 
             	new Ext.grid.RowNumberer(),
@@ -558,12 +653,16 @@
 	            {header:"操作(双击)",align:'center',dataIndex:"type_name",
 	            	editor : new Ext.form.ComboBox({//编辑的时候变成下拉框。
 	                    triggerAction : "all",
-	                    width : 12,
 	                    editable: false,
-	                    store : ["经度","维度","详细地址","图片编号"],
+//	                    valueField:'value',
+	        			displayField:'text',
+//	                    store : ["无","经度","维度","详细地址","图片编号"],
+	                    store : typeStore,
 	                    resizable : true,
 	                    mode : 'local',
-	                    lazyRender : true
+	                    selectOnFocus:true,//用户不能自己输入,只能选择列表中有的记录
+	                    lazyRender : true,
+	                    width : 12
 	                   })
 	            } 
             ] 
@@ -615,59 +714,3 @@
     	});
     	sanewWin.show();
     }
-    
-function removeByValue(arr, val) {
-  for(var i=0; i<arr.length; i++) {
-    if(arr[i] == val) {
-      arr.splice(i, 1);
-      break;
-    }
-  }
-}
-
-
-function setImportDatabaseMonth(value){
-
-	var gcm = grid.getSelectionModel();
-	var dids = '';
-	var rows = gcm.getSelections();
-//	var delectArray = new Array();
-////	delectArray = grid.getStore().data.items;
-//	for(var i =0;i<grid.getStore().data.items.length;i++){
-//		delectArray.push(grid.getStore().data.items[i].data.id);
-//	}
-    if (rows.length > 0) {
-		for ( var i = 0; i < rows.length; i++) {
-			var row = rows[i];
-			dids = dids + row.data.id + ','; // 拼装ID串
-//			removeByValue(delectArray,row.data.id);
-		}
-	}else{
-		Ext.Msg.alert('提示', '请勾选要操作的记录');
-		return;
-	}
-	Ext.Msg.confirm('确认设置', '确认?',function (button,text){if(button == 'yes'){
-		Ext.Ajax.request( {
-			  url : qrUrl + "saveCompareMonth.action",
-			  method : 'post',
-			  params : {
-			   ids : dids,
-//			   deids:delectArray.join(",")
-			   value:value
-			  },
-			  success : function(response, options) {
-			   var o = Ext.util.JSON.decode(response.responseText);
-			   if(o.i_type && "success"== o.i_type){
-				   Ext.Msg.alert('提示', '设置成功'); 
-			   }else{
-			   	   Ext.Msg.alert('提示', o.i_msg); 
-			   }
-			  },
-			  failure : function() {
-			  	
-			  }
- 		});
-	}});
-    
-
-}

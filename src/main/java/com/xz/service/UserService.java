@@ -225,10 +225,10 @@ public class UserService {
 	}
 	
 	public void DeleteRoleAuth(String roleId){
-		jdbcTemplate.update("delete from sweepmgr_auth where role_id =?",roleId);
+		jdbcTemplate.update("delete from user_auth where role_id =?",roleId);
 	}
 	public void addRoleAuth(String roleId,String menuId){
-		jdbcTemplate.update("insert into sweepmgr_auth (role_id,menu_id) values(?,?)",roleId,menuId);
+		jdbcTemplate.update("insert into user_auth (role_id,menu_id) values(?,?)",roleId,menuId);
 	}
 	public void addRole(String roleName){
 		jdbcTemplate.update("insert into user_role(role_name)values(?)",roleName);
