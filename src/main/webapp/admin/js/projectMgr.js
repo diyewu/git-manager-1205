@@ -590,11 +590,11 @@
 					var arr = [];//声明空数组  
 					var rows= sagrid_.getSelectionModel().getSelections();
 //					arr.push(rows.data);
-					if (arr === undefined || arr.length == 0) {
+					if (rows === undefined || rows.length == 0) {
 						Ext.Msg.alert('提示', '没有勾选数据，请确认。');
 						return;
 					}
-					var projectId = rows[0].date.project_id;
+					var projectId = rows[0].data.project_id;
 					Ext.each(rows,function(row){//遍历行数据数组  
 					    arr.push(row.data);
 					});
