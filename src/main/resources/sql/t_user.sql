@@ -242,3 +242,29 @@ CREATE TABLE `user_role` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8 COMMENT='is_delete : 0   未删除 1：已删除';
 
+CREATE TABLE `project_attribute_type` (
+  `id` int(2) NOT NULL,
+  `type_name` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+SET FOREIGN_KEY_CHECKS=0;
+
+-- ----------------------------
+-- Table structure for project_attribute_type
+-- ----------------------------
+DROP TABLE IF EXISTS `project_attribute_type`;
+CREATE TABLE `project_attribute_type` (
+  `id` int(2) NOT NULL,
+  `type_name` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- ----------------------------
+-- Records of project_attribute_type
+-- ----------------------------
+INSERT INTO `project_attribute_type` VALUES ('1', '经度');
+INSERT INTO `project_attribute_type` VALUES ('2', '维度');
+INSERT INTO `project_attribute_type` VALUES ('3', '详细地址');
+INSERT INTO `project_attribute_type` VALUES ('4', '图片编号');

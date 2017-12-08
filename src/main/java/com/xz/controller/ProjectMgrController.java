@@ -131,4 +131,20 @@ public class ProjectMgrController extends BaseController {
 		Page<Map<String, Object>> page = peojectServices.getProjectMain(projectName, start, limit, startDate, endDate);
 		resultSuccess(null, page.getResult(), page.getTotalCount(),response);
 	}
+    @RequestMapping("listAttr")
+    public void listAttr(HttpServletRequest request,HttpServletResponse response){
+    	String startParam = request.getParameter("start");
+    	String limitParam = request.getParameter("limit");
+    	String projectId = request.getParameter("projectId");
+    	int start = 0;
+    	int limit = 100;
+    	if(StringUtils.isNotBlank(startParam)){
+    		start = Integer.parseInt(startParam);
+    	}
+    	if(StringUtils.isNotBlank(limitParam)){
+    		limit = Integer.parseInt(limitParam);
+    	}
+    	Page<Map<String, Object>> page = peojectServices.getProjectAttr(projectId, start, limit);
+    	resultSuccess(null, page.getResult(), page.getTotalCount(),response);
+    }
 }

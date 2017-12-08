@@ -144,4 +144,27 @@ public class PeojectServices {
 		page.setResult(list);
 		return page;
 	}
+	
+	
+	
+	public Page<Map<String, Object>> getProjectAttr(String projectId,int start,int limit){
+		Page<Map<String, Object>> page = new Page<Map<String, Object>>(start, limit, false);
+		List<Object> params = new ArrayList<Object>();
+		StringBuilder sql = new StringBuilder(" select pa.id,pm.project_name,pa.attribute_name,pat.type_name,pa.attribute_type  ");
+		sql.append(" from project_attribute pa left join project_main pm on pa.project_id = pm.id ");
+		sql.append(" left join project_attribute_type pat on pa.attribute_type = pat.id where 1=1 ");
+		if(StringUtils.isNotBlank(projectId)){
+			sql.append(" and pm.id = ? ");
+			params.add(projectId);
+		}
+		sql.append(" order by pa.attribute_index ");
+		List<Map<String, Object>> countList = jdbcTemplate.queryForList(sql.toString(),params.toArray());
+		page.setTotalCount(countList.size());
+		sql.append(" limit ?,?");
+		params.add(start);
+		params.add(limit);
+		List<Map<String, Object>> list = jdbcTemplate.queryForList(sql.toString(), params.toArray());
+		page.setResult(list);
+		return page;
+	}
 }
