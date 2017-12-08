@@ -3,6 +3,7 @@ package com.xz.service;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -30,7 +31,7 @@ public class PeojectServices {
 	private OperateHistoryService operateHistoryService;
 	
 	@Transactional
-	public void importProjectData(HttpServletRequest request,File file,String title,String path,String createUser){
+	public String importProjectData(HttpServletRequest request,File file,String title,String path,String createUser){
 		ArrayList<ArrayList<Object>> list = new ArrayList<ArrayList<Object>>();
 		String msg = null;
 		String type = "5";//导入项目数据
@@ -42,7 +43,7 @@ public class PeojectServices {
 		if (list == null || list.size() == 0) {
 			msg = "请检查上传附件内容，数据为空！";
 			insertOperateHistory(request, type, msg);
-			return;
+			return null;
 		}
 		if(StringUtils.isBlank(title)){
 			title = list.get(0).get(0)+"";
@@ -50,7 +51,7 @@ public class PeojectServices {
 		if(StringUtils.isBlank(title)){
 			msg = "格式有误，请确认第一行第一列为项目标题！";
 			insertOperateHistory(request, type, msg);
-			return;
+			return null;
 		}
 		//插入项目主表数据
 		String projectId = SortableUUID.randomUUID();
@@ -62,7 +63,7 @@ public class PeojectServices {
 		if(attrList == null || attrList.size() == 0){
 			insertOperateHistory(request, type, msg);
 			msg = "格式有误，请确认第二行数据不能为空！";
-			return;
+			return null ;
 		}
 		int attrSize = attrList.size();
 		String attrSql = " insert into project_attribute(id,project_id,attribute_name,attribute_index)VALUES(?,?,?,?) ";
@@ -97,14 +98,34 @@ public class PeojectServices {
 				}else{
 					msg = "格式有误，请确认第三行数据不能为空！";
 					insertOperateHistory(request, type, msg);
-					return;
+					return null;
 				}
 			}
 		}
-		
-		
+		return projectId;
+	}
+	public void generateCondition(String projectId){
+		String sql = "select * from project_attribute where project_id = ? ";
+		List<Map<String, Object>> attrList = jdbcTemplate.queryForList(sql, projectId);
+		if (attrList == null || attrList.size() == 0) {
+			return;
+		}
+		Map<String, Object> map = new HashMap<String, Object>();
+		sql = " select DISTINCT(ext__index) from project_detail where project_id = ";
+		String attrIndex = "";
+		String attrId = "";
+		String cSql = "insert into project_attribute_condition(attribute_condition,attribute_id) "
+				+ "select DISTINCT(ext__index),? from project_detail where project_id = ?";
+		for (int i = 0; i < attrList.size(); i++) {
+			map = attrList.get(i);
+			attrIndex = map.get("attribute_index")+"";
+			attrId = map.get("attribute_id")+"";
+			cSql = cSql.replace("__index", attrIndex);
+			jdbcTemplate.update(cSql, attrId,projectId);
+		}
 		
 	}
+	
 	/**
 	 * 插入操作日志
 	 * @param request
@@ -150,9 +171,9 @@ public class PeojectServices {
 	public Page<Map<String, Object>> getProjectAttr(String projectId,int start,int limit){
 		Page<Map<String, Object>> page = new Page<Map<String, Object>>(start, limit, false);
 		List<Object> params = new ArrayList<Object>();
-		StringBuilder sql = new StringBuilder(" select pa.id,pm.project_name,pa.attribute_name,pat.type_name,pa.attribute_type  ");
+		StringBuilder sql = new StringBuilder(" select pa.id,pa.project_id,pm.project_name,pa.attribute_name,pat.type_name,pa.attribute_type,pa.attribute_active  ");
 		sql.append(" from project_attribute pa left join project_main pm on pa.project_id = pm.id ");
-		sql.append(" left join project_attribute_type pat on pa.attribute_type = pat.id where 1=1 ");
+		sql.append(" left join project_attribute_type pat on pa.attribute_type = pat.id and pat.id <> 0 where 1=1 ");
 		if(StringUtils.isNotBlank(projectId)){
 			sql.append(" and pm.id = ? ");
 			params.add(projectId);
@@ -167,4 +188,31 @@ public class PeojectServices {
 		page.setResult(list);
 		return page;
 	}
+	
+	
+	public void updateAttrType(String id,String typeName){
+		StringBuilder sb = new StringBuilder();
+		String sql = " update project_attribute set attribute_type = (select id from project_attribute_type where type_name = ? ) where project_attribute.id = ? ";
+		jdbcTemplate.update(sql,typeName,id);
+	}
+	public Page<Map<String, Object>> getAttrType(){
+		Page<Map<String, Object>> page = new Page<Map<String, Object>>(0, 1010, false);
+		String sql = " select id as value,type_name as text from project_attribute_type ";
+		List<Map<String, Object>> list = jdbcTemplate.queryForList(sql);
+		page.setTotalCount(list.size());
+		page.setResult(list);
+		return page;
+	}
+	public void setAttrActive(String id){
+		String sql = " update project_attribute set attribute_active = 1 where id = ?  ";
+		jdbcTemplate.update(sql,id);
+	}
+	
+	public List<Map<String, Object>> getAttrInfoByProjectId(String id){
+		String sql = " select id,attribute_active from project_attribute where project_id = ?  ";
+		List<Map<String, Object>> list = jdbcTemplate.queryForList(sql, id);
+		return list;
+	}
+	
+	
 }

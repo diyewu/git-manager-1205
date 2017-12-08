@@ -28,19 +28,19 @@ public class MyExceptionHandler implements HandlerExceptionResolver {
 			Exception ex) {
 		Map<String, Object> model = new HashMap<String, Object>();  
         model.put("ex", ex);  
-        
-        System.out.println(ex);
-        
         response.setStatus(601); // 统一做跳转到登录页的处理
         // 根据不同错误转向不同页面  
         if(ex instanceof NumberFormatException) { 
         	logger.error("监听到了NumberFormat异常");
+        	ex.printStackTrace();
             return new ModelAndView("/login", model);  
         }else if(ex instanceof NullPointerException) {  
         	logger.error("监听到了空指针异常");
+        	ex.printStackTrace();
             return new ModelAndView("/login", model);  
         } else {  
         	logger.error("监听到了 other");
+        	ex.printStackTrace();
             return new ModelAndView("/login", model);  
         }
 	}
