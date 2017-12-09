@@ -30,7 +30,7 @@ import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 
 import com.xz.common.Page;
 import com.xz.entity.CustomConfig;
-import com.xz.service.PeojectServices;
+import com.xz.service.ProjectServices;
 
 @RequestMapping("projectmgr")
 @Controller
@@ -39,7 +39,7 @@ public class ProjectMgrController extends BaseController {
     private CustomConfig customConfig; 
 	
 	@Autowired
-	private PeojectServices peojectServices;
+	private ProjectServices peojectServices;
 	
 	
 	ExecutorService threadPool = Executors.newCachedThreadPool();
@@ -204,52 +204,22 @@ public class ProjectMgrController extends BaseController {
     		List<Map<String, Object>> olist = peojectServices.getAttrInfoByProjectId(projectId);
     		List<Map<String, Object>> paramList = mapper.readValue(json, List.class);
     		Map<String, Object> pMap = new HashMap<String, Object>();
+    		List<String> addList = new ArrayList<String>();
     		String id = "";
     		if(paramList != null && paramList.size() > 0 && olist != null && olist.size() > 0){
-    			List<String> addList = new ArrayList<String>();
-    			List<String> delList = new ArrayList<String>();
-    			String oid = "";
-    			String oactive = "";
-    			Map<String,String> oMap = new HashMap<String, String>();
-    			Map<String,String> sMap = new HashMap<String, String>();
-    			//生成两个map或者list再进行对比
-				for(int k=0;k<olist.size();k++){//生成筛选条件，判断之前是否已经生成，或者之前生成的现在要删除
-					pMap = olist.get(k);
-					oid = pMap.get("id")+"";
-					oactive = pMap.get("attribute_active")+"";
-					oMap.put(oid, oactive);
-				}
-				for(int i=0;i<paramList.size();i++){
-					pMap = paramList.get(i);
-					id = pMap.get("id")+"";
-					sMap.put(id, "1");
-				}
-				for (Map.Entry<String,String> entry : oMap.entrySet()) {  
-//				    System.out.println("Key = " + entry.getKey() + ", Value = " + entry.getValue());  
-					if("0".equals(entry.getValue())){//之前没有设置筛选
-						if(sMap.containsKey(entry.getKey())){//本次设置筛选
-							addList.add(entry.getKey());
-						}
-					}else{//之前设置筛选
-						if(sMap.containsKey(entry.getKey())){//本次设置筛选
-//							addList.add(entry.getKey());
-						}else{
-							delList.add(entry.getKey());
-						}
-					}
-				} 
-				if(addList != null && addList.size()>0){
-					for(int i=0;i<addList.size();i++){//添加筛选条件
-						peojectServices.setAttrActive(addList.get(i),1);
-					}
-					peojectServices.addCondition(addList,projectId);
-				}
-				if(delList != null && delList.size()>0){
-					for(int i=0;i<delList.size();i++){//删除筛选条件
-						peojectServices.setAttrActive(delList.get(i),0);
-					}
-					peojectServices.delCondition(delList);
-				}
+    			//有更改，先全部删除项目相关condition，并把attribute初始化,再添加新选择condition
+    			peojectServices.delConditionByProjectId(projectId);
+    			for(int i=0;i<paramList.size();i++){
+    				pMap = paramList.get(i);
+    				id = pMap.get("id")+"";
+    				addList.add(id);
+    			}
+    			if(addList != null && addList.size()>0){
+    				for(String attrId:addList){
+    					peojectServices.setAttrActive(attrId,1);
+    				}
+    				peojectServices.addCondition(addList,projectId);
+    			}
     		}
     	}else{
     		msg = "没有待更改数据";
@@ -261,6 +231,102 @@ public class ProjectMgrController extends BaseController {
     	} else {
     		map.put("i_type", "error");
     		map.put("i_msg", "保存失败：" + msg);
+    	}
+    	writeJson(map, response);
+    }
+    @RequestMapping("setAttrActive_bak")
+    public void setAttrActive_bak(HttpServletRequest request,HttpServletResponse response) throws JsonParseException, JsonMappingException, IOException{
+    	String msg = null;
+    	Map<String, String> map = new HashMap<String, String>();
+    	mapper = new ObjectMapper();
+    	String json = request.getParameter("json");
+    	String projectId = request.getParameter("projectId");
+    	if(StringUtils.isNotBlank(json)){
+    		List<Map<String, Object>> olist = peojectServices.getAttrInfoByProjectId(projectId);
+    		List<Map<String, Object>> paramList = mapper.readValue(json, List.class);
+    		Map<String, Object> pMap = new HashMap<String, Object>();
+    		String id = "";
+    		if(paramList != null && paramList.size() > 0 && olist != null && olist.size() > 0){
+    			List<String> addList = new ArrayList<String>();//attrId
+    			List<String> delList = new ArrayList<String>();
+    			String oid = "";
+    			String oactive = "";
+    			Map<String,String> oMap = new HashMap<String, String>();
+    			Map<String,String> sMap = new HashMap<String, String>();
+    			//生成两个map或者list再进行对比
+    			for(int k=0;k<olist.size();k++){//生成筛选条件，判断之前是否已经生成，或者之前生成的现在要删除
+    				pMap = olist.get(k);
+    				oid = pMap.get("id")+"";
+    				oactive = pMap.get("attribute_active")+"";
+    				oMap.put(oid, oactive);
+    			}
+    			for(int i=0;i<paramList.size();i++){
+    				pMap = paramList.get(i);
+    				id = pMap.get("id")+"";
+    				sMap.put(id, "1");
+    			}
+    			for (Map.Entry<String,String> entry : oMap.entrySet()) {  
+//				    System.out.println("Key = " + entry.getKey() + ", Value = " + entry.getValue());  
+    				if("0".equals(entry.getValue())){//之前没有设置筛选
+    					if(sMap.containsKey(entry.getKey())){//本次设置筛选
+    						addList.add(entry.getKey());
+    					}
+    				}else{//之前设置筛选
+    					if(sMap.containsKey(entry.getKey())){//本次设置筛选
+//							addList.add(entry.getKey());
+    					}else{
+    						delList.add(entry.getKey());
+    					}
+    				}
+    			} 
+    			if(addList != null && addList.size()>0){
+    				for(int i=0;i<addList.size();i++){//添加筛选条件
+    					peojectServices.setAttrActive(addList.get(i),1);
+    				}
+    				peojectServices.addCondition(addList,projectId);
+    			}
+    			if(delList != null && delList.size()>0){
+    				for(int i=0;i<delList.size();i++){//删除筛选条件
+    					peojectServices.setAttrActive(delList.get(i),0);
+    				}
+    				peojectServices.delCondition(delList);
+    			}
+    		}
+    	}else{
+    		msg = "没有待更改数据";
+    	}
+    	
+    	if (msg == null) {
+    		map.put("i_type", "success");
+    		map.put("i_msg", "");
+    	} else {
+    		map.put("i_type", "error");
+    		map.put("i_msg", "保存失败：" + msg);
+    	}
+    	writeJson(map, response);
+    }
+    
+    @RequestMapping("deleteProjectById")
+    public void deleteProjectById(HttpServletRequest request,HttpServletResponse response) throws JsonParseException, JsonMappingException, IOException{
+    	String msg = null;
+    	Map<String, String> map = new HashMap<String, String>();
+    	String projectId = request.getParameter("id");
+    	if(StringUtils.isNotBlank(projectId)){
+    		try {
+				peojectServices.deleteProjectById(projectId);
+			} catch (Exception e) {
+				e.printStackTrace();
+				msg = e.getMessage();
+			}
+    	}else{
+    		msg = "id参数为空";
+    	}
+    	if (msg == null) {
+    		map.put("i_type", "success");
+    		map.put("i_msg", "");
+    	} else {
+    		map.put("i_type", "error");
+    		map.put("i_msg", "操作失败：" + msg);
     	}
     	writeJson(map, response);
     }

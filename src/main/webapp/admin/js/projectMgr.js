@@ -83,7 +83,7 @@
 			            	+ "' onclick=\"showAttrWin('" + record.get('id')
 			            	+ "');\" type='button' value='设置' width ='15px'/>&nbsp;&nbsp;";
 						  var deleteBtn = "<input id = 'bt_delete_" + record.get('id')
-							+ "' onclick=\"deleteRom('" + record.get('id')
+							+ "' onclick=\"deleteProject('" + record.get('id')
 							+ "');\" type='button' value='删除' width ='15px'/>";
 										            			
 //            				var resultStr = String.format(formatStr);
@@ -276,10 +276,10 @@
 	
 	
 	
-	function deleteRom(id){
+	function deleteProject(id){
 		Ext.Msg.confirm('删除数据', '确认?',function (button,text){if(button == 'yes'){
 			Ext.Ajax.request( {
-				  url : qrUrl + "deleteImportById.action",
+				  url : path + "/projectmgr/deleteProjectById",
 				  method : 'post',
 				  params : {
 					  id:id

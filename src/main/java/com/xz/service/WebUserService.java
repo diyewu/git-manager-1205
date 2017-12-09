@@ -1,5 +1,7 @@
 package com.xz.service;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -8,6 +10,7 @@ import java.util.UUID;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,7 +19,6 @@ import com.xz.entity.CategoryTreeBeanCk;
 import com.xz.entity.ModuleStoreBean;
 import com.xz.entity.UserLogin;
 import com.xz.entity.UserRole;
-import com.xz.service.UserService.CategoryTreeBeanCKRowMapper;
 import com.xz.service.UserService.ModuleStoreBeanRowMapper;
 import com.xz.service.UserService.UserRoleRowMapper;
 
@@ -31,12 +33,26 @@ public class WebUserService {
 	
 	public List<CategoryTreeBeanCk> getTreeCKListAuthDo(String roleId) {//赋予权限
 		List<CategoryTreeBeanCk> list = new ArrayList();
-//		String sql = " select * from user_menu ORDER BY id desc ";
 		StringBuilder sb = new StringBuilder();
-		sb.append(" select a.id,a.parent_id,a.menu_url,a.menu_name,a.button,a.auth_leaf as leaf,b.menu_id as is_check ");
-		sb.append(" from user_menu a left join (select menu_id from user_auth where role_id = ?) b on  a.id = b.menu_id ORDER BY id desc ");
-		list = (List<CategoryTreeBeanCk>)jdbcTemplate.query(sb.toString(), new CategoryTreeBeanCKRowMapper(),roleId);
+		sb.append(" select id,pac.attribute_condition as menu_name,pac.attribute_id as parent_id,pac.leaf,pac.id as is_check from project_attribute_condition pac ");
+		sb.append(" union  ");
+		sb.append(" select id,pa.attribute_name as menu_name,pa.project_id as parent_id ,0 as leaf,pa.id as is_check from project_attribute pa where pa.attribute_active = 1  ");
+		sb.append(" union  ");
+		sb.append(" select id,pm.project_name as menu_name,null as parent_id,0 as leaf ,pm.id as is_check from project_main pm ORDER BY id desc  ");
+		list = (List<CategoryTreeBeanCk>)jdbcTemplate.query(sb.toString(), new CategoryTreeBeanCKRowMapper());
 		return list;
+	}
+	public static class CategoryTreeBeanCKRowMapper implements RowMapper<CategoryTreeBeanCk> {
+		@Override
+		public CategoryTreeBeanCk mapRow(ResultSet rs, int rowNum) throws SQLException {
+			CategoryTreeBeanCk tree = new CategoryTreeBeanCk();
+			tree.setId(rs.getString("id"));
+			tree.setText(rs.getString("menu_name"));
+			tree.setParent_id(rs.getString("parent_id"));
+			tree.setLeaf(rs.getInt("leaf")==0?false:true );
+			tree.setChecked(rs.getString("is_check") == null?false:true);
+			return tree;
+		}
 	}
 	public List<UserRole> getRoleList(Map<String, String> condition,StringBuilder sb){
 		List<UserRole> list = new ArrayList<UserRole>();
@@ -168,11 +184,11 @@ public class WebUserService {
 		jdbcTemplate.update("update web_user_login set user_password = ? where id =? ",newUserPwd,userId);
 		syncPwd(userId, userName, newUserPwd);
 	}
-	public void DeleteRoleAuth(String roleId){
-		jdbcTemplate.update("delete from web_user_auth where role_id =?",roleId);
+	public void DeleteWebRoleAuth(String roleId){
+		jdbcTemplate.update("delete from web_user_auth where web_user_role_id =?",roleId);
 	}
-	public void addRoleAuth(String roleId,String menuId){
-		jdbcTemplate.update("insert into web_user_auth (role_id,menu_id) values(?,?)",roleId,menuId);
+	public void addWebRoleAuth(String roleId,String conditionId){
+		jdbcTemplate.update("insert into web_user_auth (addWebRoleAuth,attribute_condition_id) values(?,?)",roleId,conditionId);
 	}
 	public void addRole(String roleName){
 		jdbcTemplate.update("insert into web_user_role(role_name)values(?)",roleName);
