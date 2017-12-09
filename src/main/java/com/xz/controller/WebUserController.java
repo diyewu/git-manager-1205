@@ -296,9 +296,8 @@ public class WebUserController extends BaseController {
 		printData(response, mapper.writeValueAsString(map));
 	}
 	
-	@RequestMapping("updateUserAuth")
-	@ResponseBody
-	public void updateUserAuth(HttpServletRequest request,HttpServletResponse response) throws JsonGenerationException, JsonMappingException, IOException{
+	@RequestMapping("updateWebUserAuth")
+	public void updateWebUserAuth(HttpServletRequest request,HttpServletResponse response) throws JsonGenerationException, JsonMappingException, IOException{
 		ObjectMapper mapper = new ObjectMapper();
 		Map<String, String> map = new HashMap<String, String>();
 		String menuIds = request.getParameter("ids");
@@ -308,7 +307,7 @@ public class WebUserController extends BaseController {
 		String msg = null;
 		if(StringUtils.isNotBlank(menuIds) && StringUtils.isNotBlank(roleId)){
 			try {
-				webUserService.DeleteRoleAuth(roleId);
+				webUserService.DeleteWebRoleAuth(roleId);
 			} catch (Exception e) {
 				e.printStackTrace();
 				msg = e.getMessage();
@@ -316,7 +315,7 @@ public class WebUserController extends BaseController {
 			if (msg == null) {
 				for (String temId : menuId) {
 					try {
-						webUserService.addRoleAuth(roleId, temId);
+						webUserService.addWebRoleAuth(roleId, temId);
 					} catch (Exception e) {
 						e.printStackTrace();
 						msg = e.getMessage();

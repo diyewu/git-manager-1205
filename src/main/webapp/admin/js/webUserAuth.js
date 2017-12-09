@@ -270,15 +270,16 @@
     	  var authTree = new Ext.tree.TreePanel({
     	        animate : true,
     	        border:false,
-    			title:"勾选角色可以操作的菜单",
+    			title:"勾选角色可以操作的属性",
     			collapsible:true,
     			frame:true,
     			enableDD:true,
     			enableDrag:true,
     			rootVisible:true,
     			autoScroll:true,
-    			autoHeight:true,
-    			width:150,
+//    			autoHeight:true,
+    			width:300,
+    			height:500,
     			lines:true,
     			loader: new Ext.tree.TreeLoader({
     				url: path+'/webuser/getAuthTree?roleId='+roleId,
@@ -288,7 +289,7 @@
     			root: new Ext.tree.AsyncTreeNode({
     				    id: 'root',
     				    text: '数据管理',
-    					expanded: true
+    					expanded: false
     				})
     	 });
     	//判断是否有子结点被选中
@@ -333,7 +334,7 @@
 			    child.fireEvent('checkchange', child, checked);
 			});
 		 }, authTree);
-	     authTree.expandAll();
+//	     authTree.expandAll();
     	 var _importPanel = new Ext.Panel({
       		layout : "fit",
       		layoutConfig : {
@@ -347,20 +348,23 @@
       				var parm = "";
       				var checkNode=new Array()
       				checkNode = authTree.getChecked();
+      				console.log(checkNode);
+      				var json;
       				if(checkNode != null){
-      					for(var i=0;i<checkNode.length ;i++){
-      						parm = parm + checkNode[i].id+','
-      					}
+//      					for(var i=0;i<checkNode.length ;i++){
+//      						parm = parm + checkNode[i].id+','
+//      					}
+      					json=JSON.stringify(checkNode);
       				}else{
       					Ext.Msg.alert('提示', "请勾选菜单！");
       					return;
       				}
       				Ext.Ajax.request({
-  					  url : path + "/webuser/updateUserAuth.action",
+  					  url : path + "/webuser/updateWebUserAuth",
   					  method : 'post',
   					  params : {
   						  roleId:roleId,
-  						  ids:parm,
+  						  json:json
   					  },
   					  success : function(response, options) {
   					   var o = Ext.util.JSON.decode(response.responseText);
