@@ -101,8 +101,6 @@ public class ProjectMgrController extends BaseController {
 						File tfile = new File(path);
 						RecCallable cb = new RecCallable(multiRequest, tfile, null, path, null);
 						threadPool.submit(cb);
-//						peojectServices.importProjectData(request, tfile, null, path,null);
-//						peojectServices.importProjectData(request, tfile, null, path, null);
 					}
 				}
 
@@ -208,28 +206,49 @@ public class ProjectMgrController extends BaseController {
     		Map<String, Object> pMap = new HashMap<String, Object>();
     		String id = "";
     		if(paramList != null && paramList.size() > 0 && olist != null && olist.size() > 0){
-    			Set<String> idList = new HashSet<String>();
-    			Set<String> addList = new HashSet<String>();
-    			Set<String> delList = new HashSet<String>();
+    			List<String> addList = new ArrayList<String>();
+    			List<String> delList = new ArrayList<String>();
     			String oid = "";
     			String oactive = "";
-    			
-//    				peojectServices.setAttrActive(id);
+    			Map<String,String> oMap = new HashMap<String, String>();
+    			Map<String,String> sMap = new HashMap<String, String>();
     			//生成两个map或者list再进行对比
 				for(int k=0;k<olist.size();k++){//生成筛选条件，判断之前是否已经生成，或者之前生成的现在要删除
 					pMap = olist.get(k);
 					oid = pMap.get("id")+"";
 					oactive = pMap.get("attribute_active")+"";
+					oMap.put(oid, oactive);
 				}
 				for(int i=0;i<paramList.size();i++){
 					pMap = paramList.get(i);
 					id = pMap.get("id")+"";
-					idList.add(id);
-					if(oid.equals(id)){//如果是当前数据
-						if("0".equals(oactive)){//0 非条件
-							addList.add(id);//该属性需要生成条件
+					sMap.put(id, "1");
+				}
+				for (Map.Entry<String,String> entry : oMap.entrySet()) {  
+//				    System.out.println("Key = " + entry.getKey() + ", Value = " + entry.getValue());  
+					if("0".equals(entry.getValue())){//之前没有设置筛选
+						if(sMap.containsKey(entry.getKey())){//本次设置筛选
+							addList.add(entry.getKey());
+						}
+					}else{//之前设置筛选
+						if(sMap.containsKey(entry.getKey())){//本次设置筛选
+//							addList.add(entry.getKey());
+						}else{
+							delList.add(entry.getKey());
 						}
 					}
+				} 
+				if(addList != null && addList.size()>0){
+					for(int i=0;i<addList.size();i++){//添加筛选条件
+						peojectServices.setAttrActive(addList.get(i),1);
+					}
+					peojectServices.addCondition(addList,projectId);
+				}
+				if(delList != null && delList.size()>0){
+					for(int i=0;i<delList.size();i++){//删除筛选条件
+						peojectServices.setAttrActive(delList.get(i),0);
+					}
+					peojectServices.delCondition(delList);
 				}
     		}
     	}else{

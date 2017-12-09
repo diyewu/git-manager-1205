@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -104,27 +105,37 @@ public class PeojectServices {
 		}
 		return projectId;
 	}
-	public void generateCondition(String projectId){
-		String sql = "select * from project_attribute where project_id = ? ";
-		List<Map<String, Object>> attrList = jdbcTemplate.queryForList(sql, projectId);
-		if (attrList == null || attrList.size() == 0) {
-			return;
-		}
-		Map<String, Object> map = new HashMap<String, Object>();
-		sql = " select DISTINCT(ext__index) from project_detail where project_id = ";
-		String attrIndex = "";
-		String attrId = "";
-		String cSql = "insert into project_attribute_condition(attribute_condition,attribute_id) "
-				+ "select DISTINCT(ext__index),? from project_detail where project_id = ?";
-		for (int i = 0; i < attrList.size(); i++) {
-			map = attrList.get(i);
-			attrIndex = map.get("attribute_index")+"";
-			attrId = map.get("attribute_id")+"";
-			cSql = cSql.replace("__index", attrIndex);
-			jdbcTemplate.update(cSql, attrId,projectId);
+	
+	/**
+	 * 添加筛选条件
+	 * @param list
+	 */
+	public void addCondition(List<String> list,String projectId){
+		String sql = " select attribute_index from project_attribute where id = ? ";
+		String detailSql = "";
+		List<Map<String, Object>> attrList = new ArrayList<Map<String,Object>>();
+		String attributeIndex = "";
+		for (int i = 0; i < list.size(); i++) {
+			detailSql = " insert into project_attribute_condition(attribute_condition,attribute_id)"
+					+ "select DISTINCT(ext__index),? from project_detail where project_id = ? ";
+			attrList = jdbcTemplate.queryForList(sql, list.get(i));
+			attributeIndex = attrList.get(0).get("attribute_index")+"";
+			detailSql=detailSql.replace("__index", attributeIndex);
+			jdbcTemplate.update(detailSql, list.get(i),projectId);
+			System.out.println(detailSql);
+			System.out.println(list.get(i));
+			System.out.println(projectId);
 		}
 		
 	}
+	/**
+	 * 删除筛选条件
+	 */
+	public void delCondition(List<String> list){
+		String sql = " delete from project_attribute_condition where attribute_id = ? ";
+		jdbcTemplate.update(sql, StringUtils.join(list.toArray(), "','"));
+	}
+	
 	
 	/**
 	 * 插入操作日志
@@ -203,9 +214,9 @@ public class PeojectServices {
 		page.setResult(list);
 		return page;
 	}
-	public void setAttrActive(String id){
-		String sql = " update project_attribute set attribute_active = 1 where id = ?  ";
-		jdbcTemplate.update(sql,id);
+	public void setAttrActive(String id,int value){
+		String sql = " update project_attribute set attribute_active = ? where id = ?  ";
+		jdbcTemplate.update(sql,value,id);
 	}
 	
 	public List<Map<String, Object>> getAttrInfoByProjectId(String id){
