@@ -10,7 +10,7 @@ Target Server Type    : MYSQL
 Target Server Version : 50629
 File Encoding         : 65001
 
-Date: 2017-12-10 17:08:47
+Date: 2017-12-10 22:09:50
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -71,7 +71,7 @@ CREATE TABLE `operate_history` (
   `operate_summary` text,
   `is_success` int(32) DEFAULT NULL,
   UNIQUE KEY `IDX_RS_operate_history_ID` (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=30 DEFAULT CHARSET=utf8 COMMENT='is_success : 0 false(失败)，1 true (成功)';
+) ENGINE=InnoDB AUTO_INCREMENT=42 DEFAULT CHARSET=utf8 COMMENT='is_success : 0 false(失败)，1 true (成功)';
 
 -- ----------------------------
 -- Records of operate_history
@@ -105,6 +105,18 @@ INSERT INTO `operate_history` VALUES ('26', '2bb49d9d514c48c5bebbf78beab3e179', 
 INSERT INTO `operate_history` VALUES ('27', '2bb49d9d514c48c5bebbf78beab3e179', '16', '2017-12-10 11:15:36', '0:0:0:0:0:0:0:1', '', '0:0:0:0:0:0:0:1', '', 'PreparedStatementCallback; SQL [insert into project_condition_auth (web_user_role_id,condition_id) values(?,?)]; Data truncation: Out of range value for column \'condition_id\' at row 1; nested exception is com.mysql.jdbc.MysqlDataTruncation: Data truncation: Out of range value for column \'condition_id\' at row 1', '0');
 INSERT INTO `operate_history` VALUES ('28', '2bb49d9d514c48c5bebbf78beab3e179', '16', '2017-12-10 11:17:03', '0:0:0:0:0:0:0:1', '', '0:0:0:0:0:0:0:1', '', null, '1');
 INSERT INTO `operate_history` VALUES ('29', '2bb49d9d514c48c5bebbf78beab3e179', '16', '2017-12-10 11:24:30', '0:0:0:0:0:0:0:1', '', '0:0:0:0:0:0:0:1', '', null, '1');
+INSERT INTO `operate_history` VALUES ('30', '2bb49d9d514c48c5bebbf78beab3e179', '14', '2017-12-10 17:13:30', '0:0:0:0:0:0:0:1', '', '0:0:0:0:0:0:0:1', '', null, '1');
+INSERT INTO `operate_history` VALUES ('31', '2bb49d9d514c48c5bebbf78beab3e179', '15', '2017-12-10 17:18:33', '0:0:0:0:0:0:0:1', '', '0:0:0:0:0:0:0:1', '', null, '1');
+INSERT INTO `operate_history` VALUES ('32', '2bb49d9d514c48c5bebbf78beab3e179', '10', '2017-12-10 17:22:57', '0:0:0:0:0:0:0:1', '', '0:0:0:0:0:0:0:1', '', null, '1');
+INSERT INTO `operate_history` VALUES ('33', '2bb49d9d514c48c5bebbf78beab3e179', '11', '2017-12-10 17:31:51', '0:0:0:0:0:0:0:1', '', '0:0:0:0:0:0:0:1', '', null, '1');
+INSERT INTO `operate_history` VALUES ('34', '2bb49d9d514c48c5bebbf78beab3e179', '11', '2017-12-10 17:37:17', '0:0:0:0:0:0:0:1', '', '0:0:0:0:0:0:0:1', '', null, '1');
+INSERT INTO `operate_history` VALUES ('35', '2bb49d9d514c48c5bebbf78beab3e179', '16', '2017-12-10 19:56:41', '0:0:0:0:0:0:0:1', '', '0:0:0:0:0:0:0:1', '', null, '1');
+INSERT INTO `operate_history` VALUES ('36', '2bb49d9d514c48c5bebbf78beab3e179', '16', '2017-12-10 19:57:41', '0:0:0:0:0:0:0:1', '', '0:0:0:0:0:0:0:1', '', null, '1');
+INSERT INTO `operate_history` VALUES ('37', '2bb49d9d514c48c5bebbf78beab3e179', '16', '2017-12-10 20:17:25', '0:0:0:0:0:0:0:1', '', '0:0:0:0:0:0:0:1', '', null, '1');
+INSERT INTO `operate_history` VALUES ('38', '2bb49d9d514c48c5bebbf78beab3e179', '16', '2017-12-10 20:17:32', '0:0:0:0:0:0:0:1', '', '0:0:0:0:0:0:0:1', '', null, '1');
+INSERT INTO `operate_history` VALUES ('39', '2bb49d9d514c48c5bebbf78beab3e179', '15', '2017-12-10 20:55:53', '0:0:0:0:0:0:0:1', '', '0:0:0:0:0:0:0:1', '', null, '1');
+INSERT INTO `operate_history` VALUES ('40', '2bb49d9d514c48c5bebbf78beab3e179', '14', '2017-12-10 20:57:27', '0:0:0:0:0:0:0:1', '', '0:0:0:0:0:0:0:1', '', null, '1');
+INSERT INTO `operate_history` VALUES ('41', '2bb49d9d514c48c5bebbf78beab3e179', '13', '2017-12-10 21:06:06', '0:0:0:0:0:0:0:1', '', '0:0:0:0:0:0:0:1', '', null, '1');
 
 -- ----------------------------
 -- Table structure for operate_type
@@ -221,15 +233,38 @@ CREATE TABLE `project_condition_auth` (
   `condition_id` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `web_user_role_id` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=26 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=57 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ----------------------------
 -- Records of project_condition_auth
 -- ----------------------------
-INSERT INTO `project_condition_auth` VALUES ('22', '00151280833337500000', '1');
-INSERT INTO `project_condition_auth` VALUES ('23', '00151280833339000011', '1');
-INSERT INTO `project_condition_auth` VALUES ('24', '449', '1');
-INSERT INTO `project_condition_auth` VALUES ('25', '448', '1');
+INSERT INTO `project_condition_auth` VALUES ('26', '00151280833337500000', '2');
+INSERT INTO `project_condition_auth` VALUES ('27', '00151280833339000011', '2');
+INSERT INTO `project_condition_auth` VALUES ('28', '449', '2');
+INSERT INTO `project_condition_auth` VALUES ('29', '448', '2');
+INSERT INTO `project_condition_auth` VALUES ('30', '00151280833338700003', '2');
+INSERT INTO `project_condition_auth` VALUES ('31', '447', '2');
+INSERT INTO `project_condition_auth` VALUES ('32', '446', '2');
+INSERT INTO `project_condition_auth` VALUES ('33', '445', '2');
+INSERT INTO `project_condition_auth` VALUES ('34', '444', '2');
+INSERT INTO `project_condition_auth` VALUES ('35', '443', '2');
+INSERT INTO `project_condition_auth` VALUES ('36', '442', '2');
+INSERT INTO `project_condition_auth` VALUES ('37', '441', '2');
+INSERT INTO `project_condition_auth` VALUES ('38', '00151280833337500000', '1');
+INSERT INTO `project_condition_auth` VALUES ('39', '00151280833339000011', '1');
+INSERT INTO `project_condition_auth` VALUES ('40', '449', '1');
+INSERT INTO `project_condition_auth` VALUES ('41', '448', '1');
+INSERT INTO `project_condition_auth` VALUES ('42', '00151280833338700003', '1');
+INSERT INTO `project_condition_auth` VALUES ('43', '447', '1');
+INSERT INTO `project_condition_auth` VALUES ('44', '446', '1');
+INSERT INTO `project_condition_auth` VALUES ('45', '445', '1');
+INSERT INTO `project_condition_auth` VALUES ('46', '444', '1');
+INSERT INTO `project_condition_auth` VALUES ('47', '443', '1');
+INSERT INTO `project_condition_auth` VALUES ('48', '442', '1');
+INSERT INTO `project_condition_auth` VALUES ('49', '441', '1');
+INSERT INTO `project_condition_auth` VALUES ('54', '00151280833337500000', '7');
+INSERT INTO `project_condition_auth` VALUES ('55', '00151280833339000011', '7');
+INSERT INTO `project_condition_auth` VALUES ('56', '448', '7');
 
 -- ----------------------------
 -- Table structure for project_detail
@@ -534,7 +569,7 @@ CREATE TABLE `user_menu` (
 INSERT INTO `user_menu` VALUES ('1', null, null, '系统管理', '0', '0', '0');
 INSERT INTO `user_menu` VALUES ('2', null, null, '前端管理', '0', '0', '0');
 INSERT INTO `user_menu` VALUES ('3', null, null, '项目管理', '0', '0', '0');
-INSERT INTO `user_menu` VALUES ('111', '1', 'welcome.jsp', '登陆记录', '1', '0', '1');
+INSERT INTO `user_menu` VALUES ('111', '1', 'welcome1.jsp', '登陆记录', '1', '0', '1');
 INSERT INTO `user_menu` VALUES ('112', '1', 'welcome.jsp', '操作记录', '1', '0', '1');
 INSERT INTO `user_menu` VALUES ('113', '1', 'PasswordMgr.jsp', '密码管理', '1', '0', '1');
 INSERT INTO `user_menu` VALUES ('114', '1', 'userMgr.jsp', '用户管理', '1', '0', '1');
@@ -605,8 +640,9 @@ CREATE TABLE `web_user_login` (
 -- ----------------------------
 -- Records of web_user_login
 -- ----------------------------
-INSERT INTO `web_user_login` VALUES ('2bb49d9d514c48c5bebbf78beab3e179', 'admin', 'admin', '1', '0', null, null, null, null, '0', null);
-INSERT INTO `web_user_login` VALUES ('60672052e98a45ec800173a9b1829f5b', 'zhou', 'user', '7', '0', null, null, null, null, '1', null);
+INSERT INTO `web_user_login` VALUES ('2bb49d9d514c48c5bebbf78beab3e179', 'admin', 'admin', '1', '0', null, null, null, null, '0', '管理员');
+INSERT INTO `web_user_login` VALUES ('60672052e98a45ec800173a9b1829f5b', 'zhou', 'user', '7', '1', null, null, null, null, '1', '周期');
+INSERT INTO `web_user_login` VALUES ('e2058de4d2704de08c952c768578bd20', '546a', 'asd', '9', '0', null, null, null, null, '1', '阿斯顿');
 
 -- ----------------------------
 -- Table structure for web_user_role
@@ -617,12 +653,14 @@ CREATE TABLE `web_user_role` (
   `role_name` varchar(32) DEFAULT NULL,
   `is_delete` int(10) DEFAULT '0',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8 COMMENT='is_delete : 0   未删除 1：已删除';
+) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8 COMMENT='is_delete : 0   未删除 1：已删除';
 
 -- ----------------------------
 -- Records of web_user_role
 -- ----------------------------
-INSERT INTO `web_user_role` VALUES ('1', '管理员', '0');
+INSERT INTO `web_user_role` VALUES ('1', '上海市绿化管理员', '0');
 INSERT INTO `web_user_role` VALUES ('2', '静安区管理', '0');
-INSERT INTO `web_user_role` VALUES ('7', '宝山区绿化', '0');
+INSERT INTO `web_user_role` VALUES ('7', '宝山区绿化', '1');
 INSERT INTO `web_user_role` VALUES ('9', '上海市绿化', '0');
+INSERT INTO `web_user_role` VALUES ('10', 'asdsad', '1');
+INSERT INTO `web_user_role` VALUES ('11', '宝山区总管', '0');
