@@ -2,6 +2,7 @@ package com.xz.controller;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -300,12 +301,17 @@ public class WebUserController extends BaseController {
 	public void updateWebUserAuth(HttpServletRequest request,HttpServletResponse response) throws JsonGenerationException, JsonMappingException, IOException{
 		ObjectMapper mapper = new ObjectMapper();
 		Map<String, String> map = new HashMap<String, String>();
-		String menuIds = request.getParameter("ids");
+		String params = request.getParameter("json");
+		System.out.println("_____"+params);
 		String roleId = request.getParameter("roleId");
+		
+		List<String> paramList = new ArrayList<String>(Arrays.asList(params.split(",")));
+		
+		
 		HttpSession session=request.getSession();
-		String menuId[] = menuIds.split(",");//
 		String msg = null;
-		if(StringUtils.isNotBlank(menuIds) && StringUtils.isNotBlank(roleId)){
+		
+		if(StringUtils.isNotBlank(params) && StringUtils.isNotBlank(roleId)){
 			try {
 				webUserService.DeleteWebRoleAuth(roleId);
 			} catch (Exception e) {
@@ -313,7 +319,7 @@ public class WebUserController extends BaseController {
 				msg = e.getMessage();
 			}
 			if (msg == null) {
-				for (String temId : menuId) {
+				for (String temId : paramList) {
 					try {
 						webUserService.addWebRoleAuth(roleId, temId);
 					} catch (Exception e) {

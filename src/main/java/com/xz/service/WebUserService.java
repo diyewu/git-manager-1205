@@ -185,10 +185,10 @@ public class WebUserService {
 		syncPwd(userId, userName, newUserPwd);
 	}
 	public void DeleteWebRoleAuth(String roleId){
-		jdbcTemplate.update("delete from web_user_auth where web_user_role_id =?",roleId);
+		jdbcTemplate.update("delete from project_condition_auth where web_user_role_id =?",roleId);
 	}
 	public void addWebRoleAuth(String roleId,String conditionId){
-		jdbcTemplate.update("insert into web_user_auth (addWebRoleAuth,attribute_condition_id) values(?,?)",roleId,conditionId);
+		jdbcTemplate.update("insert into project_condition_auth (web_user_role_id,condition_id) values(?,?)",roleId,conditionId);
 	}
 	public void addRole(String roleName){
 		jdbcTemplate.update("insert into web_user_role(role_name)values(?)",roleName);
