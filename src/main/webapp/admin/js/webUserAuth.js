@@ -49,11 +49,11 @@
 						     + "');\" type='button' value='设置权限' width ='20px'/>";
 										            			
             				var resultStr = String.format(formatStr);
-            				if("管理员" != record.data.roleName){
+//            				if("管理员" != record.data.roleName){
             					return "<div>" + resultStr+deleteBtn +authBtn+ "</div>";
-            				}else{
-            					return "<div>" +authBtn+ "</div>";
-            				}
+//            				}else{
+//            					return "<div>" +authBtn+ "</div>";
+//            				}
         				  } .createDelegate(this)
 	            } 
             ] 

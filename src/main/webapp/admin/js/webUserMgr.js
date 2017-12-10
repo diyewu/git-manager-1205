@@ -52,11 +52,11 @@
 							+ "');\" type='button' value='删除' width ='15px'/>";
 										            			
             				var resultStr = String.format(formatStr);
-            				if(loginUserId != record.id){
+//            				if(loginUserId != record.id){
             					return "<div>" + resultStr+deleteBtn + "</div>";
-            				}else{
-            					return "";
-            				}
+//            				}else{
+//            					return "";
+//            				}
         				  } .createDelegate(this)
 	            } 
             ] 

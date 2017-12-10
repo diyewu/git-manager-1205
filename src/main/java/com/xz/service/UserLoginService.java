@@ -6,4 +6,5 @@ public interface UserLoginService {
 	UserLogin getUserById(String id);
 	
 	UserLogin checkUserExist(UserLogin userLogin);
+	
 }
