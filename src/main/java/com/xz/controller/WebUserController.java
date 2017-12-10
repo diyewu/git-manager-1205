@@ -159,8 +159,8 @@ public class WebUserController extends BaseController {
 		}
 		resultSuccess("", page.getResult(), page.getTotalCount(),response);
 	}
+	
 	@RequestMapping("getRole")
-	@ResponseBody
 	public void getRole(HttpServletRequest request,HttpServletResponse response) throws JsonGenerationException, JsonMappingException, IOException{
 		String msg = null;
 		String isAll = request.getParameter("all");
@@ -201,9 +201,10 @@ public class WebUserController extends BaseController {
 		String userId = request.getParameter("userId");
 		String userName = request.getParameter("userName");
 		String userPwd = request.getParameter("userPwd");
+		String realName = request.getParameter("realName");
 		String userRole = request.getParameter("userRole");
 		String msg = null;
-		if(!StringUtils.isNotBlank(userName) || !StringUtils.isNotBlank(userPwd) || !StringUtils.isNotBlank(userRole)){
+		if(!StringUtils.isNotBlank(userName) || !StringUtils.isNotBlank(userPwd) || !StringUtils.isNotBlank(userRole) || !StringUtils.isNotBlank(realName)){
 			msg = "参数有误!";
 		}
 		int role = 1;
@@ -218,11 +219,10 @@ public class WebUserController extends BaseController {
 		if (msg == null) {
 			if (!StringUtils.isNotBlank(userId) && !"null".equals(userId)) {//添加用户
 				if (!webUserService.isExitUser(userName,"")) {//检查是否存在userName
-					
 					if (msg == null) {
 						try {
 //							userPwd = Md5Util.generatePassword(userPwd);
-							webUserService.addUser(userName, userPwd, role);
+							webUserService.addUser(userName, userPwd, role,realName);
 						} catch (Exception e) {
 							e.printStackTrace();
 							msg = e.getMessage();
@@ -242,6 +242,7 @@ public class WebUserController extends BaseController {
 					}
 					user.setUserName(userName);
 					user.setUserRole(role);
+					user.setRealName(realName);
 					user.setId(userId);
 					try {
 						webUserService.editUser(user);
@@ -349,9 +350,9 @@ public class WebUserController extends BaseController {
 		ObjectMapper mapper = new ObjectMapper();
 		Map<String, String> map = new HashMap<String, String>();
 		String roleId = request.getParameter("roleId");
-		String sessionRoleId = (String)session.getAttribute("userRole");
+		String sessionRoleId = session.getAttribute("userRole")+"";
 		String msg = null;
-		if(sessionRoleId.equals(roleId)){
+		if(roleId.equals(sessionRoleId)){
 			msg = "当前角色不能删除!";
 		}
 		if (msg  == null) {

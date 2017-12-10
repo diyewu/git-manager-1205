@@ -34,12 +34,16 @@ public class WebUserService {
 	public List<CategoryTreeBeanCk> getTreeCKListAuthDo(String roleId) {//赋予权限
 		List<CategoryTreeBeanCk> list = new ArrayList();
 		StringBuilder sb = new StringBuilder();
-		sb.append(" select id,pac.attribute_condition as menu_name,pac.attribute_id as parent_id,pac.leaf,pac.id as is_check from project_attribute_condition pac ");
+		sb.append(" select a.id,	a.menu_name,	a.parent_id,	a.leaf	,b.web_user_role_id as is_check from ");
+		sb.append(" (SELECT	id,	pac.attribute_condition AS menu_name,	pac.attribute_id AS parent_id,	pac.leaf,	pac.id AS is_check FROM 	project_attribute_condition pac  ");
 		sb.append(" union  ");
-		sb.append(" select id,pa.attribute_name as menu_name,pa.project_id as parent_id ,0 as leaf,pa.id as is_check from project_attribute pa where pa.attribute_active = 1  ");
+		sb.append(" SELECT id,	pa.attribute_name AS menu_name,		pa.project_id AS parent_id,		0 AS leaf,		pa.id AS is_check	FROM 		project_attribute pa	WHERE		pa.attribute_active = 1 ");
 		sb.append(" union  ");
-		sb.append(" select id,pm.project_name as menu_name,null as parent_id,0 as leaf ,pm.id as is_check from project_main pm ORDER BY id desc  ");
-		list = (List<CategoryTreeBeanCk>)jdbcTemplate.query(sb.toString(), new CategoryTreeBeanCKRowMapper());
+		sb.append(" SELECT id,	pm.project_name AS menu_name,	NULL AS parent_id,	0 AS leaf,	pm.id AS is_check	FROM	project_main pm	 ");
+		sb.append(" )a left JOIN (  ");
+		sb.append(" select * from project_condition_auth pca 	where pca.web_user_role_id = ?  ");
+		sb.append(" ) b on a.id = b.condition_id ORDER BY a.id DESC  ");
+		list = (List<CategoryTreeBeanCk>)jdbcTemplate.query(sb.toString(), new CategoryTreeBeanCKRowMapper(),roleId);
 		return list;
 	}
 	public static class CategoryTreeBeanCKRowMapper implements RowMapper<CategoryTreeBeanCk> {
@@ -86,7 +90,7 @@ public class WebUserService {
 		Page<Map<String, Object>> page = new Page<Map<String, Object>>(0, 1000, false);
 		List<Object> params = new ArrayList<Object>();
 		List<Map<String, Object>> list = new ArrayList<Map<String,Object>>();
-		StringBuilder sbud = new StringBuilder("select a.id,a.user_name,a.user_password,a.is_delete,a.user_role as user_role_id,b.role_name as user_role,is_allow_weblogin from web_user_login a left join web_user_role b on a.user_role = b.id where 1 = 1 and a.is_delete = 0 and b.is_delete = 0 ");
+		StringBuilder sbud = new StringBuilder("select a.id,a.user_name,a.user_password,a.is_delete,a.user_role as user_role_id,b.role_name as user_role,real_name from web_user_login a left join web_user_role b on a.user_role = b.id where 1 = 1 and a.is_delete = 0 and b.is_delete = 0 ");
 		if (!condition.isEmpty()) { 
 			if (condition.containsKey("userName")) {
 				sbud.append(" and a.user_name like ?");
@@ -129,9 +133,9 @@ public class WebUserService {
 		return i>0;
 	}
 	
-	public void addUser(String userName,String userPwd,int role){
+	public void addUser(String userName,String userPwd,int role,String realName){
 		String uuid = UUID.randomUUID().toString().replace("-", "");
-		jdbcTemplate.update("insert into web_user_login(id,user_name,user_password,user_role)values(?,?,?,?)",uuid,userName,userPwd,role);
+		jdbcTemplate.update("insert into web_user_login(id,user_name,user_password,user_role,real_name)values(?,?,?,?,?)",uuid,userName,userPwd,role,realName);
 	}
 	public void editUser(UserLogin user){
 		if(StringUtils.isNotBlank(user.getId())){
@@ -149,6 +153,10 @@ public class WebUserService {
 			if(StringUtils.isNotBlank(user.getUserRole()+"")){
 				sb.append(",user_role = ?");
 				params.add(user.getUserRole());
+			}
+			if(StringUtils.isNotBlank(user.getRealName()+"")){
+				sb.append(",real_name = ?");
+				params.add(user.getRealName());
 			}
 			sb.append(" where id = ?");
 			params.add(user.getId());

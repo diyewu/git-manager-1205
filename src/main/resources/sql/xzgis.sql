@@ -10,7 +10,7 @@ Target Server Type    : MYSQL
 Target Server Version : 50629
 File Encoding         : 65001
 
-Date: 2017-12-09 17:04:25
+Date: 2017-12-10 17:08:47
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -71,7 +71,7 @@ CREATE TABLE `operate_history` (
   `operate_summary` text,
   `is_success` int(32) DEFAULT NULL,
   UNIQUE KEY `IDX_RS_operate_history_ID` (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8 COMMENT='is_success : 0 false(失败)，1 true (成功)';
+) ENGINE=InnoDB AUTO_INCREMENT=30 DEFAULT CHARSET=utf8 COMMENT='is_success : 0 false(失败)，1 true (成功)';
 
 -- ----------------------------
 -- Records of operate_history
@@ -92,6 +92,19 @@ INSERT INTO `operate_history` VALUES ('13', '2bb49d9d514c48c5bebbf78beab3e179', 
 INSERT INTO `operate_history` VALUES ('14', '2bb49d9d514c48c5bebbf78beab3e179', '16', '2017-12-09 16:55:55', '0:0:0:0:0:0:0:1', '', '0:0:0:0:0:0:0:1', '', 'PreparedStatementCallback; bad SQL grammar [insert into web_user_auth (addWebRoleAuth,attribute_condition_id) values(?,?)]; nested exception is com.mysql.jdbc.exceptions.jdbc4.MySQLSyntaxErrorException: Unknown column \'addWebRoleAuth\' in \'field list\'', '0');
 INSERT INTO `operate_history` VALUES ('15', '2bb49d9d514c48c5bebbf78beab3e179', '16', '2017-12-09 16:57:28', '0:0:0:0:0:0:0:1', '', '0:0:0:0:0:0:0:1', '', 'PreparedStatementCallback; bad SQL grammar [insert into web_user_auth (addWebRoleAuth,attribute_condition_id) values(?,?)]; nested exception is com.mysql.jdbc.exceptions.jdbc4.MySQLSyntaxErrorException: Unknown column \'addWebRoleAuth\' in \'field list\'', '0');
 INSERT INTO `operate_history` VALUES ('16', '2bb49d9d514c48c5bebbf78beab3e179', '16', '2017-12-09 16:58:03', '0:0:0:0:0:0:0:1', '', '0:0:0:0:0:0:0:1', '', 'PreparedStatementCallback; bad SQL grammar [insert into web_user_auth (addWebRoleAuth,attribute_condition_id) values(?,?)]; nested exception is com.mysql.jdbc.exceptions.jdbc4.MySQLSyntaxErrorException: Unknown column \'addWebRoleAuth\' in \'field list\'', '0');
+INSERT INTO `operate_history` VALUES ('17', '2bb49d9d514c48c5bebbf78beab3e179', '16', '2017-12-09 21:04:50', '0:0:0:0:0:0:0:1', '', '0:0:0:0:0:0:0:1', '', null, '1');
+INSERT INTO `operate_history` VALUES ('18', '2bb49d9d514c48c5bebbf78beab3e179', '16', '2017-12-09 21:04:57', '0:0:0:0:0:0:0:1', '', '0:0:0:0:0:0:0:1', '', null, '1');
+INSERT INTO `operate_history` VALUES ('19', '2bb49d9d514c48c5bebbf78beab3e179', '16', '2017-12-09 21:23:14', '0:0:0:0:0:0:0:1', '', '0:0:0:0:0:0:0:1', '', null, '1');
+INSERT INTO `operate_history` VALUES ('20', '2bb49d9d514c48c5bebbf78beab3e179', '16', '2017-12-09 21:24:11', '0:0:0:0:0:0:0:1', '', '0:0:0:0:0:0:0:1', '', null, '1');
+INSERT INTO `operate_history` VALUES ('21', '2bb49d9d514c48c5bebbf78beab3e179', '16', '2017-12-09 21:44:45', '0:0:0:0:0:0:0:1', '', '0:0:0:0:0:0:0:1', '', null, '1');
+INSERT INTO `operate_history` VALUES ('22', '2bb49d9d514c48c5bebbf78beab3e179', '16', '2017-12-09 21:45:17', '0:0:0:0:0:0:0:1', '', '0:0:0:0:0:0:0:1', '', null, '1');
+INSERT INTO `operate_history` VALUES ('23', '2bb49d9d514c48c5bebbf78beab3e179', '16', '2017-12-09 22:07:06', '0:0:0:0:0:0:0:1', '', '0:0:0:0:0:0:0:1', '', null, '1');
+INSERT INTO `operate_history` VALUES ('24', '2bb49d9d514c48c5bebbf78beab3e179', '16', '2017-12-09 22:08:27', '0:0:0:0:0:0:0:1', '', '0:0:0:0:0:0:0:1', '', null, '1');
+INSERT INTO `operate_history` VALUES ('25', '2bb49d9d514c48c5bebbf78beab3e179', '16', '2017-12-10 11:00:27', '0:0:0:0:0:0:0:1', '', '0:0:0:0:0:0:0:1', '', null, '1');
+INSERT INTO `operate_history` VALUES ('26', '2bb49d9d514c48c5bebbf78beab3e179', '16', '2017-12-10 11:01:49', '0:0:0:0:0:0:0:1', '', '0:0:0:0:0:0:0:1', '', null, '1');
+INSERT INTO `operate_history` VALUES ('27', '2bb49d9d514c48c5bebbf78beab3e179', '16', '2017-12-10 11:15:36', '0:0:0:0:0:0:0:1', '', '0:0:0:0:0:0:0:1', '', 'PreparedStatementCallback; SQL [insert into project_condition_auth (web_user_role_id,condition_id) values(?,?)]; Data truncation: Out of range value for column \'condition_id\' at row 1; nested exception is com.mysql.jdbc.MysqlDataTruncation: Data truncation: Out of range value for column \'condition_id\' at row 1', '0');
+INSERT INTO `operate_history` VALUES ('28', '2bb49d9d514c48c5bebbf78beab3e179', '16', '2017-12-10 11:17:03', '0:0:0:0:0:0:0:1', '', '0:0:0:0:0:0:0:1', '', null, '1');
+INSERT INTO `operate_history` VALUES ('29', '2bb49d9d514c48c5bebbf78beab3e179', '16', '2017-12-10 11:24:30', '0:0:0:0:0:0:0:1', '', '0:0:0:0:0:0:0:1', '', null, '1');
 
 -- ----------------------------
 -- Table structure for operate_type
@@ -143,14 +156,14 @@ CREATE TABLE `project_attribute` (
 -- ----------------------------
 INSERT INTO `project_attribute` VALUES ('00151280833338500001', '00151280833337500000', '序号', null, '1', '0');
 INSERT INTO `project_attribute` VALUES ('00151280833338600002', '00151280833337500000', '调研编号', null, '2', '0');
-INSERT INTO `project_attribute` VALUES ('00151280833338700003', '00151280833337500000', '区域', null, '3', '0');
+INSERT INTO `project_attribute` VALUES ('00151280833338700003', '00151280833337500000', '区域', null, '3', '1');
 INSERT INTO `project_attribute` VALUES ('00151280833338700004', '00151280833337500000', '街镇', null, '4', '0');
 INSERT INTO `project_attribute` VALUES ('00151280833338800005', '00151280833337500000', '名称', null, '5', '0');
 INSERT INTO `project_attribute` VALUES ('00151280833338800006', '00151280833337500000', '地址', null, '6', '0');
 INSERT INTO `project_attribute` VALUES ('00151280833338900007', '00151280833337500000', '问题分类', null, '7', '0');
 INSERT INTO `project_attribute` VALUES ('00151280833338900008', '00151280833337500000', '问题地址', null, '8', '0');
 INSERT INTO `project_attribute` VALUES ('00151280833339000009', '00151280833337500000', '照片编号', null, '9', '0');
-INSERT INTO `project_attribute` VALUES ('00151280833339000010', '00151280833337500000', '完成时间', null, '10', '1');
+INSERT INTO `project_attribute` VALUES ('00151280833339000010', '00151280833337500000', '完成时间', null, '10', '0');
 INSERT INTO `project_attribute` VALUES ('00151280833339000011', '00151280833337500000', '检查人员', null, '11', '1');
 INSERT INTO `project_attribute` VALUES ('00151280833339100012', '00151280833337500000', '经度', null, '12', '0');
 INSERT INTO `project_attribute` VALUES ('00151280833339100013', '00151280833337500000', '纬度', null, '13', '0');
@@ -165,20 +178,20 @@ CREATE TABLE `project_attribute_condition` (
   `attribute_id` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `leaf` int(11) DEFAULT '1',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=42 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=451 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ----------------------------
 -- Records of project_attribute_condition
 -- ----------------------------
-INSERT INTO `project_attribute_condition` VALUES ('32', '赵苏鸣', '00151280833339000011', '1');
-INSERT INTO `project_attribute_condition` VALUES ('33', '田腾腾', '00151280833339000011', '1');
-INSERT INTO `project_attribute_condition` VALUES ('35', '2017-11-18 00:00:00', '00151280833339000010', '1');
-INSERT INTO `project_attribute_condition` VALUES ('36', '2017-11-19 00:00:00', '00151280833339000010', '1');
-INSERT INTO `project_attribute_condition` VALUES ('37', '2017-11-20 00:00:00', '00151280833339000010', '1');
-INSERT INTO `project_attribute_condition` VALUES ('38', '2017-11-27 00:00:00', '00151280833339000010', '1');
-INSERT INTO `project_attribute_condition` VALUES ('39', '2017-10-15 00:00:00', '00151280833339000010', '1');
-INSERT INTO `project_attribute_condition` VALUES ('40', '2017-11-21 00:00:00', '00151280833339000010', '1');
-INSERT INTO `project_attribute_condition` VALUES ('41', '2017-10-10 00:00:00', '00151280833339000010', '1');
+INSERT INTO `project_attribute_condition` VALUES ('441', '金山区', '00151280833338700003', '1');
+INSERT INTO `project_attribute_condition` VALUES ('442', '松江区', '00151280833338700003', '1');
+INSERT INTO `project_attribute_condition` VALUES ('443', '宝山区', '00151280833338700003', '1');
+INSERT INTO `project_attribute_condition` VALUES ('444', '嘉定区', '00151280833338700003', '1');
+INSERT INTO `project_attribute_condition` VALUES ('445', '长宁区', '00151280833338700003', '1');
+INSERT INTO `project_attribute_condition` VALUES ('446', '浦东新区', '00151280833338700003', '1');
+INSERT INTO `project_attribute_condition` VALUES ('447', '杨浦区', '00151280833338700003', '1');
+INSERT INTO `project_attribute_condition` VALUES ('448', '赵苏鸣', '00151280833339000011', '1');
+INSERT INTO `project_attribute_condition` VALUES ('449', '田腾腾', '00151280833339000011', '1');
 
 -- ----------------------------
 -- Table structure for project_attribute_type
@@ -205,14 +218,18 @@ INSERT INTO `project_attribute_type` VALUES ('4', '图片编号');
 DROP TABLE IF EXISTS `project_condition_auth`;
 CREATE TABLE `project_condition_auth` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `condition_id` int(11) DEFAULT NULL,
-  `web_user_id` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `condition_id` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `web_user_role_id` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=26 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ----------------------------
 -- Records of project_condition_auth
 -- ----------------------------
+INSERT INTO `project_condition_auth` VALUES ('22', '00151280833337500000', '1');
+INSERT INTO `project_condition_auth` VALUES ('23', '00151280833339000011', '1');
+INSERT INTO `project_condition_auth` VALUES ('24', '449', '1');
+INSERT INTO `project_condition_auth` VALUES ('25', '448', '1');
 
 -- ----------------------------
 -- Table structure for project_detail

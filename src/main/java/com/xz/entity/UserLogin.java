@@ -20,6 +20,9 @@ public class UserLogin {
     private String updateDate;
 
     private Integer isAllowWeblogin;
+    
+    private String realName;
+    
 
     public String getId() {
         return id;
@@ -100,4 +103,14 @@ public class UserLogin {
     public void setIsAllowWeblogin(Integer isAllowWeblogin) {
         this.isAllowWeblogin = isAllowWeblogin;
     }
+
+	public String getRealName() {
+		return realName;
+	}
+
+	public void setRealName(String realName) {
+		this.realName = realName;
+	}
+    
+    
 }

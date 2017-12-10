@@ -80,7 +80,7 @@
 			},{
 				text : '添加新角色',
 				iconCls : 'Useradd',
-				hidden:isHidBtn('118'),
+//				hidden:isHidBtn('118'),
 				handler : function() {
 					showEditRole();
 				}
@@ -271,7 +271,7 @@
     	        animate : true,
     	        border:false,
     			title:"勾选角色可以操作的属性",
-    			collapsible:true,
+    			collapsible:false,
     			frame:true,
     			enableDD:false,
     			enableDrag:false,
