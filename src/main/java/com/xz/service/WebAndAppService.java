@@ -53,25 +53,28 @@ public class WebAndAppService {
 		List<String> conditionIdList = new ArrayList<String>();
 		if (param != null && param.size() > 0) {
 			String tempSql = "";
+			sb.append(" select pd.* from project_detail  pd ");
+			sb.append(" where project_id = ? ");
+			List<Object> sqlParam = new ArrayList<Object>();
 			for (Map.Entry<String,List<String>> entry : param.entrySet()) {  
-				sb = new StringBuilder();
+//				sb = new StringBuilder();
 //			    System.out.println("Key = " + entry.getKey() + ", Value = " + entry.getValue());  
 				list = jdbcTemplate.queryForList(attriSql, entry.getKey());
-				sb.append(" select pd.* from project_detail  pd ");
-				sb.append(" where project_id = ? ");
-				tempSql = "and ext_index in(select attribute_condition from project_attribute_condition where id in(?))";
+				tempSql = "and ext_index in(select attribute_condition from project_attribute_condition where id in (?) )";
 			    if(list != null && list.size()>0){
-			    	tempSql = tempSql.replace("_index", list.get(0)+"");
-			    	sb.append(tempSql);
+			    	tempSql = tempSql.replace("_index", list.get(0).get("attribute_index")+"");
 			    	conditionIdList = entry.getValue();
 			    	if(conditionIdList != null && conditionIdList.size()>0){
-			    		resultList = jdbcTemplate.queryForList(sb.toString(), projectId,Joiner.on(",").join(conditionIdList));
-			    		if(resultList != null && resultList.size()>0){
-			    			return resultList;
-			    		}
+			    		tempSql = tempSql.replace("?", Joiner.on(",").join(conditionIdList));
+			    		sb.append(tempSql);
+//			    		sqlParam.add(Joiner.on(",").join(conditionIdList));
 			    	}
 			    }
-			}  
+			}
+			resultList = jdbcTemplate.queryForList(sb.toString(), projectId);
+			if(resultList != null && resultList.size()>0){
+				return resultList;
+			}
 		}
 		return null;
 	}

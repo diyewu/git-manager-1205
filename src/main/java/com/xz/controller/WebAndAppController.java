@@ -14,6 +14,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.xz.common.ServerResult;
 import com.xz.entity.AppLoginBean;
 import com.xz.model.json.AppJsonModel;
@@ -108,10 +110,11 @@ public class WebAndAppController extends BaseController{
 	
 	
 	@RequestMapping("getMapInfo")
-	public JsonModel getMapInfoByMenu(HttpServletRequest request){
+	@ResponseBody
+	public AppJsonModel getMapInfoByMenu(HttpServletRequest request){
 		String token = request.getHeader("token");
 		String phoneId = request.getHeader("phoneId");
-		String jsonIds = request.getHeader("jsonIds");
+		String jsonIds = request.getParameter("jsonIds");
 		String msg = "success";
 		int code = 0;
 		List<String> paramList = new ArrayList<String>();
@@ -121,17 +124,38 @@ public class WebAndAppController extends BaseController{
 		AppLoginBean appLoginBean = new AppLoginBean();
 		code = globalCheck(paramList, token, phoneId,appLoginBean);
 		
-		List<Map<String, Object>> list = new ArrayList<Map<String,Object>>();
 		List<Map<String, Object>> info = new ArrayList<Map<String,Object>>();
 		if(code == 0){
 			//TODO 根据jsonIds解析树形json
-			Map<String,List<String>> param = new HashMap<String, List<String>>();
+			
+			String json = "[{\"attributes\":[{\"attribute_id\":\"00151280833338700003\",\"conditions\":[{\"condition_id\":\"442\"},{\"condition_id\":\"443\"}]},{\"attribute_id\":\"00151280833339000011\",\"conditions\":[{\"condition_id\":\"448\"},{\"condition_id\":\"449\"}]}],\"project_id\":\"00151280833337500000\"}]";
+			JSONArray projectArray = JSONArray.parseArray(json);
 			String projectId = "";
-			info = webAndAppService.getMapInfo(projectId, param);
+			Map<String,List<String>> param = new HashMap<String, List<String>>();
+			List<String> conditionList = new ArrayList<String>();
+			for (int k = 0; k < projectArray.size(); k++) {
+				param = new HashMap<String, List<String>>();
+				JSONObject jsonObject = projectArray.getJSONObject(k);
+				projectId = jsonObject.get("project_id")+"";
+				JSONArray array = jsonObject.getJSONArray("attributes");
+				if(array != null && array.size()>0){
+					for (int i = 0; i < array.size(); i++) {
+						conditionList = new ArrayList<String>();
+						JSONObject attrObject = array.getJSONObject(i);
+						String AttriId = attrObject.getString("attribute_id");
+						JSONArray conditionArray = attrObject.getJSONArray("conditions");
+						for(int m =0;m<conditionArray.size();m++){
+							JSONObject conditionObject = conditionArray.getJSONObject(m);
+							conditionList.add(conditionObject.get("condition_id")+"");
+						}
+						param.put(AttriId, conditionList);
+					}
+				}
+//				info = webAndAppService.getMapInfo(projectId, param);
+				info.addAll(webAndAppService.getMapInfo(projectId, param));
+			}
 		}
-		
-		
-		return new JsonModel(code, ServerResult.getCodeMsg(code, msg), list);
+		return new AppJsonModel(code, ServerResult.getCodeMsg(code, msg), info);
 	}
 	
 	

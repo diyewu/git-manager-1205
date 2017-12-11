@@ -15,8 +15,8 @@ public class HttpRequest {
 //        String s=HttpRequest.sendGet("http://localhost:8080/gismgr/app/login/", "userName=admin&userPwd=admin");
 //        System.out.println(s);
         
-        //发送 POST 请求
-        String sr=HttpRequest.sendPost("http://localhost:8080/gismgr/app/getMenu/", "");
+        //发送 POST 请求  getMapInfo
+        String sr=HttpRequest.sendPost("http://localhost:8095/gismgr/app/getMapInfo/", "userName=admin&userPwd=admin&jsonIds=asd");
         System.out.println(sr);
     }
 	
@@ -98,7 +98,7 @@ public class HttpRequest {
 //            conn.setRequestProperty("connection", "Keep-Alive");
 //            conn.setRequestProperty("user-agent", "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1;SV1)");
             conn.setRequestProperty("phoneId", "123456");
-            conn.setRequestProperty("token", "af0037e83e4d4a368c5ed8ebc5dbc9da");
+            conn.setRequestProperty("token", "ec3a42cc0a1c4700a492bace50ca2c8e");
             // 发送POST请求必须设置如下两行
             conn.setDoOutput(true);
             conn.setDoInput(true);
