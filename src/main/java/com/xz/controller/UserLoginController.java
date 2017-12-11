@@ -51,8 +51,7 @@ public class UserLoginController {
 		condition.put("userName", userLogin.getUserName());
 		condition.put("userPwd", userLogin.getUserPassword());
 		session.setAttribute("userRole", userLogin.getUserRole());
-		// TODO: userRoleId
-		session.setAttribute("userRoleId", "1");
+		session.setAttribute("userRoleId", userLogin.getUserRole());
 		session.setAttribute("userId", userLogin.getId());
 		return new JsonModel(true, userLogin);
 	}

@@ -49,11 +49,11 @@
 						     + "');\" type='button' value='设置权限' width ='20px'/>";
 										            			
             				var resultStr = String.format(formatStr);
-            				if("管理员" != record.data.roleName){
+//            				if("管理员" != record.data.roleName){
             					return "<div>" + resultStr+deleteBtn +authBtn+ "</div>";
-            				}else{
-            					return "<div>" +authBtn+ "</div>";
-            				}
+//            				}else{
+//            					return "<div>" +authBtn+ "</div>";
+//            				}
         				  } .createDelegate(this)
 	            } 
             ] 
@@ -80,7 +80,7 @@
 			},{
 				text : '添加新角色',
 				iconCls : 'Useradd',
-				hidden:isHidBtn('118'),
+//				hidden:isHidBtn('118'),
 				handler : function() {
 					showEditRole();
 				}
@@ -271,10 +271,10 @@
     	        animate : true,
     	        border:false,
     			title:"勾选角色可以操作的属性",
-    			collapsible:true,
+    			collapsible:false,
     			frame:true,
-    			enableDD:true,
-    			enableDrag:true,
+    			enableDD:false,
+    			enableDrag:false,
     			rootVisible:true,
     			autoScroll:true,
 //    			autoHeight:true,
@@ -334,7 +334,43 @@
 			    child.fireEvent('checkchange', child, checked);
 			});
 		 }, authTree);
-//	     authTree.expandAll();
+	     authTree.expandAll();
+		
+		var nodeArr = new Array();
+	  	var findchildnode = function(node){
+			var childNodes = node.childNodes;
+			if(childNodes && childNodes.length>0){
+		    	for(var i=0;i<childNodes.length;i++){
+		    		nodeArr.push(childNodes[i].id);
+		    		if(childNodes[i] && childNodes[i].childNodes.length>0){  //判断子节点下是否存在子节点
+		    			findchildnode(childNodes[i]);    //如果存在子节点  递归
+		    		}  
+		    	}
+			}
+			if(node.attributes){
+				findAttribute(node.attributes);
+			}
+		}
+	  	var findchildren = function(children){
+	  		nodeArr.push(children.id);
+	  		if(children && children.length>0){
+	  			for(var i=0;i<children.length;i++){
+	  				if(children[i] && children[i].children.length>0){  //判断子节点下是否存在子节点
+	  					findchildren(children[i].children);    //如果存在子节点  递归
+	  				}  
+	  			}
+	  		}
+	  	}
+	  	var findAttribute = function(attributes){
+			nodeArr.push(attributes.id);
+			if(attributes.children && attributes.children.length>0){  //判断子节点下是否存在子节点
+				for(var i=0;i<attributes.children.length;i++){
+					findchildren(attributes.children[i]);
+				}
+			}  
+	  	}
+	  	
+		
     	 var _importPanel = new Ext.Panel({
       		layout : "fit",
       		layoutConfig : {
@@ -347,14 +383,25 @@
       			handler : function() {
       				var parm = "";
       				var checkNode=new Array()
+      				console.log(authTree.getRootNode());
+//      				var roonodes = authTree.getRootNode();
+//      				findchildnode(roonodes);  //开始递归
+//      				findAttribute(roonodes);
+//      		        console.log(nodeArr);
+//      				return ;
       				checkNode = authTree.getChecked();
-      				console.log(checkNode);
-      				var json;
+      				var jsons = "";
+//      				console.log(checkNode);
+//      				console.log(json);
       				if(checkNode != null){
-//      					for(var i=0;i<checkNode.length ;i++){
-//      						parm = parm + checkNode[i].id+','
-//      					}
-      					json=JSON.stringify(checkNode);
+//      					console.log(checkNode);
+//      					console.log(outArr);
+      					for(var i=0;i<checkNode.length ;i++){
+//      						var json=JSON.stringify(checkNode);
+      						parm = parm + checkNode[i].id+','
+//      						console.log(checkNode[i]);
+      					}
+      					console.log("parm="+parm);
       				}else{
       					Ext.Msg.alert('提示', "请勾选菜单！");
       					return;
@@ -364,7 +411,7 @@
   					  method : 'post',
   					  params : {
   						  roleId:roleId,
-  						  json:json
+  						  json:parm
   					  },
   					  success : function(response, options) {
   					   var o = Ext.util.JSON.decode(response.responseText);
@@ -410,3 +457,5 @@
     	authWin.show();
     }
     
+    
+

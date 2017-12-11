@@ -21,7 +21,7 @@
 					{name:  'user_name'},
 					{name : 'user_role'},
 					{name : 'user_role_id'},
-					{name : 'is_allow_weblogin'},
+					{name : 'real_name'},
 					{name : 'id'}
 				]
 			}),
@@ -35,13 +35,7 @@
             	sm,
             	{header:"用户名",align:'center',dataIndex:"user_name",sortable:true}, 
 	            {header:"角色类别",align:'center',dataIndex:"user_role",sortable:true},
-	            {header:"允许前台登陆",align:'center',dataIndex:"is_allow_weblogin",sortable:true,renderer:function(value, cellmeta, record, rowIndex, columnIndex, store){
-                    if(value==0){
-                        return '是';
-                      } else {
-                        return '否';
-                      }
-	            }},
+	            {header:"用户别名",align:'center',dataIndex:"real_name",sortable:true},
 	            {header:"操作",align:'center',dataIndex:"id",width:50,
 	            renderer: function (value, meta, record) {
 //	            	console.log(record);
@@ -49,7 +43,8 @@
 							+ "' onclick=\"showEditUser('" + record.get('id') + "','"
 							+ record.get('user_name') + "','"
 							+ record.get('user_role') + "','"
-							+ record.get('user_role_id')
+							+ record.get('user_role_id') + "','"
+							+ record.get('real_name')
 							+ "');\" type='button' value='编辑' width ='15px'/>&nbsp;&nbsp;"; 
 
 										     var deleteBtn = "<input id = 'bt_delete_" + record.get('id')
@@ -57,42 +52,15 @@
 							+ "');\" type='button' value='删除' width ='15px'/>";
 										            			
             				var resultStr = String.format(formatStr);
-            				if(loginUserId != record.id){
+//            				if(loginUserId != record.id){
             					return "<div>" + resultStr+deleteBtn + "</div>";
-            				}else{
-            					return "";
-            				}
+//            				}else{
+//            					return "";
+//            				}
         				  } .createDelegate(this)
 	            } 
             ] 
         ); 
-//        
-//   	 	var _codata = [
-//   	            ['2','全部'],
-//   				['0','管理员'],
-//   				['1','普通用户'],
-//   			];
-//   	    	
-//    	_cob = new Ext.form.ComboBox({
-//    		id:'shUserRole',
-//    		forceSelection: true,
-//    		listWidth: 150,
-//    		width:150,
-//    		store: new Ext.data.SimpleStore({
-//    		fields: ['value', 'text'],
-//    		data : _codata
-//    		}),
-//    		valueField:'value',
-//    		displayField:'text',
-//    		typeAhead: true,
-//    		mode: 'local',
-//    		triggerAction: 'all',
-//    		selectOnFocus:true,//用户不能自己输入,只能选择列表中有的记录
-//    		allowBlank:false,
-//    		editable:false
-//    	});
-//    	_cob.setValue('2');
-    	//------------------------
 		//用户角色
 		var moduleStore = new Ext.data.Store({
 	        proxy: new Ext.data.HttpProxy({
@@ -244,7 +212,7 @@
 		}});
 		
 	}
-    function showEditUser(_userId,_userName,_userRoleName,_userRole){
+    function showEditUser(_userId,_userName,_userRoleName,_userRole,_realName){
     	var isHidden = true;
     	var pwdval = "******";
     	if(typeof(_userId) == "undefined" || _userId  == ""){
@@ -292,6 +260,7 @@
             items: [
                {xtype:"textfield", width:180,id: "eUserName",name: "eUserName", fieldLabel: "用户名",value:_userName},
                {xtype:"textfield", width:180,id: "enewpwd",name: "enewpwd", fieldLabel: "用户密码",value:pwdval},
+               {xtype:"textfield", width:180,id: "enrealName",name: "enrealName", fieldLabel: "用户别名",value:_realName},
                co
             ],
          });
@@ -308,6 +277,7 @@
     			handler : function() {
     				var name = Ext.getCmp('eUserName').getValue();
     				var pwd = Ext.getCmp('enewpwd').getValue();
+    				var realName = Ext.getCmp('enrealName').getValue();
     				var role = co.getValue();
     				if(typeof(name) == "undefined" || name  == ""){
     					Ext.Msg.alert('提示', '请填写用户名');
@@ -317,11 +287,15 @@
     					Ext.Msg.alert('提示', '请填写用户密码');
     					return;
     				}
+    				if(typeof(realName) == "undefined" || realName  == ""){
+    					Ext.Msg.alert('提示', '请填写用户别名');
+    					return;
+    				}
     				if(typeof(role) == "undefined" || role  == ""){
     					Ext.Msg.alert('提示', '请选择用户角色');
     					return;
     				}
-    				console.log(co);
+//    				console.log(co);
     				Ext.Ajax.request({
     					  url : path + "/webuser/editUser.action",
     					  method : 'post',
@@ -329,6 +303,7 @@
     						  userId:_userId,
     						  userName:name,
     						  userPwd:pwd,
+    						  realName:realName,
     						  userRole:role
     					  },
     					  success : function(response, options) {

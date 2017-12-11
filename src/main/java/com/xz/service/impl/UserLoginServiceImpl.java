@@ -11,7 +11,7 @@ import com.xz.service.UserLoginService;
 @Service
 @Transactional
 public class UserLoginServiceImpl implements UserLoginService{
-
+	
 	@Autowired
 	private UserLoginMapper userLoginMapper;
 	@Override
