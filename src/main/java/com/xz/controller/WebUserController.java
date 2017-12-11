@@ -266,37 +266,6 @@ public class WebUserController extends BaseController {
 		printData(response, mapper.writeValueAsString(map));
 	}
 	
-	@RequestMapping("updatePwd")
-	@ResponseBody
-	public void updatePwd(HttpServletRequest request,HttpServletResponse response) throws JsonGenerationException, JsonMappingException, IOException{
-		ObjectMapper mapper = new ObjectMapper();
-		Map<String, String> map = new HashMap<String, String>();
-		HttpSession session=request.getSession();
-		String oldpwd = request.getParameter("oldpwd");
-		String newpwd = request.getParameter("newpwd");
-		String userName = (String)session.getAttribute("userName");
-		String userId = (String)session.getAttribute("userId");
-		String msg = null;
-		if(webUserService.checkUser(userName, oldpwd)){
-			msg = "原密码输入错误";
-		}else{
-			try {
-				webUserService.updatePwd(userId,userName, newpwd);
-			} catch (Exception e) {
-				e.printStackTrace();
-				msg = "密码重置错误："+e.getMessage();
-			}
-		}
-		if(msg == null){
-			map.put("i_type", "success");
-			map.put("i_msg", "");
-		}else{
-			map.put("i_type", "error");
-			map.put("i_msg", msg);
-		}
-		operateHistoryService.insertOH(request,(String)session.getAttribute("userId") , "9", msg,msg==null?1:0);
-		printData(response, mapper.writeValueAsString(map));
-	}
 	
 	@RequestMapping("updateWebUserAuth")
 	public void updateWebUserAuth(HttpServletRequest request,HttpServletResponse response) throws JsonGenerationException, JsonMappingException, IOException{
