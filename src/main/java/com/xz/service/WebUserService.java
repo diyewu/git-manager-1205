@@ -178,14 +178,6 @@ public class WebUserService {
 			}
 		}
 	}
-	public boolean checkUser(String name,String pwd){
-		String sql = "  select * from web_user_login where user_name = ? and user_password=?";
-		List<Map<String, Object>> list = jdbcTemplate.queryForList(sql,name,pwd);
-		if(list != null && list.size()>0){
-			return true;
-		}
-		return false;
-	}
 	
 	public void updatePwd(String userId,String userName,String newUserPwd){
 //		String md5Pwd = Md5Util.generatePassword(newUserPwd);

@@ -2,12 +2,17 @@ package com.xz.controller;
 
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.util.List;
 
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang.StringUtils;
 import org.codehaus.jackson.map.ObjectMapper;
 
+import com.xz.common.ServerResult;
 import com.xz.common.Simp2TranUtils;
+import com.xz.entity.AppLoginBean;
+import com.xz.utils.AgingCache;
 
 
 public class BaseController {
@@ -51,6 +56,40 @@ public class BaseController {
 		result.setTotal((int) total);
 		writeJson(result,response);
 	}
+	
+	protected int globalCheck(List<String> paramList,String token,String phoneId,AppLoginBean appLoginBean) {
+		int code = 0;
+		if(paramList != null && paramList.size()>0){
+			for(String param:paramList){
+				if(StringUtils.isBlank(param)){
+					code = ServerResult.RESULT_ERROE_PARAM;
+					break;
+				}
+			}
+		}
+		if(code == 0){
+//			AppLoginBean appLoginBean = null;
+			String lastToken = "";
+			try {
+				appLoginBean = (AppLoginBean) AgingCache.getCacheInfo(phoneId).getValue();
+			} catch (Exception e) {
+			}
+			if(appLoginBean != null){
+				lastToken = appLoginBean.getToken();
+				if(!token.equals(lastToken)){
+					code = ServerResult.RESULT_TOKEN_CHECK_ERROR;
+//					msg = ServerResult.RESULT_TOKEN_CHECK_ERROR_MSG;
+				}
+			}else{
+				code = ServerResult.RESULT_TOKEN_OVERTIME;
+//				msg = ServerResult.RESULT_TOKEN_OVERTIME_MSG;
+			}
+		}
+		
+		return code;
+		
+	}
+	
 	
 	
 	public static class Result {
@@ -113,8 +152,5 @@ public class BaseController {
 		public void setTotal(int total) {
 			this.total = total;
 		}
-
-	
-
-}
+	}
 }
