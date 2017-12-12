@@ -599,25 +599,27 @@
 					    arr.push(row.data);
 					});
 					var json=JSON.stringify(arr);
-					Ext.Ajax.request( {
-						  url : path + "/projectmgr/setAttrActive",
-						  method : 'post',
-						  params : {
-							 json : json,
-							 projectId:projectId
-						  },
-						  success : function(response, options) {
-						   var o = Ext.util.JSON.decode(response.responseText);
-						   if(o.i_type && "success"== o.i_type){
-							   Ext.Msg.alert('提示', '设置成功'); 
-						   }else{
-						   	   Ext.Msg.alert('提示', o.i_msg); 
-						   }
-						  },
-						  failure : function() {
-						  	
-						  }
-			 		});
+					Ext.Msg.confirm('tip', '设置筛选条件后会重置前端项目权限，确认设置吗?',function (button,text){if(button == 'yes'){
+						Ext.Ajax.request( {
+							  url : path + "/projectmgr/setAttrActive",
+							  method : 'post',
+							  params : {
+								 json : json,
+								 projectId:projectId
+							  },
+							  success : function(response, options) {
+							   var o = Ext.util.JSON.decode(response.responseText);
+							   if(o.i_type && "success"== o.i_type){
+								   Ext.Msg.alert('提示', '设置成功'); 
+							   }else{
+							   	   Ext.Msg.alert('提示', o.i_msg); 
+							   }
+							  },
+							  failure : function() {
+							  	
+							  }
+				 		});
+					}});
 				}
 			}]
 

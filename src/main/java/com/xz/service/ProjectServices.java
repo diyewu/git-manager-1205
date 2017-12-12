@@ -174,6 +174,14 @@ public class ProjectServices {
 	 * 删除筛选条件
 	 */
 	public void delConditionByProjectId(String projectId){
+		//删除project_condition_auth数据，提示用户重置该项目涉及权限
+		String authSql = "delete from project_condition_auth where condition_id in(select id from project_attribute_condition  where attribute_id in (select id from project_attribute where project_id = ?))";
+		jdbcTemplate.update(authSql, projectId);
+		authSql = " delete from project_condition_auth where condition_id in(select id from project_attribute where project_id = ?) ";
+		jdbcTemplate.update(authSql, projectId);
+		authSql = " delete from project_condition_auth where condition_id in(?) ";
+		jdbcTemplate.update(authSql, projectId);
+		
 		String sql = " delete from project_attribute_condition  where attribute_id in (select id from project_attribute where project_id = ?) ";
 		jdbcTemplate.update(sql, projectId);
 		sql = " update project_attribute set attribute_active = 0 where project_id = ? ";
@@ -276,7 +284,7 @@ public class ProjectServices {
 	@Transactional
 	public void deleteProjectById(String projectId){
 		String sql = " select id from project_attribute where project_id = ? ";
-		String conditionSql = " select id from project_condition_auth where condition_id = ? ";
+		String conditionSql = " select id from project_attribute_condition where attribute_id = ? ";
 		String delConditionSql = " delete from project_condition_auth where condition_id = ? ";
 		String delprojectAuthSql = " delete from project_condition_auth where condition_id = ? ";
 		
@@ -303,9 +311,11 @@ public class ProjectServices {
 						jdbcTemplate.update(delprojectAuthSql,conditionId);
 					}
 				}
-				//删除condition
+				//删除attribute 条件
 				jdbcTemplate.update(delConditionSql,attrId);
 			}
+			//删除项目的条件
+			jdbcTemplate.update(delConditionSql,projectId);
 		}
 		//删除condition
 		jdbcTemplate.update(delprojectCondition,projectId);

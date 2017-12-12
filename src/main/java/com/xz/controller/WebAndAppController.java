@@ -2,6 +2,8 @@ package com.xz.controller;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -18,6 +20,8 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.xz.common.ServerResult;
 import com.xz.entity.AppLoginBean;
+import com.xz.entity.AppMenu;
+import com.xz.entity.AppMenu;
 import com.xz.model.json.AppJsonModel;
 import com.xz.model.json.JsonModel;
 import com.xz.service.WebAndAppService;
@@ -94,11 +98,65 @@ public class WebAndAppController extends BaseController{
 		paramList.add(phoneId);
 		AppLoginBean appLoginBean = new AppLoginBean();
 		code = globalCheck(paramList, token, phoneId,appLoginBean);
+		List<AppMenu> newList = new ArrayList<AppMenu>();
+		if(code == 0){
+			List<AppMenu>  l = new ArrayList<AppMenu>();
+			l = webAndAppService.getMenu(appLoginBean.getUserRoleId());
+			Map<String,AppMenu> map = new LinkedHashMap<String,AppMenu>(); 
+			Map<String,AppMenu> map1 = new LinkedHashMap<String,AppMenu>(); 
+			for(AppMenu t:l){//list转换成map
+				map.put(t.getId(), t);
+				map1.put(t.getId(), t);
+			}
+			AppMenu c1 = null;
+			AppMenu c2 = null;
+			Iterator it = map.keySet().iterator();//遍历map
+			while (it.hasNext()) {
+				c1 = new AppMenu();
+				c1 = map.get(it.next());
+				if(c1.getId() == null ||"null".equals(c1.getId())){//第一级节点
+					
+				}else{
+					if(map1.containsKey(c1.getParent_id())){//
+						c2 = new AppMenu();
+						c2 = map1.get(c1.getParent_id());
+						if(c2.getChildren() != null){
+							c2.getChildren().add(c1);
+						}else{
+							List<AppMenu> childrens = new ArrayList<AppMenu>();
+							childrens.add(c1);
+							c2.setChildren(childrens);
+						}
+						map1.remove(c1.getId());
+					}
+				}
+			}
+			
+			Iterator i = map1.keySet().iterator();
+			while (i.hasNext()) {
+				newList.add((AppMenu)map.get(i.next()));
+			}
+		}
+		return new AppJsonModel(code, ServerResult.getCodeMsg(code, msg), newList);
+	}
+	
+//	@RequestMapping("getMenu")
+//	@ResponseBody
+	public AppJsonModel getMenu_bak(HttpServletRequest request){
+		String token = request.getHeader("token");
+		String phoneId = request.getHeader("phoneId");
+		String msg = "success";
+		int code = 0;
+		List<String> paramList = new ArrayList<String>();
+		paramList.add(token);
+		paramList.add(phoneId);
+		AppLoginBean appLoginBean = new AppLoginBean();
+		code = globalCheck(paramList, token, phoneId,appLoginBean);
 		
 		List<Map<String, Object>> list = new ArrayList<Map<String,Object>>();
 		if(code == 0){
 			try {
-				list = webAndAppService.getMenu(appLoginBean.getUserRoleId());
+//				list = webAndAppService.getMenu(appLoginBean.getUserRoleId());
 			} catch (Exception e) {
 				e.printStackTrace();
 				msg = e.getMessage();
@@ -125,6 +183,7 @@ public class WebAndAppController extends BaseController{
 		code = globalCheck(paramList, token, phoneId,appLoginBean);
 		
 		List<Map<String, Object>> info = new ArrayList<Map<String,Object>>();
+		List<Map<String, Object>> list = new ArrayList<Map<String,Object>>();
 		if(code == 0){
 			//TODO 根据jsonIds解析树形json
 			
@@ -152,13 +211,42 @@ public class WebAndAppController extends BaseController{
 					}
 				}
 //				info = webAndAppService.getMapInfo(projectId, param);
-				info.addAll(webAndAppService.getMapInfo(projectId, param));
+				list = webAndAppService.getMapInfo(projectId, param);
+				if(list != null && list.size()>0){
+					info.addAll(list);
+				}
 			}
 		}
 		return new AppJsonModel(code, ServerResult.getCodeMsg(code, msg), info);
 	}
 	
 	
-	
-	
+	@RequestMapping("getCoordinateInfo")
+	@ResponseBody
+	public AppJsonModel getCoordinateInfo(HttpServletRequest request){
+		String token = request.getHeader("token");
+		String phoneId = request.getHeader("phoneId");
+		String coordinateId = request.getParameter("coordinateId");
+		String msg = "success";
+		int code = 0;
+		List<String> paramList = new ArrayList<String>();
+		paramList.add(token);
+		paramList.add(phoneId);
+		paramList.add(coordinateId);
+		AppLoginBean appLoginBean = new AppLoginBean();
+		code = globalCheck(paramList, token, phoneId,appLoginBean);
+		
+		List<Map<String, Object>> list = new ArrayList<Map<String,Object>>();
+		if(code == 0){
+			try {
+				list = webAndAppService.getCoordinateInfo(coordinateId);
+			} catch (Exception e) {
+				e.printStackTrace();
+				msg = e.getMessage();
+				code = ServerResult.RESULT_SERVER_ERROR;
+			}
+		}
+		return new AppJsonModel(code, ServerResult.getCodeMsg(code, msg), list);
+	}
+	//TODO 增加心跳包接口
 }

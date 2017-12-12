@@ -195,6 +195,7 @@ public class ProjectMgrController extends BaseController {
     }
     @RequestMapping("setAttrActive")
     public void setAttrActive(HttpServletRequest request,HttpServletResponse response) throws JsonParseException, JsonMappingException, IOException{
+    	//TODO 重选之后筛选权限失效BUG getMapInfo
     	String msg = null;
     	Map<String, String> map = new HashMap<String, String>();
     	mapper = new ObjectMapper();
