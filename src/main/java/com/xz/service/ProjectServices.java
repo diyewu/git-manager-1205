@@ -275,6 +275,7 @@ public class ProjectServices {
 	 */
 	@Transactional
 	public void deleteProjectById(String projectId){
+		//TODO 删除 project_condition_auth 数据
 		String sql = " select id from project_attribute where project_id = ? ";
 		String conditionSql = " select id from project_condition_auth where condition_id = ? ";
 		String delConditionSql = " delete from project_condition_auth where condition_id = ? ";

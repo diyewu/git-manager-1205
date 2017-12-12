@@ -68,6 +68,13 @@ public class AgingCache implements InitializingBean{
         cache.setCurrentTime(System.currentTimeMillis());
         cacheMap.put(key, cache); 
     } 
+    
+    //更新cache时间
+    public static void updateCacheTimeOut(String key) {
+        Cache cache = getCache(key); 
+        cache.setCurrentTime(System.currentTimeMillis());
+    } 
+    
  
     //判断缓存是否终止 
     /**

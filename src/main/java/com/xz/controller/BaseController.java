@@ -68,21 +68,19 @@ public class BaseController {
 			}
 		}
 		if(code == 0){
-//			AppLoginBean appLoginBean = null;
 			String lastToken = "";
 			try {
 				appLoginBean = (AppLoginBean) AgingCache.getCacheInfo(phoneId).getValue();
 			} catch (Exception e) {
 			}
 			if(appLoginBean != null){
+				AgingCache.updateCacheTimeOut(phoneId);
 				lastToken = appLoginBean.getToken();
 				if(!token.equals(lastToken)){
 					code = ServerResult.RESULT_TOKEN_CHECK_ERROR;
-//					msg = ServerResult.RESULT_TOKEN_CHECK_ERROR_MSG;
 				}
 			}else{
 				code = ServerResult.RESULT_TOKEN_OVERTIME;
-//				msg = ServerResult.RESULT_TOKEN_OVERTIME_MSG;
 			}
 		}
 		
