@@ -10,7 +10,7 @@ Target Server Type    : MYSQL
 Target Server Version : 50629
 File Encoding         : 65001
 
-Date: 2017-12-12 18:39:50
+Date: 2017-12-13 19:19:11
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -633,7 +633,7 @@ CREATE TABLE `web_user_login` (
   `type` varchar(255) DEFAULT NULL,
   `create_date` varchar(255) DEFAULT NULL,
   `update_date` varchar(255) DEFAULT NULL,
-  `is_allow_weblogin` int(10) DEFAULT '1' COMMENT '0:允许，1：不允许',
+  `allow_phone_size` int(10) DEFAULT '1' COMMENT '允许登陆的设备数量',
   `real_name` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `USER_LOGIN_ID` (`id`)
@@ -645,6 +645,22 @@ CREATE TABLE `web_user_login` (
 INSERT INTO `web_user_login` VALUES ('2bb49d9d514c48c5bebbf78beab3e179', 'admin', 'admin', '1', '0', null, null, null, null, '0', '管理员');
 INSERT INTO `web_user_login` VALUES ('60672052e98a45ec800173a9b1829f5b', 'zhou', 'user', '7', '1', null, null, null, null, '1', '周期');
 INSERT INTO `web_user_login` VALUES ('e2058de4d2704de08c952c768578bd20', '546a', 'asd', '9', '0', null, null, null, null, '1', '阿斯顿');
+
+-- ----------------------------
+-- Table structure for web_user_login_phone
+-- ----------------------------
+DROP TABLE IF EXISTS `web_user_login_phone`;
+CREATE TABLE `web_user_login_phone` (
+  `id` int(11) NOT NULL,
+  `web_user_id` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `phone_id` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `create_date` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ----------------------------
+-- Records of web_user_login_phone
+-- ----------------------------
 
 -- ----------------------------
 -- Table structure for web_user_role

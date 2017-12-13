@@ -20,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.xz.common.Page;
 import com.xz.utils.ExcelReadUtils;
 import com.xz.utils.SortableUUID;
+import com.xz.utils.ZipUtil;
 
 
 @Service
@@ -32,7 +33,7 @@ public class ProjectServices {
 	private OperateHistoryService operateHistoryService;
 	
 	@Transactional
-	public String importProjectData(HttpServletRequest request,File file,String title,String path,String createUser){
+	public String importProjectData(HttpServletRequest request,File file,String title,String createUser){
 		ArrayList<ArrayList<Object>> list = new ArrayList<ArrayList<Object>>();
 		String msg = null;
 		String type = "5";//导入项目数据
@@ -57,7 +58,7 @@ public class ProjectServices {
 		//插入项目主表数据
 		String projectId = SortableUUID.randomUUID();
 		String mainSql = " insert into project_main(id,project_name,create_time,create_user_id,file_path)values(?,?,NOW(),?,?) ";
-		jdbcTemplate.update(mainSql, projectId,title,createUser,path);
+		jdbcTemplate.update(mainSql, projectId,title,createUser,file.getPath());
 		
 		//插入项目属性表数据
 		ArrayList<Object> attrList = list.get(1);
@@ -104,6 +105,14 @@ public class ProjectServices {
 			}
 		}
 		return projectId;
+	}
+	
+	
+	public void addRelateImg(String projectId,File zipFile,String desPath) throws IOException{
+		Map<String,String> map = new HashMap<String, String>();
+		ZipUtil.unZipFiles(zipFile, desPath+File.separator);
+		ZipUtil.readFiles(desPath, map);
+		System.out.println(map);
 	}
 	
 	/**
@@ -174,6 +183,14 @@ public class ProjectServices {
 	 * 删除筛选条件
 	 */
 	public void delConditionByProjectId(String projectId){
+		//删除project_condition_auth数据，提示用户重置该项目涉及权限
+		String authSql = "delete from project_condition_auth where condition_id in(select id from project_attribute_condition  where attribute_id in (select id from project_attribute where project_id = ?))";
+		jdbcTemplate.update(authSql, projectId);
+		authSql = " delete from project_condition_auth where condition_id in(select id from project_attribute where project_id = ?) ";
+		jdbcTemplate.update(authSql, projectId);
+		authSql = " delete from project_condition_auth where condition_id in(?) ";
+		jdbcTemplate.update(authSql, projectId);
+		
 		String sql = " delete from project_attribute_condition  where attribute_id in (select id from project_attribute where project_id = ?) ";
 		jdbcTemplate.update(sql, projectId);
 		sql = " update project_attribute set attribute_active = 0 where project_id = ? ";
@@ -275,9 +292,8 @@ public class ProjectServices {
 	 */
 	@Transactional
 	public void deleteProjectById(String projectId){
-		//TODO 删除 project_condition_auth 数据
 		String sql = " select id from project_attribute where project_id = ? ";
-		String conditionSql = " select id from project_condition_auth where condition_id = ? ";
+		String conditionSql = " select id from project_attribute_condition where attribute_id = ? ";
 		String delConditionSql = " delete from project_condition_auth where condition_id = ? ";
 		String delprojectAuthSql = " delete from project_condition_auth where condition_id = ? ";
 		
@@ -304,9 +320,11 @@ public class ProjectServices {
 						jdbcTemplate.update(delprojectAuthSql,conditionId);
 					}
 				}
-				//删除condition
+				//删除attribute 条件
 				jdbcTemplate.update(delConditionSql,attrId);
 			}
+			//删除项目的条件
+			jdbcTemplate.update(delConditionSql,projectId);
 		}
 		//删除condition
 		jdbcTemplate.update(delprojectCondition,projectId);

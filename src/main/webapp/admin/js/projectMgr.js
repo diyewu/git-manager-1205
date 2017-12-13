@@ -352,12 +352,21 @@
     				id : 'sampleUploadFileId',
     				name : 'uploadFile',
     				xtype : "textfield",
-    				fieldLabel : '文件',
+    				fieldLabel : 'EXCEL文件',
     				inputType : 'file',
     				anchor : '96%',
 					hidden:isHid,
 					hideLabel:isHid 
-    			},uxfile]
+    			},{
+    				id : 'sampleZipUploadFile',
+    				name : 'zipUploadFile',
+    				xtype : "textfield",
+    				fieldLabel : 'ZIP图片包',
+    				inputType : 'file',
+    				anchor : '96%',
+					hidden:isHid,
+					hideLabel:isHid 
+    			}]
     		}, {
     			xtype : 'fieldset',
     			title : '设置参数',
@@ -476,7 +485,7 @@
     	
     	newWin = new Ext.Window({
     		width : 520,
-    		title : '导入数据',
+    		title : '导入项目数据',
     		height : winHeight,
     		defaults : {// 表示该窗口中所有子元素的特性
     			border : false
@@ -599,25 +608,27 @@
 					    arr.push(row.data);
 					});
 					var json=JSON.stringify(arr);
-					Ext.Ajax.request( {
-						  url : path + "/projectmgr/setAttrActive",
-						  method : 'post',
-						  params : {
-							 json : json,
-							 projectId:projectId
-						  },
-						  success : function(response, options) {
-						   var o = Ext.util.JSON.decode(response.responseText);
-						   if(o.i_type && "success"== o.i_type){
-							   Ext.Msg.alert('提示', '设置成功'); 
-						   }else{
-						   	   Ext.Msg.alert('提示', o.i_msg); 
-						   }
-						  },
-						  failure : function() {
-						  	
-						  }
-			 		});
+					Ext.Msg.confirm('tip', '设置筛选条件后会重置前端项目权限，确认设置吗?',function (button,text){if(button == 'yes'){
+						Ext.Ajax.request( {
+							  url : path + "/projectmgr/setAttrActive",
+							  method : 'post',
+							  params : {
+								 json : json,
+								 projectId:projectId
+							  },
+							  success : function(response, options) {
+							   var o = Ext.util.JSON.decode(response.responseText);
+							   if(o.i_type && "success"== o.i_type){
+								   Ext.Msg.alert('提示', '设置成功'); 
+							   }else{
+							   	   Ext.Msg.alert('提示', o.i_msg); 
+							   }
+							  },
+							  failure : function() {
+							  	
+							  }
+				 		});
+					}});
 				}
 			}]
 
