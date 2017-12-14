@@ -203,11 +203,14 @@ public class WebUserController extends BaseController {
 		String userPwd = request.getParameter("userPwd");
 		String realName = request.getParameter("realName");
 		String userRole = request.getParameter("userRole");
+		String phoneSize = request.getParameter("phoneSize");
 		String msg = null;
-		if(!StringUtils.isNotBlank(userName) || !StringUtils.isNotBlank(userPwd) || !StringUtils.isNotBlank(userRole) || !StringUtils.isNotBlank(realName)){
+		if(!StringUtils.isNotBlank(userName) || !StringUtils.isNotBlank(userPwd) || 
+				!StringUtils.isNotBlank(userRole) || !StringUtils.isNotBlank(realName) || !StringUtils.isNotBlank(phoneSize)){
 			msg = "参数有误!";
 		}
 		int role = 1;
+		int phoneSizeInt = 1;
 		if(msg == null ){
 			try {
 				role = Integer.parseInt(userRole);
@@ -216,13 +219,21 @@ public class WebUserController extends BaseController {
 				msg = e.getMessage();
 			}
 		}
+		if(msg == null ){
+			try {
+				phoneSizeInt = Integer.parseInt(phoneSize);
+			} catch (Exception e) {
+				e.printStackTrace();
+				msg = "登录手机数 有误："+e.getMessage();
+			}
+		}
 		if (msg == null) {
 			if (!StringUtils.isNotBlank(userId) && !"null".equals(userId)) {//添加用户
 				if (!webUserService.isExitUser(userName,"")) {//检查是否存在userName
 					if (msg == null) {
 						try {
 //							userPwd = Md5Util.generatePassword(userPwd);
-							webUserService.addUser(userName, userPwd, role,realName);
+							webUserService.addUser(userName, userPwd, role,realName,phoneSizeInt);
 						} catch (Exception e) {
 							e.printStackTrace();
 							msg = e.getMessage();
@@ -244,6 +255,7 @@ public class WebUserController extends BaseController {
 					user.setUserRole(role);
 					user.setRealName(realName);
 					user.setId(userId);
+					user.setAllowPhoneSize(phoneSizeInt);
 					try {
 						webUserService.editUser(user);
 					} catch (Exception e) {

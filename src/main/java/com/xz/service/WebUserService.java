@@ -90,7 +90,7 @@ public class WebUserService {
 		Page<Map<String, Object>> page = new Page<Map<String, Object>>(0, 1000, false);
 		List<Object> params = new ArrayList<Object>();
 		List<Map<String, Object>> list = new ArrayList<Map<String,Object>>();
-		StringBuilder sbud = new StringBuilder("select a.id,a.user_name,a.user_password,a.is_delete,a.user_role as user_role_id,b.role_name as user_role,real_name from web_user_login a left join web_user_role b on a.user_role = b.id where 1 = 1 and a.is_delete = 0 and b.is_delete = 0 ");
+		StringBuilder sbud = new StringBuilder("select a.id,a.user_name,a.user_password,a.is_delete,a.user_role as user_role_id,b.role_name as user_role,real_name, a.allow_phone_size from web_user_login a left join web_user_role b on a.user_role = b.id where 1 = 1 and a.is_delete = 0 and b.is_delete = 0 ");
 		if (!condition.isEmpty()) { 
 			if (condition.containsKey("userName")) {
 				sbud.append(" and a.user_name like ?");
@@ -133,9 +133,9 @@ public class WebUserService {
 		return i>0;
 	}
 	
-	public void addUser(String userName,String userPwd,int role,String realName){
+	public void addUser(String userName,String userPwd,int role,String realName,int phoneSizeInt){
 		String uuid = UUID.randomUUID().toString().replace("-", "");
-		jdbcTemplate.update("insert into web_user_login(id,user_name,user_password,user_role,real_name)values(?,?,?,?,?)",uuid,userName,userPwd,role,realName);
+		jdbcTemplate.update("insert into web_user_login(id,user_name,user_password,user_role,real_name,allow_phone_size)values(?,?,?,?,?,?)",uuid,userName,userPwd,role,realName,phoneSizeInt);
 	}
 	public void editUser(UserLogin user){
 		if(StringUtils.isNotBlank(user.getId())){

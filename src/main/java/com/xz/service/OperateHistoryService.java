@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 import org.codehaus.jackson.JsonGenerationException;
 import org.codehaus.jackson.map.JsonMappingException;
@@ -42,6 +43,29 @@ public class OperateHistoryService {
 			ip = getIpAddr(request);
 //			mac = getMACAddr(ip);
 			serverIp = request.getLocalAddr();
+		} catch (Exception e) {
+			e.printStackTrace();
+			logger.error(e.getMessage());
+		}
+		String operateUserCity = "";
+		String sql = "insert into operate_history (operate_user_id,operete_type_id,create_time,operate_user_ip,operate_user_mac,local_server,operate_user_city,operate_summary,is_success)" +
+				"values(?,?,sysdate(),?,?,?,?,?,?)";
+		try {
+			jdbcTemplate.update(sql, operateUserId, opereteTypeId, ip, mac,
+					serverIp, operateUserCity, operateSummary,isSuccess);
+		} catch (Exception e) {
+			e.printStackTrace();
+			logger.error("operateUserId = "+operateUserId +",opereteTypeId="+opereteTypeId+",operateSummary ="+operateSummary+",ip="+ip+",mac="+mac+",serverIp="+serverIp+",出错信息："+e.getMessage());
+		}
+	}
+	public void insertOH(HttpSession session, String opereteTypeId, String operateSummary,int isSuccess) {
+		String ip = "";
+		String mac = "";
+		String serverIp = "";
+		String operateUserId = session.getAttribute("userId")+"";
+		try {
+			ip = session.getAttribute("userIP")+"";
+			serverIp = session.getAttribute("userMAC")+"";
 		} catch (Exception e) {
 			e.printStackTrace();
 			logger.error(e.getMessage());

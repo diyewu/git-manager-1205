@@ -85,14 +85,10 @@ public class ZipUtil {
 
 	public static void readFiles(String path,Map<String,String> map) {
 		// String path="G:\\tmp\\112";
-		System.out.println("path=" + path);
 		File file = new File(path);
 		File[] tempList = file.listFiles();
-		System.out.println("该目录下对象个数：" + tempList.length);
 		for (int i = 0; i < tempList.length; i++) {
 			if (tempList[i].isFile()) {
-				System.out.println("文     件：" + tempList[i]);
-				System.out.println("文     件：" + tempList[i].getName());
 				map.put(tempList[i].getName(), tempList[i].toString());
 			}
 			// 文件夹

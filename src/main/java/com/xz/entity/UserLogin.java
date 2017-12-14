@@ -19,7 +19,7 @@ public class UserLogin {
 
     private String updateDate;
 
-    private Integer isAllowWeblogin;
+    private Integer allowPhoneSize;
     
     private String realName;
     
@@ -96,13 +96,13 @@ public class UserLogin {
         this.updateDate = updateDate == null ? null : updateDate.trim();
     }
 
-    public Integer getIsAllowWeblogin() {
-        return isAllowWeblogin;
-    }
+	public Integer getAllowPhoneSize() {
+		return allowPhoneSize;
+	}
 
-    public void setIsAllowWeblogin(Integer isAllowWeblogin) {
-        this.isAllowWeblogin = isAllowWeblogin;
-    }
+	public void setAllowPhoneSize(Integer allowPhoneSize) {
+		this.allowPhoneSize = allowPhoneSize;
+	}
 
 	public String getRealName() {
 		return realName;

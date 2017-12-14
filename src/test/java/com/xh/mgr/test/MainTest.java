@@ -7,9 +7,13 @@ import org.apache.commons.lang.StringUtils;
 
 public class MainTest {
 	public static void main(String[] args) {
-		listTest();
+		splitTest();
 	}
 	
+	public static void splitTest(){
+		String s = "asdas.zip";
+		System.out.println(s.split("\\.")[0]);
+	}
 	public static void listTest(){
 		List<String> list = new ArrayList<String>();
 		list.add("1");

@@ -70,7 +70,8 @@ logging:
 
 #custom settings
 custom:
-    clientFileUpladPath: F:\tempfilepath
+    clientFileUpladPath: F:\tempfilepath/
+#    clientFileUpladPath: /Users/calvin/Work/Tomcat/temp/
 
 
 

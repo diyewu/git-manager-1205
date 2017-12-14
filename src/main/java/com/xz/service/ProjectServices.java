@@ -33,7 +33,7 @@ public class ProjectServices {
 	private OperateHistoryService operateHistoryService;
 	
 	@Transactional
-	public String importProjectData(HttpServletRequest request,File file,String title,String createUser){
+	public String importProjectData(HttpSession session,File file,String title,String createUser){
 		ArrayList<ArrayList<Object>> list = new ArrayList<ArrayList<Object>>();
 		String msg = null;
 		String type = "5";//导入项目数据
@@ -44,7 +44,7 @@ public class ProjectServices {
 		}
 		if (list == null || list.size() == 0) {
 			msg = "请检查上传附件内容，数据为空！";
-			insertOperateHistory(request, type, msg);
+			insertOperateHistory(session, type, msg);
 			return null;
 		}
 		if(StringUtils.isBlank(title)){
@@ -52,7 +52,7 @@ public class ProjectServices {
 		}
 		if(StringUtils.isBlank(title)){
 			msg = "格式有误，请确认第一行第一列为项目标题！";
-			insertOperateHistory(request, type, msg);
+			insertOperateHistory(session, type, msg);
 			return null;
 		}
 		//插入项目主表数据
@@ -63,7 +63,7 @@ public class ProjectServices {
 		//插入项目属性表数据
 		ArrayList<Object> attrList = list.get(1);
 		if(attrList == null || attrList.size() == 0){
-			insertOperateHistory(request, type, msg);
+			insertOperateHistory(session, type, msg);
 			msg = "格式有误，请确认第二行数据不能为空！";
 			return null ;
 		}
@@ -99,20 +99,66 @@ public class ProjectServices {
 					jdbcTemplate.update(sb.toString(), params.toArray());
 				}else{
 					msg = "格式有误，请确认第三行数据不能为空！";
-					insertOperateHistory(request, type, msg);
+					insertOperateHistory(session, type, msg);
 					return null;
 				}
 			}
 		}
 		return projectId;
 	}
+	public boolean checkSetImg(String projectId){
+		String sql = " select * from project_attribute where project_id = ? and attribute_type = 4 ";
+		List<Map<String, Object>> attrList = jdbcTemplate.queryForList(sql, projectId);
+		if(attrList != null && attrList.size()>0){
+			return true;
+		}
+		return false;
+	}
 	
 	
-	public void addRelateImg(String projectId,File zipFile,String desPath) throws IOException{
-		Map<String,String> map = new HashMap<String, String>();
-		ZipUtil.unZipFiles(zipFile, desPath+File.separator);
-		ZipUtil.readFiles(desPath, map);
-		System.out.println(map);
+	public void addRelateImg(HttpSession session,String projectId,File zipFile,String desPath) throws IOException{
+		String msg = null;
+		String sql = " select * from project_attribute where project_id = ? and attribute_type = 4 ";
+		try {
+			List<Map<String, Object>> attrList = jdbcTemplate.queryForList(sql, projectId);
+			if (attrList != null && attrList.size() > 0) {
+				Map<String, String> map = new HashMap<String, String>();
+				String desPathLocal = desPath.split("\\.")[0];
+				ZipUtil.unZipFiles(zipFile, desPathLocal + File.separator);
+				ZipUtil.readFiles(desPathLocal, map);
+				//			System.out.println(map);
+				String attrIndex = attrList.get(0).get("attribute_index") + "";
+				sql = "select id, ext" + attrIndex + " as imgname from project_detail where project_id = ?";
+				if (map != null && map.size() > 0) {
+					List<Map<String, Object>> detailList = jdbcTemplate.queryForList(sql, projectId);
+					if (detailList != null && detailList.size() > 0) {
+						String imgName = "";
+						String detailId = "";
+						sql = " update project_detail set img_path = ? where id = ? ";
+						for (int i = 0; i < detailList.size(); i++) {
+							imgName = detailList.get(i).get("imgname") + "";
+							detailId = detailList.get(i).get("id") + "";
+							for (Map.Entry<String, String> entry : map.entrySet()) {
+								//System.out.println("key= " + entry.getKey() + " and value= " + entry.getValue());
+								if (imgName.equals(entry.getKey().split("\\.")[0])) {
+									jdbcTemplate.update(sql, entry.getValue(), detailId);
+								}
+							}
+						}
+					} else {
+						msg = "项目详细数据为空！";
+					}
+				} else {
+					msg = "请确认zip压缩包有正确数据！";
+				}
+			} else {
+				msg = "请先设置项目图片属性，在提交图片数据！";
+			} 
+		} catch (Exception e) {
+			e.printStackTrace();
+			msg = e.getMessage();
+		}
+		operateHistoryService.insertOH(session, "18", msg, msg==null?1:0);
 	}
 	
 	/**
@@ -208,6 +254,14 @@ public class ProjectServices {
 		HttpSession session=request.getSession();
 		operateHistoryService.insertOH(request,(String)session.getAttribute("userId") , type, msg,msg==null?1:0);
 	}
+	public void insertOperateHistory(HttpSession session,String type,String msg){
+		operateHistoryService.insertOH(session, type, msg,msg==null?1:0);
+	}
+	
+	public void insertOperateHistory(String userId,String type,String msg){
+		operateHistoryService.insertOH(userId, type, msg,msg==null?1:0);
+	}
+	
 	
 	public Page<Map<String, Object>> getProjectMain(String projectname,int start,int limit,String startDate,String endDate){
 		Page<Map<String, Object>> page = new Page<Map<String, Object>>(start, limit, false);
