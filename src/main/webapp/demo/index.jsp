@@ -124,7 +124,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
             <div class="myHeader" id="myHeader">
                 <a href="/" class="logo"></a>
                  
-                <input type="text" placeholder="请输入名称" class="search-input" @click="resultFlag = !resultFlag">
+                <input type="text" placeholder="输入详细地址查询" class="search-input" @click="resultFlag = !resultFlag">
                 <a class="search-btn"><i class="fa fa-search" aria-hidden="true"></i></a>
                 <div class="result-list" style="display: none;">
                     <ul>
@@ -166,20 +166,40 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
                 
                 <div class="region-box" @mouseenter="over('region')" @mouseleave="out('region')">
                     <a href="javascript:;" id="regionTab" class="region" :class="{'expand':expand=='region'}" @click="">
-                                        <span>区域/地铁</span>
+                                        <span>项目</span>
                                         <i class="fa fa-sort-desc" aria-hidden="true"></i>                        
                                     </a>
                 </div>
                 <div class="region-list slide-transition sh" style="display: none;" v-show="subFlag == 'region'" @mouseenter="subOver('region')"
                     @mouseleave="subOut('region')">
                     <ul class="first-info-list">
+                        <li>所有</li>
+                        <li data-dianji="price/100万以下">
+                            <span class="text">测试 </span>
+                        </li>
+                        <li data-dianji="price/100-200万">
+                        <span class="text"> 测试 </span></li>
+                        <li data-dianji="price/200-300万">
+                        <span class="text"> 测试 </span></li>
+						<li data-dianji="price/300-400万">
+						<span class="text">测试 </span></li>
+						<li data-dianji="price/4001-500万"><span class="text">
+								测试 </span></li>
+						<li data-dianji="price/4002-500万"><span class="text">
+								测试 </span></li>
+						<li data-dianji="price/4003-500万"><span class="text">
+								测试 </span></li>
+					</ul>
+                    <!--  
+                    <ul class="first-info-list">
                         <li :class="{ 'selected': selected == 1 }" @mouseenter="selected = 1">不限</li>
                         <li :class="{ 'selected': selected == 2 }" @mouseenter="selected = 2">区域</li>
                         <li :class="{ 'selected': selected == 3 }" @mouseenter="selected = 3">地铁</li>
                     </ul>
+                     -->
                     <ul class="second-info-list data-list swing-transition" style="display: none;" v-show="selected == 3">
                         <li>全部</li>
-                        <li data-dianji="区域/地铁/1号线">1号线</li>
+                        <li data-dianji="区域/地铁/1号线">1号线号线号线号线号线号线号线号线号线</li>
                         <li data-dianji="区域/地铁/2号线">2号线</li>
                         <li data-dianji="区域/地铁/3号线">3号线</li>
                         <li data-dianji="区域/地铁/4号线">4号线</li>
@@ -225,7 +245,6 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
                         <li>所有</li>
                         <li data-dianji="price/100万以下">
                             <span class="text">市容 </span>
-
                         </li>
                         <li data-dianji="price/100-200万">
                         <span class="text"> 绿化 </span></li>
@@ -237,6 +256,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 								城管 </span></li>
 					</ul>
                 </div>
+                 -->
                 <!-- 
                 <div class="filter-box">
                     <a href="javascript:;" class="filter room" :class="{'expand':expand=='room'}" @mouseenter="over('room')" @mouseleave="out('room')">
