@@ -191,6 +191,7 @@ public class WebAndAppController extends BaseController{
 		paramList.add(token);
 		paramList.add(phoneId);
 		paramList.add(jsonIds);
+		System.out.println("jsonIds="+jsonIds);
 		AppLoginBean appLoginBean = new AppLoginBean();
 		code = globalCheck(paramList, token, phoneId,appLoginBean);
 		
@@ -198,8 +199,9 @@ public class WebAndAppController extends BaseController{
 		List<Map<String, Object>> list = new ArrayList<Map<String,Object>>();
 		if(code == 0){
 			//TODO 根据jsonIds解析树形json
-			String json = "[{\"attributes\":[{\"attribute_id\":\"00151280833338700003\",\"conditions\":[{\"condition_id\":\"442\"},{\"condition_id\":\"443\"}]},{\"attribute_id\":\"00151280833339000011\",\"conditions\":[{\"condition_id\":\"448\"},{\"condition_id\":\"449\"}]}],\"project_id\":\"00151280833337500000\"}]";
-			JSONArray projectArray = JSONArray.parseArray(json);
+//			String json = "[{\"attributes\":[{\"attribute_id\":\"00151280833338700003\",\"conditions\":[{\"condition_id\":\"442\"},{\"condition_id\":\"443\"}]},{\"attribute_id\":\"00151280833339000011\",\"conditions\":[{\"condition_id\":\"448\"},{\"condition_id\":\"449\"}]}],\"project_id\":\"00151280833337500000\"}]";
+//			String json = "[{\"attributes\":[{\"attribute_id\":\"00151324042913000013005056c00001\",\"conditions\":[{\"condition_id\":\"1765\"}]}],\"project_id\":\"00151324042911900000005056c00001\"}]";
+			JSONArray projectArray = JSONArray.parseArray(jsonIds);
 			String projectId = "";
 			Map<String,List<String>> param = new HashMap<String, List<String>>();
 			List<String> conditionList = new ArrayList<String>();
@@ -228,7 +230,7 @@ public class WebAndAppController extends BaseController{
 				}
 			}
 		}
-		return new AppJsonModel(code, ServerResult.getCodeMsg(code, msg), info);
+		return new AppJsonModel(code, ServerResult.getCodeMsg(code, msg), list);
 	}
 	
 	

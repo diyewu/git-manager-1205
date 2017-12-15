@@ -30,7 +30,7 @@ public class Swagger2 {
 	
 	private ApiInfo apiInfo(){
 		return new ApiInfoBuilder()
-				.title("Spring Boot中使用Swagger2构建RESTful APIs")
+				.title("GIS APP APIs")
 				.description("描述")
 				.termsOfServiceUrl("https://www.zhaoshuxue.top")
 				.version("3.1.2")

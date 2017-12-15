@@ -147,9 +147,8 @@ public class WebAndAppService {
 		return null;
 	}
 	
-	
 	public List<Map<String, Object>> getCoordinateInfo(String detailId){
-		String attrSql = " SELECT * FROM project_attribute WHERE project_id = ( SELECT project_id FROM project_detail WHERE id = ? ) ";
+		String attrSql = " SELECT pat.alias_name, attribute_index FROM project_attribute_type pat LEFT JOIN ( SELECT * FROM project_attribute WHERE project_id = ( SELECT project_id FROM project_detail WHERE id = ? )) pa ON pa.attribute_type = pat.id WHERE pat.alias_name IS NOT NULL ";
 		List<Map<String, Object>> list = jdbcTemplate.queryForList(attrSql, detailId);
 		if(list == null || list.size()==0){
 			return null;
@@ -159,7 +158,11 @@ public class WebAndAppService {
 		sb.append(" select ");
 		for (int i = 0; i < list.size(); i++) {
 			attrMap = list.get(i);
-			sb.append(" ext"+attrMap.get("attribute_index")+" as "+attrMap.get("attribute_name")+",");
+			if(StringUtils.isNotBlank(attrMap.get("attribute_index")==null?null:attrMap.get("attribute_index")+"")){
+				sb.append(" ext"+attrMap.get("attribute_index")+" as "+attrMap.get("alias_name")+",");
+			}else{
+				sb.append(" 'null' as "+attrMap.get("alias_name")+",");
+			}
 		}
 		sb.append(" id from project_detail where id = ? ");
 		return jdbcTemplate.queryForList(sb.toString(), detailId);

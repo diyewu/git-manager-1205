@@ -15,8 +15,7 @@ import io.swagger.annotations.ApiParam;
  */
 @RestController
 public class ApiController {
-
-	@ApiOperation(value = "获取字典列表", notes = "测试地址：", httpMethod = "GET")
+	@ApiOperation(value = "测试获取字典列表", notes = "测试地址：", httpMethod = "GET")
 	@RequestMapping("getList")
 	@ResponseBody
 	public JsonModel getList(
