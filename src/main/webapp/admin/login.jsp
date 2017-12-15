@@ -1,38 +1,78 @@
-<%@ page language="java" import="java.util.*" pageEncoding="utf-8"%>
+<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
 <%
 String path = request.getContextPath();
 String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+path+"/";
 String pathName = request.getParameter("pathName")==null?"index":request.getParameter("pathName");
-
-session.removeAttribute("isLogin");//判断是否登陆
-session.removeAttribute("userName");			
 %>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
-<head>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<title>login</title>
-<link rel="stylesheet" type="text/css" href="../css/jquery.alerts.css">
-<link rel="stylesheet" type="text/css" href="../css/login.css">
-<script src="../js/jquery.js"></script>
-<script src="../js/jquery.ui.draggable.js" type="text/javascript"></script>
-<script src="../js/jquery.alerts.js" type="text/javascript"></script>
-</head>
 
-<body>
-<!--"content"-->
-<div id = "logindiv" class="alert-content1 tc lh22 fs14 cl7">
-  <form action="" method="get" class="login fr">
-    <font class="loginhint dsp bfb fs14 cl8 tl" style="display:none;">你还没有输入账号！</font>
-    <input id="username" type="text" class="homeinput01 mb10" placeholder="您的账号" autocomplete="off">
-    <input id="userpwd" type="password" class="homeinput02 mb10" placeholder="登录密码" autocomplete="off">
-    <p class="bfb tr pb5 dsp pt5">
-      <button type="button" id="loginBtn" class="btn btn-primary loginbtn" style="width:100%;font-size:20px;"  onclick="login();" onfocus = this.blur() />
-    	  登  录
-      </button>
-    </p>
-  </form>
-</div>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+    
+    <title>登陆</title>
+    
+	<meta http-equiv="pragma" content="no-cache">
+	<meta http-equiv="cache-control" content="no-cache">
+	<meta http-equiv="expires" content="0">    
+	<meta http-equiv="keywords" content="keyword1,keyword2,keyword3">
+	<meta http-equiv="description" content="This is my page">
+	<!--
+	<link rel="stylesheet" type="text/css" href="styles.css">
+	-->
+    <link rel="stylesheet" type="text/css" href="../css/jquery.alerts.css">
+	<script src="../js/jquery.js"></script>
+	<script src="../js/jquery.ui.draggable.js" type="text/javascript"></script>
+	<script src="../js/jquery.alerts.js" type="text/javascript"></script>
+	<link rel="stylesheet" href="../css/base.css">
+    <link rel="stylesheet" href="../css/style.css">
+
+  </head>
+  
+  <body>
+    <div class="bg"></div>
+    <div class="container">
+        <div class="line bouncein">
+            <div id="logindiv" class="xs6 xm4 xs3-move xm4-move">
+                <div style="height:150px;"></div>
+                <div class="media media-y margin-big-bottom">
+                </div>
+                <form action="index.html" method="post">
+                    <div  class="panel loginbox">
+                        <div class="text-center margin-big padding-big-top">
+                            <h1>GIS后台管理中心</h1>
+                        </div>
+                        <div class="panel-body" style="padding:30px; padding-bottom:10px; padding-top:10px;">
+                            <div class="form-group">
+                                <div class="field field-icon-right">
+                                    <input type="text" class="input input-big" name="name" id="username" placeholder="登录账号" />
+                                    <span class="icon icon-user margin-small"></span>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="field field-icon-right">
+                                    <input type="password" class="input input-big" name="password" id="userpwd"  placeholder="登录密码" />
+                                    <span class="icon icon-key margin-small"></span>
+                                </div>
+                            </div>
+                            <!-- 
+                            <div class="form-group">
+                                <div class="field">
+                                    <input type="text" class="input input-big" name="code" placeholder="填写右侧的验证码" />
+                                    <img src="images/passcode.jpg" alt="" width="100" height="32" class="passcode" style="height:43px;cursor:pointer;" onClick="this.src=this.src+'?'">
+                                </div>
+                            </div>
+                             -->
+                        </div>
+                        <div style="padding:30px;">
+                            <input type="button" id="button" class="button button-block bg-main text-big input-big" onclick="login();" value="登录">
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+</body>
 <script type="text/javascript">
 	var path = '<%=path%>';
 	function login(){
@@ -57,20 +97,12 @@ session.removeAttribute("userName");
 		}
 	}
 	
-	/*document.onkeyup = function (event) {
-         var e = event || window.event;
-         var keyCode = e.keyCode || e.which;
-         if(keyCode == 13){
-         	login();
-         }
-    }*/
-    
 	$("#logindiv").keypress(function(e) {
+	console.log(123123);
 		var keyCode = e.keyCode ? e.keyCode : e.which ? e.which : e.charCode;
 		if (keyCode == 13) {
 			login();
 		}
 	});
 </script>
-</body>
 </html>

@@ -352,12 +352,21 @@
     				id : 'sampleUploadFileId',
     				name : 'uploadFile',
     				xtype : "textfield",
-    				fieldLabel : '文件',
+    				fieldLabel : 'EXCEL文件',
     				inputType : 'file',
     				anchor : '96%',
 					hidden:isHid,
 					hideLabel:isHid 
-    			},uxfile]
+    			},{
+    				id : 'sampleZipUploadFile',
+    				name : 'zipUploadFile',
+    				xtype : "textfield",
+    				fieldLabel : 'ZIP图片包',
+    				inputType : 'file',
+    				anchor : '96%',
+					hidden:isHid,
+					hideLabel:isHid 
+    			}]
     		}, {
     			xtype : 'fieldset',
     			title : '设置参数',
@@ -476,7 +485,7 @@
     	
     	newWin = new Ext.Window({
     		width : 520,
-    		title : '导入数据',
+    		title : '导入项目数据',
     		height : winHeight,
     		defaults : {// 表示该窗口中所有子元素的特性
     			border : false

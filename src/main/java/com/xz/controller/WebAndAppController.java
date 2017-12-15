@@ -63,27 +63,39 @@ public class WebAndAppController extends BaseController{
 				code = ServerResult.RESULT_SERVER_ERROR;
 			}
 		}
-		//TODO  判断当前手机是否允许登陆
-		//TODO  判断当前是否已经登陆
-		if(code == 0){// 服务器无异常
-			if(list != null && list.size()>0){
-				token = UUID.randomUUID().toString().replaceAll("-", "");
-				String userId = list.get(0).get("id")+"";
-				String roleId = list.get(0).get("user_role")+"";
-				String realName = list.get(0).get("real_name")+"";
-				resultMap.put("token", token);
-				resultMap.put("real_name", realName);
-				AppLoginBean appLoginBean = new AppLoginBean();
-				appLoginBean.setToken(token);
-				appLoginBean.setUserId(userId);
-				appLoginBean.setUserRoleId(roleId);
-				AgingCache.putCacheInfo(phoneId, appLoginBean,30);
-			}else{
+		// 服务器无异常
+		if(code == 0){
+			if(list == null || list.size()==0){
 				code = ServerResult.RESULT_ERROE_USER_LOGIN;
-				msg = ServerResult.RESULT_ERROE_USER_LOGIN_MSG;
 			}
 		}
-		return new AppJsonModel(code, msg, resultMap);
+		//验证phone是否允许登陆
+		if(code == 0){
+			int allowSize = list.get(0).get("allow_phone_size") ==null?1:Integer.parseInt(list.get(0).get("allow_phone_size")+"");
+			String webUserId = list.get(0).get("id")+"";
+			try {
+				code = webAndAppService.checkPhoneId(phoneId, allowSize, webUserId);
+			} catch (Exception e) {
+				e.printStackTrace();
+				msg = e.getMessage();
+				code = ServerResult.RESULT_SERVER_ERROR;
+			}
+		}
+		//TODO  判断当前是否已经登陆
+		if(code == 0){
+			token = UUID.randomUUID().toString().replaceAll("-", "");
+			String userId = list.get(0).get("id")+"";
+			String roleId = list.get(0).get("user_role")+"";
+			String realName = list.get(0).get("real_name")+"";
+			resultMap.put("token", token);
+			resultMap.put("real_name", realName);
+			AppLoginBean appLoginBean = new AppLoginBean();
+			appLoginBean.setToken(token);
+			appLoginBean.setUserId(userId);
+			appLoginBean.setUserRoleId(roleId);
+			AgingCache.putCacheInfo(phoneId, appLoginBean,30);
+		}
+		return new AppJsonModel(code, ServerResult.getCodeMsg(code, msg), resultMap);
 	}
 	
 	@RequestMapping("getMenu")
@@ -186,7 +198,6 @@ public class WebAndAppController extends BaseController{
 		List<Map<String, Object>> list = new ArrayList<Map<String,Object>>();
 		if(code == 0){
 			//TODO 根据jsonIds解析树形json
-			
 			String json = "[{\"attributes\":[{\"attribute_id\":\"00151280833338700003\",\"conditions\":[{\"condition_id\":\"442\"},{\"condition_id\":\"443\"}]},{\"attribute_id\":\"00151280833339000011\",\"conditions\":[{\"condition_id\":\"448\"},{\"condition_id\":\"449\"}]}],\"project_id\":\"00151280833337500000\"}]";
 			JSONArray projectArray = JSONArray.parseArray(json);
 			String projectId = "";

@@ -16,7 +16,7 @@ public class HttpRequest {
 //        System.out.println(s);
         
         //发送 POST 请求  	login	getMenu	getMapInfo	getCoordinateInfo
-        String sr=HttpRequest.sendPost("http://localhost:8080/gismgr/app/getCoordinateInfo/", 
+        String sr=HttpRequest.sendPost("http://huashengkewu6.vicp.io:29804/gismgr/app/login/", 
         		"userName=admin&userPwd=admin&jsonIds=asd&coordinateId=00151307024358400015005056c00001");
         System.out.println(sr);
     }
@@ -99,7 +99,7 @@ public class HttpRequest {
 //            conn.setRequestProperty("connection", "Keep-Alive");
 //            conn.setRequestProperty("user-agent", "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1;SV1)");
             conn.setRequestProperty("phoneId", "123456");
-            conn.setRequestProperty("token", "ea989607f66c42e0976f23eeb6efe8c3");
+            conn.setRequestProperty("token", "1c11fd2948ba40fab10b61b58d6ffc17");
             // 发送POST请求必须设置如下两行
             conn.setDoOutput(true);
             conn.setDoInput(true);

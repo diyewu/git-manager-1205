@@ -2,8 +2,10 @@ package com.xz.controller;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -16,6 +18,7 @@ import java.util.concurrent.Executors;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.StringUtils;
 import org.codehaus.jackson.JsonParseException;
@@ -47,23 +50,27 @@ public class ProjectMgrController extends BaseController {
 	private ObjectMapper mapper;
 	class RecCallable implements Callable{
 		HttpServletRequest request;
-		private File file;
+		private File xlsFile;
 		private String title;
-		private String path;
 		private String createUser;
-		RecCallable(HttpServletRequest request,File file,String title,String path,String createUser) {
+		private File zipFile;
+		private String desPath;
+		
+		RecCallable(HttpServletRequest request,File xlsFile,String title,String createUser,File zipFile,String desPath) {
 			this.request =request;
-	    	this.file = file;
+	    	this.xlsFile = xlsFile;
 	    	this.title = title;
-	    	this.path = path;
 	    	this.createUser = createUser;
+	    	this.zipFile = zipFile;
+	    	this.desPath = desPath;
 	    }
 	    @Override
 	    public Object call() throws Exception {
 	    	String resp = "";
 	    	try {
-	    		String projectId = peojectServices.importProjectData(request, file, title, path,createUser);
+	    		String projectId = peojectServices.importProjectData(request, xlsFile, title,createUser);
 //	    		peojectServices.generateCondition(projectId);
+	    		
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -76,9 +83,13 @@ public class ProjectMgrController extends BaseController {
 	@RequestMapping("springUpload")
 	public void springUpload(HttpServletRequest request,HttpServletResponse response) throws IllegalStateException, IOException {
     	String msg = null;
+    	HttpSession session=request.getSession();
+    	String userId = session.getAttribute("userId")+"";
     	Map<String, String> map = new HashMap<String, String>();
     	mapper = new ObjectMapper();
 		long startTime = System.currentTimeMillis();
+		String title = request.getParameter("importTitle");
+		String comment = request.getParameter("importComment");
 		// 将当前上下文初始化给 CommonsMutipartResolver （多部分解析器）
 		CommonsMultipartResolver multipartResolver = new CommonsMultipartResolver(request.getSession().getServletContext());
 		// 检查form中是否有enctype="multipart/form-data"
@@ -87,23 +98,46 @@ public class ProjectMgrController extends BaseController {
 			MultipartHttpServletRequest multiRequest = (MultipartHttpServletRequest) request;
 			// 获取multiRequest 中所有的文件名
 			Iterator iter = multiRequest.getFileNames();
+			File xlsFile = null;
+			String xlsPath = "";
+			File zipFile = null;
+			String zipPath = "";
+			String desPath = "";//解压路径
 			while (iter.hasNext()) {
 				// 一次遍历所有文件
 				MultipartFile file = multiRequest.getFile(iter.next().toString());
 				if (file != null) {
 //					String path = "E:/springUpload" + file.getOriginalFilename();
 					System.out.println("_____"+customConfig.getClientFileUpladPath());
-					String path=customConfig.getClientFileUpladPath()+File.separator+new Date().getTime()+file.getOriginalFilename();
+					SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+					Date d = new Date();  
+			        String dateNowStr = sdf.format(d);
+			        String uploadPath = customConfig.getClientFileUpladPath()+File.separator+dateNowStr;
+			        File uploadPathFile =new File(uploadPath);
+					if(!uploadPathFile.exists() && !uploadPathFile.isDirectory() ){
+						uploadPathFile.mkdir();
+					}
+					//xls
+					String path=customConfig.getClientFileUpladPath()+File.separator+dateNowStr+File.separator+new Date().getTime()+file.getOriginalFilename();
 					// 上传
 					file.transferTo(new File(path));
 					if((file.getOriginalFilename()).contains(".xls")){//上传EXCEL文件
 						//线程处理
-						File tfile = new File(path);
-						RecCallable cb = new RecCallable(multiRequest, tfile, null, path, null);
-						threadPool.submit(cb);
+						xlsFile = new File(path);
+						xlsPath = path;
+//						RecCallable cb = new RecCallable(multiRequest, tfile, null, path, null);
+//						threadPool.submit(cb);
+					}
+					if((file.getOriginalFilename()).contains(".zip")){
+						desPath = uploadPath+File.separator+zipFile.getName();
+						zipFile = new File(path);
 					}
 				}
 
+			}
+			if(xlsFile != null){
+				RecCallable cb = new RecCallable(multiRequest, xlsFile, title, userId,zipFile,desPath);
+				threadPool.submit(cb);
 			}
 		}
 		long endTime = System.currentTimeMillis();

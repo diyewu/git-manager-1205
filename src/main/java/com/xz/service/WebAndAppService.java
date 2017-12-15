@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.google.common.base.Joiner;
+import com.xz.common.ServerResult;
 import com.xz.entity.AppMenu;
 import com.xz.entity.CategoryTreeBeanCk;
 import com.xz.service.WebUserService.CategoryTreeBeanCKRowMapper;
@@ -35,6 +36,34 @@ public class WebAndAppService {
 		}
 		return null;
 	}
+	public int checkPhoneId(String phoneId,int allowSize,String webUserId){
+		int code = 0;
+		String sql = "select * from web_user_login_phone where web_user_id = ?";
+		List<Map<String, Object>> list = jdbcTemplate.queryForList(sql,webUserId);
+		//第一次使用,新增记录
+		String insertSql = " insert into web_user_login_phone(phone_id,web_user_id,create_date)values(?,?,NOW()) ";
+		if(list == null || list.size() == 0){
+			jdbcTemplate.update(insertSql,phoneId,webUserId);
+		}else{//当前存在记录
+			boolean containPhoneId = false;
+			int nowSize = list.size();
+			if(nowSize == allowSize){
+				for(int i=0;i<nowSize;i++){
+					if(phoneId.equals(list.get(i).get("phone_id"))){
+						containPhoneId = true;
+						break;
+					}
+				}
+				if(!containPhoneId){
+					code = ServerResult.RESULT_CHECK_PHONE_ERROE;
+				}
+			}else if(nowSize < allowSize){
+				jdbcTemplate.update(insertSql,phoneId,webUserId);
+			}
+		}
+		return code;
+	}
+	
 	
 	
 	public List<AppMenu> getMenu(String roleId){

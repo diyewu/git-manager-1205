@@ -20,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.xz.common.Page;
 import com.xz.utils.ExcelReadUtils;
 import com.xz.utils.SortableUUID;
+import com.xz.utils.ZipUtil;
 
 
 @Service
@@ -32,7 +33,7 @@ public class ProjectServices {
 	private OperateHistoryService operateHistoryService;
 	
 	@Transactional
-	public String importProjectData(HttpServletRequest request,File file,String title,String path,String createUser){
+	public String importProjectData(HttpServletRequest request,File file,String title,String createUser){
 		ArrayList<ArrayList<Object>> list = new ArrayList<ArrayList<Object>>();
 		String msg = null;
 		String type = "5";//导入项目数据
@@ -57,7 +58,7 @@ public class ProjectServices {
 		//插入项目主表数据
 		String projectId = SortableUUID.randomUUID();
 		String mainSql = " insert into project_main(id,project_name,create_time,create_user_id,file_path)values(?,?,NOW(),?,?) ";
-		jdbcTemplate.update(mainSql, projectId,title,createUser,path);
+		jdbcTemplate.update(mainSql, projectId,title,createUser,file.getPath());
 		
 		//插入项目属性表数据
 		ArrayList<Object> attrList = list.get(1);
@@ -104,6 +105,14 @@ public class ProjectServices {
 			}
 		}
 		return projectId;
+	}
+	
+	
+	public void addRelateImg(String projectId,File zipFile,String desPath) throws IOException{
+		Map<String,String> map = new HashMap<String, String>();
+		ZipUtil.unZipFiles(zipFile, desPath+File.separator);
+		ZipUtil.readFiles(desPath, map);
+		System.out.println(map);
 	}
 	
 	/**
