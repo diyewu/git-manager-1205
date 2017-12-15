@@ -269,8 +269,8 @@ public class ProjectServices {
 		StringBuilder sql = new StringBuilder(" select a.id,a.project_name,a.create_time,b.real_name  ");
 		sql.append(" from project_main a LEFT JOIN user_login b on a.create_user_id = b.id where 1=1 ");
 		if(StringUtils.isNotBlank(projectname)){
-			sql.append(" and a.project_name = ? ");
-			params.add(projectname);
+			sql.append(" and a.project_name like ? ");
+			params.add("%"+projectname+"%");
 		}
 		if(StringUtils.isNotBlank(startDate)){
 			sql.append(" and a.create_date >= ? ");
@@ -280,7 +280,7 @@ public class ProjectServices {
 			sql.append(" and a.create_date <= ? ");
 			params.add(endDate);
 		}
-		sql.append(" order by a.create_time ");
+		sql.append(" order by a.create_time desc ");
 		
 		List<Map<String, Object>> countList = jdbcTemplate.queryForList(sql.toString(),params.toArray());
 		page.setTotalCount(countList.size());

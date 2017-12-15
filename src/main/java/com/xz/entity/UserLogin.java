@@ -21,6 +21,8 @@ public class UserLogin {
 
     private Integer allowPhoneSize;
     
+    private Integer isAllowWeblogin;
+    
     private String realName;
     
 
@@ -111,6 +113,13 @@ public class UserLogin {
 	public void setRealName(String realName) {
 		this.realName = realName;
 	}
-    
+
+	public Integer getIsAllowWeblogin() {
+		return isAllowWeblogin;
+	}
+
+	public void setIsAllowWeblogin(Integer isAllowWeblogin) {
+		this.isAllowWeblogin = isAllowWeblogin;
+	}
     
 }

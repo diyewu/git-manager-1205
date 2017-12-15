@@ -24,8 +24,8 @@
 					{name:  'roleName'},
 					{name : 'id'},
 				]
-			}),
-			remoteSort : true
+			})
+//			remoteSort : true
 		});
 		store.load({params:{start:0,limit:20}});
         

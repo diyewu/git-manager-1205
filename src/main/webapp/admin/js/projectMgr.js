@@ -140,15 +140,16 @@
         
         var tbar = new Ext.Toolbar({  
             renderTo : Ext.grid.GridPanel.tbar,// 其中grid是上边创建的grid容器  
-            items :['导入数据年月：', {
-		  		  id : 'searchMonth',
-		  		  emptyText : "请输入年月，6位数字",
+            items :['项目名称：', {
+//		  		  id : 'searchMonth',
+		  		  id : 'searchProjectName',
+//		  		  emptyText : "请输入年月，6位数字",
 		  		  xtype : 'textfield',
 		  		  width : 115,
 		  		  listeners : {
 		  			  specialkey : function(f, e) {
 		  				  if (e.getKey() == e.ENTER) {
-		  					  self.searchItem(f);
+//		  					  self.searchItem(f);
 		  				  }
 		  			  }
 		  		  }
@@ -164,11 +165,9 @@
 				text : '重置',
 				iconCls : 'Reload',
 				handler : function() {
-					Ext.getCmp('searchMonth').setValue("");
+					Ext.getCmp('searchProjectName').setValue("");
 					Ext.getCmp('createDateStart').setValue("");
 					Ext.getCmp('createDateEnd').setValue("");
-//					Ext.getCmp('editDateStart').setValue("");
-//					Ext.getCmp('editDateEnd').setValue("");
 				}
 			},{
 				text : '导入新数据',
@@ -176,20 +175,7 @@
 				handler : function() {
 					showEditRom();
 				}
-			}/*,{
-				text : '设置比较年月',
-				iconCls : 'Cog',
-				handler : function() {
-					setImportDatabaseMonth(0);					
-				}
-			},{
-				text : '取消设置年月',
-				iconCls : 'Cancel',
-				handler : function() {
-//					showEditRom();
-					setImportDatabaseMonth(1);
-				}
-			}*/]
+			}]
 
         });  
         grid = new Ext.grid.EditorGridPanel({ 
@@ -251,13 +237,10 @@
 		if (endTime)
 			endTimeStr = endTime.format('Y-m-d H:i:s');
 		
-		var searchMonth = document.getElementById('searchMonth').value ;
+		var searchProjectName = document.getElementById('searchProjectName').value ;
 		var createDateStart = document.getElementById('createDateStart').value ;
 		var createDateEnd = document.getElementById('createDateEnd').value ;
-		if("请输入年月，6位数字" == searchMonth){
-			searchMonth = "";
-		}
-		store.baseParams['searchMonth'] = searchMonth;
+		store.baseParams['projectName'] = searchProjectName;
 		store.baseParams['createDateStart'] = createDateStart;
 		store.baseParams['createDateEnd'] = createDateEnd;
 		store.reload({

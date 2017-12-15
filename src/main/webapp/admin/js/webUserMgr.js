@@ -14,7 +14,7 @@
    		var qrUrl = path + "/webuser/";
    		var order;
         store = new Ext.data.Store({
-			url : qrUrl+"listUser.action",
+			url : qrUrl+"listUser",
 			reader : new Ext.data.JsonReader({
 				root : 'data',
 				fields : [
@@ -23,10 +23,11 @@
 					{name : 'user_role_id'},
 					{name : 'real_name'},
 					{name : 'allow_phone_size'},
+					{name : 'use_phone_size'},
 					{name : 'id'}
 				]
-			}),
-			remoteSort : true
+			})
+//			remoteSort : true
 		});
 		store.load({params:{start:0,limit:20}});
 		var sm = new Ext.grid.CheckboxSelectionModel();
@@ -38,6 +39,7 @@
 	            {header:"角色类别",align:'center',dataIndex:"user_role",sortable:true},
 	            {header:"用户别名",align:'center',dataIndex:"real_name",sortable:true},
 	            {header:"允许登陆手机数",align:'center',dataIndex:"allow_phone_size",sortable:true},
+	            {header:"已用手机数",align:'center',dataIndex:"use_phone_size",sortable:true},
 	            {header:"操作",align:'center',dataIndex:"id",width:50,
 	            renderer: function (value, meta, record) {
 //	            	console.log(record);
@@ -67,7 +69,7 @@
 		//用户角色
 		var moduleStore = new Ext.data.Store({
 	        proxy: new Ext.data.HttpProxy({
-	            url: path + "/webuser/getRole.action?all="+1 //这里是参数可以顺便写,这个数据源是在第一个下拉框select的时候load的
+	            url: path + "/webuser/getRole?all="+1 //这里是参数可以顺便写,这个数据源是在第一个下拉框select的时候load的
 	        }),
 	        reader: new Ext.data.JsonReader({
         	root : 'products',
@@ -195,7 +197,7 @@
 	function deleteUser(id){
 		Ext.Msg.confirm('删除数据', '确认?',function (button,text){if(button == 'yes'){
 			Ext.Ajax.request({
-				  url : path + "/webuser/deleteUser.action",
+				  url : path + "/webuser/deleteUser",
 				  method : 'post',
 				  params : {
 					  userId:id
@@ -225,7 +227,7 @@
     	//用户角色
 		var _moduleStore = new Ext.data.Store({
 	        proxy: new Ext.data.HttpProxy({
-	            url: path + "/webuser/getRole.action?all="+0 //这里是参数可以顺便写,这个数据源是在第一个下拉框select的时候load的
+	            url: path + "/webuser/getRole?all="+0 //这里是参数可以顺便写,这个数据源是在第一个下拉框select的时候load的
 	        }),
 	        reader: new Ext.data.JsonReader({
         	root : 'products',
@@ -305,14 +307,14 @@
     					return;
     				}else{
         		        var reg = /^\d$/;     
-        				if(vers.match(reg) == null){  
+        				if(phone.match(reg) == null){  
         					Ext.Msg.alert("error", "允许登录手机数只能填写数字");
         					return;
         				}
     				}
 //    				console.log(co);
     				Ext.Ajax.request({
-    					  url : path + "/webuser/editUser.action",
+    					  url : path + "/webuser/editUser",
     					  method : 'post',
     					  params : {
     						  userId:_userId,
@@ -388,7 +390,7 @@ function setUserCanLogin(value){
 	}
 	Ext.Msg.confirm('确认设置', '确认?',function (button,text){if(button == 'yes'){
 		Ext.Ajax.request( {
-			  url : path + "/webuser/setConsoleUserAllowLogin.action",
+			  url : path + "/webuser/setConsoleUserAllowLogin",
 			  method : 'post',
 			  params : {
 			   ids : dids,

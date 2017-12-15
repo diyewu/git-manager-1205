@@ -450,4 +450,67 @@ public class WebUserController extends BaseController {
 		operateHistoryService.insertOH(request,(String)session.getAttribute("userId") , "12", msg,msg==null?1:0);
 		this.printData(response, mapper.writeValueAsString(map));
 	}
+	@RequestMapping("deleteUserPhone")
+	@ResponseBody
+	public void deleteUserPhone(HttpServletRequest request,HttpServletResponse response) throws JsonGenerationException, JsonMappingException, IOException{
+		HttpSession session=request.getSession();
+		String msg = null;
+		ObjectMapper mapper = new ObjectMapper();
+		Map<String, String> map = new HashMap<String, String>();
+		String userPhoneId = request.getParameter("userPhoneId");
+		if (msg == null) {
+			if (StringUtils.isNotBlank(userPhoneId)) {
+				try {
+					webUserService.deleteUserPhone(userPhoneId);
+				} catch (Exception e) {
+					e.printStackTrace();
+					msg = e.getMessage();
+				}
+			} else {
+				msg = "参数为空！";
+			}
+		}
+		if (msg == null) {
+			map.put("i_type", "success");
+			map.put("i_msg", "");
+		} else {
+			map.put("i_type", "error");
+			map.put("i_msg", "操作失败：" + msg);
+		}
+		operateHistoryService.insertOH(request,(String)session.getAttribute("userId") , "19", msg,msg==null?1:0);
+		this.printData(response, mapper.writeValueAsString(map));
+	}
+	
+	@RequestMapping("listUserPhone")
+	@ResponseBody
+	public void listUserPhone(HttpServletRequest request,HttpServletResponse response) throws JsonGenerationException, JsonMappingException, IOException{
+		ObjectMapper mapper = new ObjectMapper();
+		Map<String,String> condition = new HashMap<String, String>();
+		String userRealName = request.getParameter("userRealName");
+		String userLoginName = request.getParameter("userLoginName");
+		String start = request.getParameter("start");
+		String limit = request.getParameter("limit");
+		
+		String msg = null;
+		if(StringUtils.isNotBlank(userRealName)){
+			condition.put("userRealName", userRealName);
+		}
+		if(StringUtils.isNotBlank(userLoginName)){
+			condition.put("userLoginName", userLoginName);
+		}
+		if (StringUtils.isNotBlank(start)) {
+			condition.put("start", start);
+		}
+		if (StringUtils.isNotBlank(limit)) {
+			condition.put("limit", limit);
+		}
+		Page<Map<String, Object>> page = new Page<Map<String,Object>>();
+		try {
+			page = webUserService.listUserPhone(condition);
+		} catch (Exception e) {
+			e.printStackTrace();
+			msg = e.getMessage();
+		}
+		resultSuccess("", page.getResult(), page.getTotalCount(),response);
+	}
 }
