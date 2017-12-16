@@ -1,0 +1,66 @@
+/* css-------------------------------- */
+.myContainer .selectedContainer {
+    position: absolute;
+    z-index:4;
+    top:64px;
+    left:100px;
+    bottom:100px;
+    right:100px
+}
+.myContainer .selectedContainer .selectedResult {
+    background:#fff;
+    height:60px
+}
+.myContainer .selectedContainer .selectedResult .selectedResultBtn{
+    position:fixed;
+    width:60px;
+    height:43px;
+    line-height:43px;
+    text-align:center;
+    border-right:1px solid #ddd;
+    border-bottom:1px solid #ddd;
+}
+.myContainer .selectedContainer .selectedResult .selectedResultContainer{
+    overflow-x:auto;
+    margin-left:60px;
+    border-bottom:1px solid #ddd;
+}
+.myContainer .selectedContainer .selectedResult .selectedResultContainer .selectedResultWrap {
+    height:42px;
+    float:left;
+    margin-left:20px
+}
+.myContainer .selectedContainer .selectedResult .selectedResultContainer .selectedResultWrap .selectedResultWrapText{
+    line-height:42px
+}
+.myContainer .selectedContainer .selectedResult .selectedResultContainer .selectedResultWrap .selectedResultWrapItem{
+    display:inline-block;
+    width:80px;
+    /* line-height:42px; */
+    margin-right:20px;
+    border:1px solid #3086c3;
+    text-align:center
+}
+.myContainer .selectedContainer .selectedLine {
+    width:33%;
+    overflow-y:auto;
+    background:#fff;
+    position:absolute;
+    bottom:0px;
+    top:60px
+}
+.myContainer .selectedContainer .selectedLine .selectedItem {
+    height:30px;
+    line-height:30px;
+    padding-left:20px
+}
+
+.myContainer .selectedContainer .selectedLine .selectedItem:hover{
+    background:#ddd;
+}
+.fade-enter-active, .fade-leave-active {
+    transition: opacity .5s
+}
+.fade-enter, .fade-leave-to {
+    opacity: 0
+}

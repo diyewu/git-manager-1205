@@ -5,13 +5,10 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -48,29 +45,34 @@ public class ProjectMgrController extends BaseController {
 	ExecutorService threadPool = Executors.newCachedThreadPool();
 
 	private ObjectMapper mapper;
-	class RecCallable implements Callable{
-		HttpServletRequest request;
+	class RecCallable implements Callable<Object>{
+		private HttpSession session;
 		private File xlsFile;
 		private String title;
 		private String createUser;
 		private File zipFile;
 		private String desPath;
+		private String webProjectId;
 		
-		RecCallable(HttpServletRequest request,File xlsFile,String title,String createUser,File zipFile,String desPath) {
-			this.request =request;
+		RecCallable(HttpSession session,File xlsFile,String title,String createUser,File zipFile,String desPath,String webProjectId) {
+			this.session =session;
 	    	this.xlsFile = xlsFile;
 	    	this.title = title;
 	    	this.createUser = createUser;
 	    	this.zipFile = zipFile;
 	    	this.desPath = desPath;
+	    	this.webProjectId = webProjectId;
 	    }
 	    @Override
 	    public Object call() throws Exception {
 	    	String resp = "";
 	    	try {
-	    		String projectId = peojectServices.importProjectData(request, xlsFile, title,createUser);
-//	    		peojectServices.generateCondition(projectId);
-	    		
+	    		if(zipFile != null && StringUtils.isNotBlank(webProjectId)){
+	    			peojectServices.addRelateImg(session,webProjectId, zipFile, desPath);;
+	    		}
+	    		if(xlsFile != null){
+	    			peojectServices.importProjectData(session, xlsFile, title,createUser);
+	    		}
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -80,23 +82,20 @@ public class ProjectMgrController extends BaseController {
 	/*
 	 * 采用spring提供的上传文件的方法
 	 */
-	@RequestMapping("springUpload")
-	public void springUpload(HttpServletRequest request,HttpServletResponse response) throws IllegalStateException, IOException {
+	@RequestMapping("uploadFile")
+	public void uploadFile(HttpServletRequest request,HttpServletResponse response) throws IllegalStateException, IOException {
     	String msg = null;
     	HttpSession session=request.getSession();
     	String userId = session.getAttribute("userId")+"";
     	Map<String, String> map = new HashMap<String, String>();
     	mapper = new ObjectMapper();
 		long startTime = System.currentTimeMillis();
+		String webProjectId = request.getParameter("projrctId");
 		String title = request.getParameter("importTitle");
 		String comment = request.getParameter("importComment");
-		// 将当前上下文初始化给 CommonsMutipartResolver （多部分解析器）
 		CommonsMultipartResolver multipartResolver = new CommonsMultipartResolver(request.getSession().getServletContext());
-		// 检查form中是否有enctype="multipart/form-data"
 		if (multipartResolver.isMultipart(request)) {
-			// 将request变成多部分request
 			MultipartHttpServletRequest multiRequest = (MultipartHttpServletRequest) request;
-			// 获取multiRequest 中所有的文件名
 			Iterator iter = multiRequest.getFileNames();
 			File xlsFile = null;
 			String xlsPath = "";
@@ -108,7 +107,6 @@ public class ProjectMgrController extends BaseController {
 				MultipartFile file = multiRequest.getFile(iter.next().toString());
 				if (file != null) {
 //					String path = "E:/springUpload" + file.getOriginalFilename();
-					System.out.println("_____"+customConfig.getClientFileUpladPath());
 					SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
 					Date d = new Date();  
 			        String dateNowStr = sdf.format(d);
@@ -121,23 +119,35 @@ public class ProjectMgrController extends BaseController {
 					String path=customConfig.getClientFileUpladPath()+File.separator+dateNowStr+File.separator+new Date().getTime()+file.getOriginalFilename();
 					// 上传
 					file.transferTo(new File(path));
-					if((file.getOriginalFilename()).contains(".xls")){//上传EXCEL文件
-						//线程处理
-						xlsFile = new File(path);
-						xlsPath = path;
-//						RecCallable cb = new RecCallable(multiRequest, tfile, null, path, null);
-//						threadPool.submit(cb);
-					}
-					if((file.getOriginalFilename()).contains(".zip")){
-						desPath = uploadPath+File.separator+zipFile.getName();
-						zipFile = new File(path);
+					if(StringUtils.isNotBlank(webProjectId)){
+						if((file.getOriginalFilename()).contains(".zip")){
+							zipFile = new File(path);
+							desPath = uploadPath+File.separator+zipFile.getName();
+						}
+					}else{
+						if((file.getOriginalFilename()).contains(".xls")){//上传EXCEL文件
+							xlsFile = new File(path);
+							xlsPath = path;
+						}
 					}
 				}
 
 			}
-			if(xlsFile != null){
-				RecCallable cb = new RecCallable(multiRequest, xlsFile, title, userId,zipFile,desPath);
-				threadPool.submit(cb);
+			if(xlsFile != null || zipFile != null){
+				if(zipFile != null){
+					if(StringUtils.isBlank(webProjectId)){
+						msg = "项目参数有误！";
+					}else{
+						if(!peojectServices.checkSetImg(webProjectId)){
+							msg = "请先设置项目图片属性，在提交图片数据！";
+						}
+					}
+				}
+				if(msg == null){
+					//线程处理
+					RecCallable cb = new RecCallable(session, xlsFile, title, userId,zipFile,desPath,webProjectId);
+					threadPool.submit(cb);
+				}
 			}
 		}
 		long endTime = System.currentTimeMillis();

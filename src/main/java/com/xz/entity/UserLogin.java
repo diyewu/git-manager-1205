@@ -19,6 +19,8 @@ public class UserLogin {
 
     private String updateDate;
 
+    private Integer allowPhoneSize;
+    
     private Integer isAllowWeblogin;
     
     private String realName;
@@ -96,13 +98,13 @@ public class UserLogin {
         this.updateDate = updateDate == null ? null : updateDate.trim();
     }
 
-    public Integer getIsAllowWeblogin() {
-        return isAllowWeblogin;
-    }
+	public Integer getAllowPhoneSize() {
+		return allowPhoneSize;
+	}
 
-    public void setIsAllowWeblogin(Integer isAllowWeblogin) {
-        this.isAllowWeblogin = isAllowWeblogin;
-    }
+	public void setAllowPhoneSize(Integer allowPhoneSize) {
+		this.allowPhoneSize = allowPhoneSize;
+	}
 
 	public String getRealName() {
 		return realName;
@@ -111,6 +113,13 @@ public class UserLogin {
 	public void setRealName(String realName) {
 		this.realName = realName;
 	}
-    
+
+	public Integer getIsAllowWeblogin() {
+		return isAllowWeblogin;
+	}
+
+	public void setIsAllowWeblogin(Integer isAllowWeblogin) {
+		this.isAllowWeblogin = isAllowWeblogin;
+	}
     
 }

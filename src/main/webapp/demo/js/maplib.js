@@ -601,7 +601,7 @@ var BMapLib = window.BMapLib = BMapLib || {};
         this._clusterMarker.setPosition(this._center);
          
 //      this._clusterMarker.setText(this._markers.length);
-        this._clusterMarker.setText({name : '共找到' , value : this._markers.length});
+        this._clusterMarker.setText({name : '' , value : this._markers.length});
  
         var thatMap = this._map;
         var thatBounds = this.getBounds();
@@ -610,9 +610,10 @@ var BMapLib = window.BMapLib = BMapLib || {};
 //            thatMap.setViewport(thatBounds);
  			//这个方法容易造成晃动
             thatMap.setViewport(thatBounds);
-            //console.log(center);
             var zoom = thatMap.getZoom();
+            console.log(zoom);
             zoom = zoom > 12 ? zoom : 12;
+            console.log(zoom);
             thatMap.setZoom(zoom);
             thatMap.setCenter(center);
         });

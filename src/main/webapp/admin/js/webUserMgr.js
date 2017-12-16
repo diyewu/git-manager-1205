@@ -14,7 +14,7 @@
    		var qrUrl = path + "/webuser/";
    		var order;
         store = new Ext.data.Store({
-			url : qrUrl+"listUser.action",
+			url : qrUrl+"listUser",
 			reader : new Ext.data.JsonReader({
 				root : 'data',
 				fields : [
@@ -22,10 +22,12 @@
 					{name : 'user_role'},
 					{name : 'user_role_id'},
 					{name : 'real_name'},
+					{name : 'allow_phone_size'},
+					{name : 'use_phone_size'},
 					{name : 'id'}
 				]
-			}),
-			remoteSort : true
+			})
+//			remoteSort : true
 		});
 		store.load({params:{start:0,limit:20}});
 		var sm = new Ext.grid.CheckboxSelectionModel();
@@ -36,6 +38,8 @@
             	{header:"用户名",align:'center',dataIndex:"user_name",sortable:true}, 
 	            {header:"角色类别",align:'center',dataIndex:"user_role",sortable:true},
 	            {header:"用户别名",align:'center',dataIndex:"real_name",sortable:true},
+	            {header:"允许登陆手机数",align:'center',dataIndex:"allow_phone_size",sortable:true},
+	            {header:"已用手机数",align:'center',dataIndex:"use_phone_size",sortable:true},
 	            {header:"操作",align:'center',dataIndex:"id",width:50,
 	            renderer: function (value, meta, record) {
 //	            	console.log(record);
@@ -44,7 +48,8 @@
 							+ record.get('user_name') + "','"
 							+ record.get('user_role') + "','"
 							+ record.get('user_role_id') + "','"
-							+ record.get('real_name')
+							+ record.get('real_name') + "','"
+							+ record.get('allow_phone_size')
 							+ "');\" type='button' value='编辑' width ='15px'/>&nbsp;&nbsp;"; 
 
 										     var deleteBtn = "<input id = 'bt_delete_" + record.get('id')
@@ -64,7 +69,7 @@
 		//用户角色
 		var moduleStore = new Ext.data.Store({
 	        proxy: new Ext.data.HttpProxy({
-	            url: path + "/webuser/getRole.action?all="+1 //这里是参数可以顺便写,这个数据源是在第一个下拉框select的时候load的
+	            url: path + "/webuser/getRole?all="+1 //这里是参数可以顺便写,这个数据源是在第一个下拉框select的时候load的
 	        }),
 	        reader: new Ext.data.JsonReader({
         	root : 'products',
@@ -192,7 +197,7 @@
 	function deleteUser(id){
 		Ext.Msg.confirm('删除数据', '确认?',function (button,text){if(button == 'yes'){
 			Ext.Ajax.request({
-				  url : path + "/webuser/deleteUser.action",
+				  url : path + "/webuser/deleteUser",
 				  method : 'post',
 				  params : {
 					  userId:id
@@ -212,7 +217,7 @@
 		}});
 		
 	}
-    function showEditUser(_userId,_userName,_userRoleName,_userRole,_realName){
+    function showEditUser(_userId,_userName,_userRoleName,_userRole,_realName,_phoneval){
     	var isHidden = true;
     	var pwdval = "******";
     	if(typeof(_userId) == "undefined" || _userId  == ""){
@@ -222,7 +227,7 @@
     	//用户角色
 		var _moduleStore = new Ext.data.Store({
 	        proxy: new Ext.data.HttpProxy({
-	            url: path + "/webuser/getRole.action?all="+0 //这里是参数可以顺便写,这个数据源是在第一个下拉框select的时候load的
+	            url: path + "/webuser/getRole?all="+0 //这里是参数可以顺便写,这个数据源是在第一个下拉框select的时候load的
 	        }),
 	        reader: new Ext.data.JsonReader({
         	root : 'products',
@@ -253,14 +258,15 @@
     	var _fileForm =  new Ext.form.FormPanel({
             frame: true,
             autoHeight: true,
-            labelWidth: 80,
-            labelAlign: "right",
+            labelWidth: 90,
+            labelAlign: "left",
             bodyStyle:"text-align:left",
             border : false,
             items: [
                {xtype:"textfield", width:180,id: "eUserName",name: "eUserName", fieldLabel: "用户名",value:_userName},
                {xtype:"textfield", width:180,id: "enewpwd",name: "enewpwd", fieldLabel: "用户密码",value:pwdval},
                {xtype:"textfield", width:180,id: "enrealName",name: "enrealName", fieldLabel: "用户别名",value:_realName},
+               {xtype:"textfield", width:180,id: "phoneval",name: "phoneval", fieldLabel: "允许登录手机数",value:_phoneval},
                co
             ],
          });
@@ -278,6 +284,7 @@
     				var name = Ext.getCmp('eUserName').getValue();
     				var pwd = Ext.getCmp('enewpwd').getValue();
     				var realName = Ext.getCmp('enrealName').getValue();
+    				var phone = Ext.getCmp('phoneval').getValue();
     				var role = co.getValue();
     				if(typeof(name) == "undefined" || name  == ""){
     					Ext.Msg.alert('提示', '请填写用户名');
@@ -295,15 +302,26 @@
     					Ext.Msg.alert('提示', '请选择用户角色');
     					return;
     				}
+    				if(typeof(phone) == "undefined" || phone  == ""){
+    					Ext.Msg.alert('提示', '请填写允许登录手机数');
+    					return;
+    				}else{
+        		        var reg = /^\d$/;     
+        				if(phone.match(reg) == null){  
+        					Ext.Msg.alert("error", "允许登录手机数只能填写数字");
+        					return;
+        				}
+    				}
 //    				console.log(co);
     				Ext.Ajax.request({
-    					  url : path + "/webuser/editUser.action",
+    					  url : path + "/webuser/editUser",
     					  method : 'post',
     					  params : {
     						  userId:_userId,
     						  userName:name,
     						  userPwd:pwd,
     						  realName:realName,
+    						  phoneSize:phone,
     						  userRole:role
     					  },
     					  success : function(response, options) {
@@ -327,7 +345,7 @@
     	
     	newWin = new Ext.Window({
     		width : 520,
-    		height:200,
+    		height:250,
     		title : '用户编辑',
     		defaults : {// 表示该窗口中所有子元素的特性
     			border : false
@@ -372,7 +390,7 @@ function setUserCanLogin(value){
 	}
 	Ext.Msg.confirm('确认设置', '确认?',function (button,text){if(button == 'yes'){
 		Ext.Ajax.request( {
-			  url : path + "/webuser/setConsoleUserAllowLogin.action",
+			  url : path + "/webuser/setConsoleUserAllowLogin",
 			  method : 'post',
 			  params : {
 			   ids : dids,

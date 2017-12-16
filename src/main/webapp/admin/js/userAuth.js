@@ -24,8 +24,8 @@
 					{name:  'roleName'},
 					{name : 'id'},
 				]
-			}),
-			remoteSort : true
+			})
+//			remoteSort : true
 		});
 		store.load({params:{start:0,limit:20}});
         
@@ -33,7 +33,7 @@
             [ 
             	new Ext.grid.RowNumberer(),
 //            	sm,
-            	{header:"角色名",align:'center',dataIndex:"roleName",sortable:true}, 
+            	{header:"角色名",align:'center',dataIndex:"roleName",sortable:false}, 
 	            {header:"操作",align:'center',dataIndex:"id",
 	            renderer: function (value, meta, record) {
 					            			var formatStr = "<input id = 'bt_edit_" + record.get('id')

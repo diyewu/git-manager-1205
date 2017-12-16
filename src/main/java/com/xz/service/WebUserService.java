@@ -90,7 +90,11 @@ public class WebUserService {
 		Page<Map<String, Object>> page = new Page<Map<String, Object>>(0, 1000, false);
 		List<Object> params = new ArrayList<Object>();
 		List<Map<String, Object>> list = new ArrayList<Map<String,Object>>();
-		StringBuilder sbud = new StringBuilder("select a.id,a.user_name,a.user_password,a.is_delete,a.user_role as user_role_id,b.role_name as user_role,real_name from web_user_login a left join web_user_role b on a.user_role = b.id where 1 = 1 and a.is_delete = 0 and b.is_delete = 0 ");
+		StringBuilder sbud = new StringBuilder("select a.id,a.user_name,a.user_password,a.is_delete,a.user_role as user_role_id,b.role_name as user_role,"
+				+ "real_name,CASE when c.use_size is null then 0 else c.use_size end as use_phone_size, a.allow_phone_size "
+				+ "from web_user_login a left join web_user_role b on a.user_role = b.id "
+				+ " left join (select count(wp.id) as use_size,wp.web_user_id from web_user_login_phone wp GROUP BY wp.web_user_id) c on c.web_user_id = a.id "
+				+ "where 1 = 1 and a.is_delete = 0 and b.is_delete = 0 ");
 		if (!condition.isEmpty()) { 
 			if (condition.containsKey("userName")) {
 				sbud.append(" and a.user_name like ?");
@@ -133,9 +137,9 @@ public class WebUserService {
 		return i>0;
 	}
 	
-	public void addUser(String userName,String userPwd,int role,String realName){
+	public void addUser(String userName,String userPwd,int role,String realName,int phoneSizeInt){
 		String uuid = UUID.randomUUID().toString().replace("-", "");
-		jdbcTemplate.update("insert into web_user_login(id,user_name,user_password,user_role,real_name)values(?,?,?,?,?)",uuid,userName,userPwd,role,realName);
+		jdbcTemplate.update("insert into web_user_login(id,user_name,user_password,user_role,real_name,allow_phone_size)values(?,?,?,?,?,?)",uuid,userName,userPwd,role,realName,phoneSizeInt);
 	}
 	public void editUser(UserLogin user){
 		if(StringUtils.isNotBlank(user.getId())){
@@ -158,31 +162,20 @@ public class WebUserService {
 				sb.append(",real_name = ?");
 				params.add(user.getRealName());
 			}
+			if(StringUtils.isNotBlank(user.getAllowPhoneSize()+"")){
+				sb.append(",allow_phone_size = ?");
+				params.add(user.getAllowPhoneSize());
+			}
 			sb.append(" where id = ?");
 			params.add(user.getId());
 			jdbcTemplate.update(sb.toString(), params.toArray(new Object[params.size()]));
 			
-			syncPwd(user.getId(), user.getUserName(), user.getUserPassword());
-		}
-	}
-	
-	public void syncPwd(String userId,String userName,String newUserPwd){
-		String sql = "  select is_allow_weblogin,user_name from web_user_login where id = ? ";
-		List<Map<String, Object>> list = jdbcTemplate.queryForList(sql,userId);
-		String isAllow = "";
-		if(list != null && list.size()>0){
-			isAllow = list.get(0).get("is_allow_weblogin")+"";
-			if("0".equals(isAllow)){//允许登陆
-				String sql1 = " update base_user set login_pwd = ? where auth_type = 0 and  login_name = ?  ";
-				jdbcTemplate.update(sql1,newUserPwd,userName);
-			}
 		}
 	}
 	
 	public void updatePwd(String userId,String userName,String newUserPwd){
 //		String md5Pwd = Md5Util.generatePassword(newUserPwd);
 		jdbcTemplate.update("update web_user_login set user_password = ? where id =? ",newUserPwd,userId);
-		syncPwd(userId, userName, newUserPwd);
 	}
 	public void DeleteWebRoleAuth(String roleId){
 		jdbcTemplate.update("delete from project_condition_auth where web_user_role_id =?",roleId);
@@ -204,7 +197,18 @@ public class WebUserService {
 	
 	public void deleteUserByRoleId(String roleId){
 		if(StringUtils.isNotBlank(roleId)){
-			jdbcTemplate.update("update web_user_login set is_delete = 1 where user_role =?",roleId);
+//			jdbcTemplate.update("update web_user_login set is_delete = 1 where user_role =?",roleId);
+			String sql  = " select id from web_user_login where user_role = ? ";
+			List<Map<String, Object>> webUserlist = jdbcTemplate.queryForList(sql, roleId);
+			if (webUserlist != null && webUserlist.size() > 0) {
+				String webUserId =""; 
+				for(int i=0;i<webUserlist.size();i++){
+					webUserId = webUserlist.get(i).get("id")+"";
+					if(StringUtils.isNotBlank(webUserId)){
+						deleteUser(webUserId);
+					}
+				}
+			}
 		}
 	}
 	public void deleteRole(String roleId){
@@ -215,6 +219,12 @@ public class WebUserService {
 	public void deleteUser(String userId){
 		if(StringUtils.isNotBlank(userId)){
 			jdbcTemplate.update("update web_user_login set is_delete = 1 where id =?",userId);
+			deleteUserPhone(userId);
+		}
+	}
+	public void deleteUserPhone(String userPhoneId){
+		if(StringUtils.isNotBlank(userPhoneId)){
+			jdbcTemplate.update("delete from web_user_login_phone where id = ?",userPhoneId);
 		}
 	}
 	
@@ -232,4 +242,35 @@ public class WebUserService {
 			jdbcTemplate.update(sb.toString(), params.toArray(new Object[params.size()]));
 		}
 	}
+	public Page<Map<String, Object>> listUserPhone (Map<String, String> condition){
+		Page<Map<String, Object>> page = new Page<Map<String, Object>>(0, 1000, false);
+		List<Object> params = new ArrayList<Object>();
+		List<Map<String, Object>> list = new ArrayList<Map<String,Object>>();
+		StringBuilder sbud = new StringBuilder("select wp.create_date, wp.id,wp.phone_id,wl.user_name,wl.real_name from web_user_login_phone wp "
+				+ "inner join web_user_login wl on wp.web_user_id = wl.id and wl.is_delete = 0 ");
+		if (!condition.isEmpty()) { 
+			if (condition.containsKey("userRealName")) {
+				sbud.append(" and wl.real_name like ?");
+				params.add("%"+condition.get("userRealName")+"%");
+			}
+			if(condition.containsKey("userLoginName")){
+				sbud.append(" and wl.user_name like ?");
+				params.add("%"+condition.get("userLoginName")+"%");
+			}
+			List<Map<String, Object>> countList = jdbcTemplate.queryForList(sbud.toString(),params.toArray());
+			page.setTotalCount(countList.size());
+			if (condition.containsKey("start") && condition.containsKey("limit")) {
+				sbud.append(" LIMIT ?,? ");
+				int start = Integer.parseInt(condition.get("start"));
+				int limit = Integer.parseInt(condition.get("limit"));
+				params.add(start);
+				params.add(limit);
+			}
+			list = jdbcTemplate.queryForList(sbud.toString(),params.toArray());
+		}
+		page.setResult(list);
+		return page;
+	}
+	
+	
 }

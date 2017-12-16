@@ -16,6 +16,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
     <script src="plugins/layer/layer.js"></script>
     <script src="js/common.js"></script>
     <link rel="stylesheet" href="css/index.css">
+    <link rel="stylesheet" href="css/index_cascade.css">
     <link rel="stylesheet" type="text/css" href="plugins/earthmap/css/demo.css" />
     <link rel="stylesheet" type="text/css" href="plugins/earthmap/css/layerown.css" />
     <script type="text/javascript" src="plugins/earthmap/js/layerown.js"></script>
@@ -73,9 +74,57 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
         </header>
         <button class="trigger" data-info="跳过"><span>跳过</span></button>
         <div class="myContainer" id="myContainer">
+        	 <transition name="fade">
+                <div class="selectedContainer" v-if="cascaderStatus">
+                    <transition name="fade">
+                        <div class="selectedResult" :style="{width:firstIndex!==''?(secondIndex!==''?'99%':'66%'):'33%'}">
+                            <div class="selectedResultBtn" @click="cascadeClose()">
+                               	 确定
+                            </div>
+                            <div class="selectedResultContainer">
+                                <div class="selectedResultWrap" :style="{width:selectedIndex.length*100+50+'px'}">
+                                        <span class="selectedResultWrapText">结果：</span>
+                                        <span class="selectedResultWrapItem" v-for="(v,i) in selectedIndex">{{v.id}}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </transition>
+                    
+                    <div class="selectedLine" :style="{borderRight:firstIndex!==''?'1px solid #ddd':''}">
+                        <div class="selectedItem" :style="{color:firstIndex===i?'#3086c3':''}"  @click="firstClick(i)" v-for="(v,i) in cascaderData">
+                            {{v.id}}
+                        </div>
+                    </div>
+                    <transition name="fade">
+                        <div class="selectedLine" :style="{borderRight:secondIndex!==''?'1px solid #ddd':'',left:'33%'}" v-if="firstIndex!==''">
+                            <div class="selectedItem" :style="{color:secondIndex===i?'#3086c3':''}" @click="secondClick(i)" v-for="(v,i) in cascaderData[firstIndex].children">
+                                    {{v.id}}
+                            </div>
+                        </div>
+                    </transition>
+                    
+                    <transition name="fade">
+                        <div class="selectedLine" style="left:66%" v-if="firstIndex!==''&&secondIndex!==''">
+                            <div @click="thirdClick(v,i)" class="selectedItem"  :style="{color:v.status?'#3086c3':''}" v-for="(v,i) in cascaderData[firstIndex].children[secondIndex].children">
+                                    <!-- //{{v.id}} -->
+                                    <input style="width:auto;height:auto;margin:auto;padding:auto;float:none" :checked="v.status"   type="checkbox">{{v.id}}
+                            </div>
+                        </div>
+                    </transition>
+                    
+                    <!-- <div style="width:150px;float:left" v-if="cascaderData[firstIndex].children[secondIndex].children">
+                        <div @click="thirdClick(v)" v-for="(v,i) in cascaderData">
+                            {{v.id}}
+                        </div>
+                    </div> -->
+                </div>
+            </transition>
+        
+        
             <div class="myHeader" id="myHeader">
                 <a href="/" class="logo"></a>
-                <input type="text" placeholder="请输入名称" class="search-input" @click="resultFlag = !resultFlag">
+                 
+                <input type="text" placeholder="输入详细地址查询" class="search-input" @click="resultFlag = !resultFlag">
                 <a class="search-btn"><i class="fa fa-search" aria-hidden="true"></i></a>
                 <div class="result-list" style="display: none;">
                     <ul>
@@ -114,22 +163,43 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
                         </li>
                     </ul>
                 </div>
+                
                 <div class="region-box" @mouseenter="over('region')" @mouseleave="out('region')">
                     <a href="javascript:;" id="regionTab" class="region" :class="{'expand':expand=='region'}" @click="">
-                                        <span>区域/地铁</span>
+                                        <span>项目</span>
                                         <i class="fa fa-sort-desc" aria-hidden="true"></i>                        
                                     </a>
                 </div>
                 <div class="region-list slide-transition sh" style="display: none;" v-show="subFlag == 'region'" @mouseenter="subOver('region')"
                     @mouseleave="subOut('region')">
                     <ul class="first-info-list">
+                        <li>所有</li>
+                        <li data-dianji="price/100万以下">
+                            <span class="text">测试 </span>
+                        </li>
+                        <li data-dianji="price/100-200万">
+                        <span class="text"> 测试 </span></li>
+                        <li data-dianji="price/200-300万">
+                        <span class="text"> 测试 </span></li>
+						<li data-dianji="price/300-400万">
+						<span class="text">测试 </span></li>
+						<li data-dianji="price/4001-500万"><span class="text">
+								测试 </span></li>
+						<li data-dianji="price/4002-500万"><span class="text">
+								测试 </span></li>
+						<li data-dianji="price/4003-500万"><span class="text">
+								测试 </span></li>
+					</ul>
+                    <!--  
+                    <ul class="first-info-list">
                         <li :class="{ 'selected': selected == 1 }" @mouseenter="selected = 1">不限</li>
                         <li :class="{ 'selected': selected == 2 }" @mouseenter="selected = 2">区域</li>
                         <li :class="{ 'selected': selected == 3 }" @mouseenter="selected = 3">地铁</li>
                     </ul>
+                     -->
                     <ul class="second-info-list data-list swing-transition" style="display: none;" v-show="selected == 3">
                         <li>全部</li>
-                        <li data-dianji="区域/地铁/1号线">1号线</li>
+                        <li data-dianji="区域/地铁/1号线">1号线号线号线号线号线号线号线号线号线</li>
                         <li data-dianji="区域/地铁/2号线">2号线</li>
                         <li data-dianji="区域/地铁/3号线">3号线</li>
                         <li data-dianji="区域/地铁/4号线">4号线</li>
@@ -162,6 +232,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
                         <li data-dianji="bizcircle/赵巷">金山区</li>
                     </ul>
                 </div>
+                <!-- 
                 <div class="filter-box">
                     <a href="javascript:;" class="filter price" :class="{'expand':expand=='price'}" @mouseenter="over('price')" @mouseleave="out('price')">
                                         <span>属性</span>
@@ -174,7 +245,6 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
                         <li>所有</li>
                         <li data-dianji="price/100万以下">
                             <span class="text">市容 </span>
-
                         </li>
                         <li data-dianji="price/100-200万">
                         <span class="text"> 绿化 </span></li>
@@ -186,6 +256,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 								城管 </span></li>
 					</ul>
                 </div>
+                 -->
                 <!-- 
                 <div class="filter-box">
                     <a href="javascript:;" class="filter room" :class="{'expand':expand=='room'}" @mouseenter="over('room')" @mouseleave="out('room')">
@@ -248,11 +319,19 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
                     </ul>
                 </div>
                  -->
+                 <!-- 
                 <div class="more-box" @mouseenter="over('more')" @mouseleave="out('more')">
                     <a href="javascript:;" class="filter more " :class="{'expand':expand=='more'}">
                                         <span>更多</span>
                                         <i class="fa fa-sort-desc" aria-hidden="true"></i>                        
                                     </a>
+                </div>
+                 -->
+                <div class="filter-box" @click.stop="cascadeOpen()">
+                    <a href="javascript:;"  class="filter price">
+                                            <span>更多</span>
+                                            <!-- <i class="fa fa-sort-desc" aria-hidden="true"></i>                         -->
+                                        </a>
                 </div>
                 <div class="condition-box slide-transition" style="display:none;" v-show="subFlag=='more'" @mouseenter="subOver('more')"
                     @mouseleave="subOut('more')">
@@ -392,7 +471,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
             <div class="list-container">
                 <div class="overlay" style="display: none;"></div>
                 <div class="list-header">
-                    <span class="total-count">共<em>666</em>张图片</span>
+                    <span class="total-count">共<em>888</em>条信息</span>
                     <!-- 
                     <span class="sort" data-dianji="time/排序">开盘时间<i class="fa fa-arrow-down" aria-hidden="true"></i></span>
                     <span class="sort" data-dianji="price/排序">价格<i class="fa fa-arrow-up" aria-hidden="true"></i></span>
@@ -405,15 +484,15 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
                         <div class="right-info">
                             <div>
                                 <span class="title">
-                                            <a target="_blank" href="/detail/lujinsheshanyuanzibs/">楠华饭店</a>
+                                            <a target="_blank" href="/detail/lujinsheshanyuanzibs/">南龙谭苑小区</a>
                                         </span>
-                                <span class="villa-name">饭店</span>
+                                <span class="villa-name">松江区</span>
                                 <!-- <span class="sale-status" data-status="在售">正常</span> -->
                                 <i class="iconfont favor-icon" style="display: none;" data-dianji="favor/测试图片详情"></i>
                             </div>
-                            <div><span>负责人：酱油</span> <span class="price">详情</span></div>
-                            <div><span>饭店测试</span></div>
-                            <div><span>XXXXXX</span></div>
+                            <div><span>检查人员：赵苏鸣</span> <span class="price">详情</span></div>
+                            <div><span>经度：121.239</span></div>
+                            <div><span>纬度：31.015</span></div>
                         </div>
                         <hr>
                     </div>
@@ -646,13 +725,13 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
                 </div>
                 <div class="houseInfo" style="margin: 0.3rem 0.85rem;">
                     <span class="title" style="font-weight:bolder;font-size:0.9rem;">
-                        <a target="_blank" href="/detail/lujinsheshanyuanzibs/">路劲佘山院子（别墅）</a>
+                        <a target="_blank" href="">南龙谭苑小区</a>
                     </span>
-                    <span class="villa-name">别墅</span><span class="sale-status" data-status="在售">在售</span>
+                    <span class="villa-name">松江区</span><!-- <span class="sale-status" data-status="在售"></span> -->
                     <i class="iconfont favor-icon" style="display: none;" data-dianji="favor/关注路劲佘山院子（别墅）"></i>
-                    <div class="inlineText"><span><span class="tag">住房面积：</span><span>121-142m²</span></span><span class="afterSpan"><span class="tag">户型介绍：</span><span>别墅户型</span></span>
+                    <div class="inlineText"><span><span class="tag">检查人员</span><span>赵苏鸣</span></span><span class="afterSpan"><span class="tag">完成时间：</span><span>2017-11-18 00:00:00</span></span>
                     </div>
-                    <div class="inlineText"><span><span class="tag">销售总价：</span><span class="price">666万/套起</span></span><span class="afterSpan"><span class="tag">地址：</span><span>松江-松江松江崇南公路599弄</span></span>
+                    <div class="inlineText"><span><span class="tag">调研编号：</span><span class="price">0701163pp</span></span><span class="afterSpan"><span class="tag">地址：</span><span>岳阳街道中山二路125弄</span></span>
                     </div>
                 </div>
             </div>

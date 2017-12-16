@@ -24,8 +24,8 @@
 					{name : 'is_allow_weblogin'},
 					{name : 'id'}
 				]
-			}),
-			remoteSort : true
+			})
+//			remoteSort : true
 		});
 		store.load({params:{start:0,limit:20}});
 		var sm = new Ext.grid.CheckboxSelectionModel();

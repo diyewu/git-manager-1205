@@ -23,6 +23,8 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
+import com.sun.xml.internal.messaging.saaj.util.ByteInputStream;
+
 /**
  * excel读取工具
  * @author dean
@@ -31,63 +33,125 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 public class ExcelReadUtils {
 	
 	public static Workbook getWorkbook(String excelFile) throws IOException {
-		return getWorkbook(new FileInputStream(excelFile));
+		FileInputStream is = null;
+		Workbook workbook = null;
+		try {
+			is = new FileInputStream(excelFile);
+			workbook = getWorkbook(is);
+		} finally {
+			
+		}
+		return workbook;
 	}
 	
 	public static Workbook getWorkbook(InputStream is) throws IOException {
-
 		Workbook wb = null;
-
 		ByteArrayOutputStream byteOS = new ByteArrayOutputStream();
-		byte[] buffer = new byte[512];
-		int count = -1;
-		int i=0;
-		while ((count = is.read(buffer)) != -1){
-			byteOS.write(buffer, 0, count);
-		}
-		byteOS.close();
-		byte[] allBytes = byteOS.toByteArray();
-
+		ByteArrayInputStream byteArrayInputStream = new ByteInputStream();
 		try {
-			wb = new XSSFWorkbook(new ByteArrayInputStream(allBytes));
+			byte[] buffer = new byte[512];
+			int count = -1;
+			while ((count = is.read(buffer)) != -1){
+				byteOS.write(buffer, 0, count);
+			}
+			byte[] allBytes = byteOS.toByteArray();
+			byteArrayInputStream = new ByteArrayInputStream(allBytes);
+			wb = new XSSFWorkbook(byteArrayInputStream);
 		} catch (Exception ex) {
-			wb = new HSSFWorkbook(new ByteArrayInputStream(allBytes));
+			wb = new HSSFWorkbook(byteArrayInputStream);
+		}finally{
+			if(byteOS != null){
+				byteOS.close();
+			}
+			if(byteArrayInputStream != null){
+				byteArrayInputStream.close();
+			}
 		}
-
 		return wb;
 	}
 	public static int getSheetNums(String excelFile) throws IOException{
-		InputStream is = new FileInputStream(excelFile);
-		Workbook wb = getWorkbook(is);
+		InputStream is = null;
+		Workbook wb = null;
+		try {
+			is = new FileInputStream(excelFile);
+			wb = getWorkbook(is);
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			if(is != null){
+				is.close();
+			}
+		}
 		return wb.getNumberOfSheets();
 	}
 	
 	public static ArrayList<ArrayList<Object>> readAllRows(String excelFile) throws IOException {
-		return readAllRows(new FileInputStream(excelFile));
+		FileInputStream is = null;
+		ArrayList<ArrayList<Object>> list = new ArrayList<ArrayList<Object>>();
+		try {
+			is = new FileInputStream(excelFile);
+			list = readAllRows(is);
+		} finally {
+			if(is != null){
+				is.close();
+			}
+		}
+		return list;
 	}
 	public static ArrayList<ArrayList<Object>> readAllRows(File file) throws IOException {
-		return readAllRows(FileUtils.openInputStream(file));
+		FileInputStream is = null;
+		ArrayList<ArrayList<Object>> list = new ArrayList<ArrayList<Object>>();
+		try {
+			is = FileUtils.openInputStream(file);
+			list = readAllRows(is);
+		} finally {
+			if(is != null){
+				is.close();
+			}
+		}
+		return list;
 	}
 	
 	public static ArrayList<ArrayList<Object>> readAllRowsBySheet(String excelFile,int sheetNum) throws IOException {
-		return readAllRowsBySheet(new FileInputStream(excelFile), sheetNum);
+		FileInputStream is =null;
+		ArrayList<ArrayList<Object>> list = new ArrayList<ArrayList<Object>>();
+		try {
+			is = new FileInputStream(excelFile);
+			list = readAllRowsBySheet(is, sheetNum);
+		} finally {
+			if(is != null){
+				is.close();
+			}
+		}
+		return list;
 	}
 	
 	public static ArrayList<ArrayList<Object>> readAllRowsBySheet(File file,int sheetNum) throws IOException {
-		return readAllRowsBySheet(FileUtils.openInputStream(file),sheetNum);
+		FileInputStream is = null;
+		ArrayList<ArrayList<Object>> list = new ArrayList<ArrayList<Object>>();
+		try {
+			is = FileUtils.openInputStream(file);
+			list = readAllRowsBySheet(is,sheetNum);
+		} finally {
+			if(is != null){
+				is.close();
+			}
+		}
+		return list;
 	}
 	
 	public static ArrayList<ArrayList<Object>> readAllRows(InputStream is) throws IOException {
-		Workbook wb = getWorkbook(is);
 		ArrayList<ArrayList<Object>> rowList = new ArrayList<ArrayList<Object>>();
-		
+		Workbook wb = getWorkbook(is);
 	    for (int i = 0; i < wb.getNumberOfSheets(); i++) {//获取每个Sheet表
-	    	Sheet sheet = wb.getSheetAt(i);
-			if (sheet.getLastRowNum() > 0) {
-				rowList.addAll(readRows(sheet));
-			}
+	    	if(i == 0){
+		    	Sheet sheet = wb.getSheetAt(i);
+				if (sheet.getLastRowNum() > 0) {
+					rowList.addAll(readRows(sheet));
+				}
+	    	}
         }
-
+	    wb = null;
 		return rowList;
 	}
 	public static ArrayList<ArrayList<Object>> readAllRowsBySheet(InputStream is,int sheetNum) throws IOException {
@@ -109,15 +173,44 @@ public class ExcelReadUtils {
 
 	public static ArrayList<ArrayList<Object>> readRows(String excelFile,
 			int startRowIndex, int rowCount) throws IOException {
-		return readRows(new FileInputStream(excelFile), startRowIndex, rowCount);
+		FileInputStream is = null;
+		ArrayList<ArrayList<Object>> list = new ArrayList<ArrayList<Object>>();
+		try {
+			is = new FileInputStream(excelFile);
+			list = readRows(is, startRowIndex, rowCount);
+		} finally {
+			if(is != null){
+				is.close();
+			}
+		}
+		return list;
 	}
 	
 	public static ArrayList<ArrayList<Object>> readRows(String excelFile) throws IOException {
-		return readRows(new FileInputStream(excelFile));
+		FileInputStream is = null;
+		ArrayList<ArrayList<Object>> list  = new ArrayList<ArrayList<Object>>();
+		try {
+			is = new FileInputStream(excelFile);
+			list = readRows(is);
+		} finally {
+			if(is != null){
+				is.close();
+			}
+		}
+		return list;
 	}
 	
 	public static ArrayList<ArrayList<Object>> readRows(String excelFile, int i) throws IOException {
-		return readRows(new FileInputStream(excelFile), i);
+		FileInputStream is = null;
+		ArrayList<ArrayList<Object>> list =new ArrayList<ArrayList<Object>>();
+		try {
+			is = new FileInputStream(excelFile);
+			list = readRows(is, i);
+		} finally {
+			if(is != null)
+				is.close();
+		}	
+		return list;
 	}
 
 	public static ArrayList<ArrayList<Object>> readRows(InputStream is,
@@ -232,9 +325,5 @@ public class ExcelReadUtils {
 		Sheet sheet = wb.getSheetAt(0);
 		return sheet.getLastRowNum();
 	}
-	
-	
-	
-	
 	
 }

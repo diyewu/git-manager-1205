@@ -79,15 +79,18 @@
 	            {header:"创建人",align:'center',dataIndex:"real_name",sortable:true},
 	            {header:"操作",align:'center',dataIndex:"id",
 	            renderer: function (value, meta, record) {
-			            	var setBtn = "<input id = 'bt_set_" + record.get('id')
+			              var setBtn = "<input id = 'bt_set_" + record.get('id')
 			            	+ "' onclick=\"showAttrWin('" + record.get('id')
 			            	+ "');\" type='button' value='设置' width ='15px'/>&nbsp;&nbsp;";
+			              var upImfBtn = "<input id = 'bt_upload_" + record.get('id')
+			              + "' onclick=\"showEditRom('" + record.get('id')
+			              + "');\" type='button' value='上传图片' width ='15px'/>&nbsp;&nbsp;";
 						  var deleteBtn = "<input id = 'bt_delete_" + record.get('id')
 							+ "' onclick=\"deleteProject('" + record.get('id')
 							+ "');\" type='button' value='删除' width ='15px'/>";
 										            			
 //            				var resultStr = String.format(formatStr);
-            				return "<div>" + setBtn+deleteBtn + "</div>";
+            				return "<div>" + setBtn+upImfBtn+deleteBtn + "</div>";
         				  } .createDelegate(this)
 	            } 
             ] 
@@ -137,15 +140,16 @@
         
         var tbar = new Ext.Toolbar({  
             renderTo : Ext.grid.GridPanel.tbar,// 其中grid是上边创建的grid容器  
-            items :['导入数据年月：', {
-		  		  id : 'searchMonth',
-		  		  emptyText : "请输入年月，6位数字",
+            items :['项目名称：', {
+//		  		  id : 'searchMonth',
+		  		  id : 'searchProjectName',
+//		  		  emptyText : "请输入年月，6位数字",
 		  		  xtype : 'textfield',
 		  		  width : 115,
 		  		  listeners : {
 		  			  specialkey : function(f, e) {
 		  				  if (e.getKey() == e.ENTER) {
-		  					  self.searchItem(f);
+//		  					  self.searchItem(f);
 		  				  }
 		  			  }
 		  		  }
@@ -161,11 +165,9 @@
 				text : '重置',
 				iconCls : 'Reload',
 				handler : function() {
-					Ext.getCmp('searchMonth').setValue("");
+					Ext.getCmp('searchProjectName').setValue("");
 					Ext.getCmp('createDateStart').setValue("");
 					Ext.getCmp('createDateEnd').setValue("");
-//					Ext.getCmp('editDateStart').setValue("");
-//					Ext.getCmp('editDateEnd').setValue("");
 				}
 			},{
 				text : '导入新数据',
@@ -173,20 +175,7 @@
 				handler : function() {
 					showEditRom();
 				}
-			}/*,{
-				text : '设置比较年月',
-				iconCls : 'Cog',
-				handler : function() {
-					setImportDatabaseMonth(0);					
-				}
-			},{
-				text : '取消设置年月',
-				iconCls : 'Cancel',
-				handler : function() {
-//					showEditRom();
-					setImportDatabaseMonth(1);
-				}
-			}*/]
+			}]
 
         });  
         grid = new Ext.grid.EditorGridPanel({ 
@@ -248,13 +237,10 @@
 		if (endTime)
 			endTimeStr = endTime.format('Y-m-d H:i:s');
 		
-		var searchMonth = document.getElementById('searchMonth').value ;
+		var searchProjectName = document.getElementById('searchProjectName').value ;
 		var createDateStart = document.getElementById('createDateStart').value ;
 		var createDateEnd = document.getElementById('createDateEnd').value ;
-		if("请输入年月，6位数字" == searchMonth){
-			searchMonth = "";
-		}
-		store.baseParams['searchMonth'] = searchMonth;
+		store.baseParams['projectName'] = searchProjectName;
 		store.baseParams['createDateStart'] = createDateStart;
 		store.baseParams['createDateEnd'] = createDateEnd;
 		store.reload({
@@ -302,28 +288,28 @@
 		
 	}
 	
-    function showEditRom(_romId,_romOriginalName,_romVersion,_romType,_romComment){
+    function showEditRom(projrctId){
     	var winHeight='';
     	var isHid =null;
     	var imisHid =null;
-    	if(typeof(_romId) == "undefined" || _romId  == ""){
-    		winHeight = 400;
-    		isHid = false;
-    		imisHid = true;
-    	}else{
-    		winHeight = 400;
+    	if(typeof(projrctId) == "undefined" || projrctId  == ""){
     		isHid = true;
     		imisHid = false;
+    		winHeight = 350;
+    	}else{
+    		winHeight = 200;
+    		isHid = false;
+    		imisHid = true;
     	}
     	var uxfile = new Ext.ux.form.FileUploadField({
     		width: 200,
-    		hidden:imisHid,
-			hideLabel:imisHid,
+//    		hidden:imisHid,
+//			hideLabel:imisHid,
 			id : 'showFileName',
 			name : 'uploadFile',
 			fieldLabel : '文件名'
     	});
-    	uxfile.setValue(_romOriginalName);
+    	uxfile.setValue();
     	
     	var _fileForm = new Ext.FormPanel({
     		layout : "fit",
@@ -341,8 +327,8 @@
     		items : [{  
                 xtype:'hidden',  
                 fieldLabel: 'id',  
-                name: 'id',  
-                value: _romId 
+                name: 'id'//,  
+//                value: '' 
             },{
     			xtype : 'fieldset',
     			title : '选择文件',
@@ -352,12 +338,12 @@
     				id : 'sampleUploadFileId',
     				name : 'uploadFile',
     				xtype : "textfield",
-    				fieldLabel : 'EXCEL文件',
+    				fieldLabel : '选择文件',
     				inputType : 'file',
-    				anchor : '96%',
-					hidden:isHid,
-					hideLabel:isHid 
-    			},{
+    				anchor : '96%'//,
+//					hidden:isHid,
+//					hideLabel:isHid 
+    			}/*,{
     				id : 'sampleZipUploadFile',
     				name : 'zipUploadFile',
     				xtype : "textfield",
@@ -366,20 +352,22 @@
     				anchor : '96%',
 					hidden:isHid,
 					hideLabel:isHid 
-    			}]
+    			}*/]
     		}, {
     			xtype : 'fieldset',
     			title : '设置参数',
     			autoHeight : true,
+    			hidden:imisHid,
+				hideLabel:imisHid,
     			items : [{
     				width:150,
     				xtype : 'textfield',
     				id:'importTitle',
     				name : 'importTitle',
-    				fieldLabel : '标题',
+    				fieldLabel : '标题'//,
 //    				regex : /^\d{8}$/, //正则表达式在/...../之间
 //    				regexText:"版本号只能填写8位数字，如20150101", //正则表达式错误提示  
-    				value:_romVersion,
+//    				value:_romVersion,
     			}/*,co,co1*/,{
     				id:'_romCommentEdit',
     				width:400,
@@ -409,19 +397,31 @@
 //    					Ext.Msg.alert("error", "版本号只能填写8位数字，如20150101");
 //    					return;
 //    				}
-    				if(typeof(_romId) == "undefined" || _romId  == ""){
-	    				if (!Ext.getCmp("sampleUploadFileId").getValue()) {
+    					var upval = Ext.getCmp("sampleUploadFileId").getValue();
+    					console.log(upval);
+	    				if (!upval) {
 	    					Ext.Msg.alert("error", "请选择你要上传的文件");
 	    					return;
 	    				} else {
+	    					if(typeof(projrctId) == "undefined" || projrctId  == ""){
+	    						if(upval.indexOf('.xls') < 0 && upval.indexOf('.xlsx') < 0){
+	    							Ext.Msg.alert("error", "请选择正确的EXCEl文件");
+	    							return;
+	    						}
+	    					}else{
+	    						if(upval.indexOf('.zip') < 0){
+	    							Ext.Msg.alert("error", "请选择正确的zip文件");
+	    							return;
+	    						}
+    						}
 	    					this.disable();
 	    					var btn = this;
 	    					// 开始上传
 	    					var sampleForm = _fileForm.getForm();
 	    					sampleForm.submit({
-	    						url : path +'/projectmgr/springUpload',
+	    						url : path +'/projectmgr/uploadFile',
 	    						params : {  
-//	    		                    searchc : '1231223',  
+	    							projrctId : projrctId
 	    		                },  
 	    						success : function(form, action) {
 	    							btn.enable();
@@ -449,36 +449,6 @@
 	    						}
 	    					});
 	    				}
-    				}else{
-						var sampleForm = _fileForm.getForm();
-    					this.disable();
-    					var btn = this;
-						sampleForm.submit({
-							params : {}	,
-							url : path +'/deviceqr!updateRom.action?id='+_romId,
-							success : function(form, action) {
-							   btn.enable();
-	    	            	   var data = Ext.decode(action.response.responseText);
-	    	            	   if(data.i_type == "success"){
-	    	            		   Ext.Msg.alert("success",'保存成功！',function(){  
-		    	            		   newWin.close();
-		    	            		   reloadData();
-	    	            		   });
-	    	            	   }else{
-	    	            		   Ext.Msg.alert("Error",data.i_msg,function(){
-		    	            		   newWin.close();
-		    	            		   reloadData();
-	    	            		   });
-	    	            	   }
-							},
-							failure : function(form, action) {
-								Ext.Msg.alert("Error",'保存失败！',function(){
-									newWin.close();
-									reloadData();
-								});
-							}
-						});
-    				}
     			}
     		}]
     	});
@@ -555,45 +525,12 @@
 			} 
 		});
 
-       sastore.load({params:{start:0,limit:20}})
+       sastore.load({params:{start:0,limit:20,projectId : projectId}})
 		
        var satbar = new Ext.Toolbar({  
             renderTo : Ext.grid.GridPanel.tbar,// 其中grid是上边创建的grid容器  
             items :[{
-				text : '保存',
-				iconCls : 'Disk',
-				handler : function() {
-					var arr = [];//声明空数组  
-					var records = sastore.getModifiedRecords();  
-					Ext.each(records,function(record){//遍历行数据数组  
-					    arr.push(record.data);
-					});
-					if (arr === undefined || arr.length == 0) {
-						Ext.Msg.alert('提示', '数据没有改动，请确认。');
-						return;
-					}
-					var json=JSON.stringify(arr);
-					Ext.Ajax.request( {
-						  url : path + "/projectmgr/saveAttrType",
-						  method : 'post',
-						  params : {
-							 json : json
-						  },
-						  success : function(response, options) {
-						   var o = Ext.util.JSON.decode(response.responseText);
-						   if(o.i_type && "success"== o.i_type){
-							   Ext.Msg.alert('提示', '设置成功'); 
-						   }else{
-						   	   Ext.Msg.alert('提示', o.i_msg); 
-						   }
-						  },
-						  failure : function() {
-						  	
-						  }
-			 		});
-				}
-			},{
-				text : '勾选设置筛选条件',
+				text : '设置勾选筛选条件',
 				iconCls : 'Accept',
 				handler : function() {
 					var arr = [];//声明空数组  
@@ -630,6 +567,39 @@
 				 		});
 					}});
 				}
+			},{
+				text : '保存属性信息',
+				iconCls : 'Disk',
+				handler : function() {
+					var arr = [];//声明空数组  
+					var records = sastore.getModifiedRecords();  
+					Ext.each(records,function(record){//遍历行数据数组  
+					    arr.push(record.data);
+					});
+					if (arr === undefined || arr.length == 0) {
+						Ext.Msg.alert('提示', '数据没有改动，请确认。');
+						return;
+					}
+					var json=JSON.stringify(arr);
+					Ext.Ajax.request( {
+						  url : path + "/projectmgr/saveAttrType",
+						  method : 'post',
+						  params : {
+							 json : json
+						  },
+						  success : function(response, options) {
+						   var o = Ext.util.JSON.decode(response.responseText);
+						   if(o.i_type && "success"== o.i_type){
+							   Ext.Msg.alert('提示', '设置成功'); 
+						   }else{
+						   	   Ext.Msg.alert('提示', o.i_msg); 
+						   }
+						  },
+						  failure : function() {
+						  	
+						  }
+			 		});
+				}
 			}]
 
         });  
@@ -661,7 +631,7 @@
             	sasm,
             	{header:"项目名称",align:'center',dataIndex:"project_name",sortable:true}, 
 	            {header:"属性名称",align:'center',dataIndex:"attribute_name",sortable:true},
-	            {header:"操作(双击)",align:'center',dataIndex:"type_name",
+	            {header:"设置属性信息(双击)",align:'center',dataIndex:"type_name",
 	            	editor : new Ext.form.ComboBox({//编辑的时候变成下拉框。
 	                    triggerAction : "all",
 	                    editable: false,
