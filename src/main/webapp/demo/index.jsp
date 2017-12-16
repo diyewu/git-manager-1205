@@ -12,7 +12,8 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
     <link href="plugins/bootstrap-3.3.7-dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="plugins/font-awesome-4.7.0/css/font-awesome.min.css" rel="stylesheet">
     <script src="plugins/bootstrap-3.3.7-dist/js/bootstrap.min.js"></script>
-    <script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=plEzfOG4jm58EGxEsHw4kCPoG3UjOcNv"></script>
+    <!--  <script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=plEzfOG4jm58EGxEsHw4kCPoG3UjOcNv"></script>-->
+    <script type="text/javascript" src="http://api.map.baidu.com/api?v=1.2"></script>
     <script src="plugins/layer/layer.js"></script>
     <script src="js/common.js"></script>
     <link rel="stylesheet" href="css/index.css">
@@ -25,15 +26,21 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 	<!-- <link rel="stylesheet" type="text/css" href="css/loader.css"> -->
 	
 	
-	<link href="css/industry_map.css" rel="stylesheet">
+	<!-- <link href="css/industry_map.css" rel="stylesheet" /> -->
 	<script type="text/javascript" src="js/textIconOverlay.js"></script>
 	<script type="text/javascript" src="js/maplib.js"></script>
+	
+	
+	<link rel="stylesheet" href="css/autocomplete.css">
+	<link rel="stylesheet" href="css/stylecomplete.css">
+	<script type="text/javascript" src="js/autocomplete.js"></script>
 	<!--[if IE]>
  		<script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
 	<![endif]-->
     <script type="text/javascript">         
     // 等待所有加载
     //$(window).load(function(){
+    var map ;
     $(document).ready(function() { 
     	$('#myContainer').hide();
         $('body').addClass('loaded');
@@ -48,7 +55,63 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 			interval: 3000,//自动轮播的时间，以毫秒为单位，默认3000毫秒
 			activeClass: "active",//小的控制按钮激活的样式，不包括作用两边，默认active
 		});
+		
+		
     }); 
+    
+    
+    
+    
+    function G(id) {
+		return document.getElementById(id);
+	}
+	
+	/*
+	var map = new BMap.Map("container");
+	var point = new BMap.Point(116.3964,39.9093);
+	map.centerAndZoom(point,13);
+	map.enableScrollWheelZoom();
+	*/
+	var ac = new BMap.Autocomplete(    //建立一个自动完成的对象
+	    {"input" : "suggestId"
+	    ,"location" : map
+	});
+	
+	ac.addEventListener("onhighlight", function(e) {  //鼠标放在下拉列表上的事件
+	var str = "";
+	var _value = e.fromitem.value;
+	var value = "";
+	if (e.fromitem.index > -1) {
+	        value = _value.province +  _value.city +  _value.district +  _value.street +  _value.business;
+	    }    
+	    str = "FromItem<br />index = " + e.fromitem.index + "<br />value = " + value;
+	
+	    value = "";
+	if (e.toitem.index > -1) {
+	        _value = e.toitem.value;
+	        value = _value.province +  _value.city +  _value.district +  _value.street +  _value.business;
+	    }    
+	    str += "<br />ToItem<br />index = " + e.toitem.index + "<br />value = " + value;
+	    //G("searchResultPanel").innerHTML = str;
+	});
+	
+	var myValue;
+	ac.addEventListener("onconfirm", function(e) {    //鼠标点击下拉列表后的事件
+	var _value = e.item.value;
+	    myValue = _value.province +  _value.city +  _value.district +  _value.street +  _value.business;
+	    //G("searchResultPanel").innerHTML ="onconfirm<br />index = " + e.item.index + "<br />myValue = " + myValue;
+	    setPlace();
+	});
+	
+	function setPlace(){// 创建地址解析器实例
+	var myGeo = new BMap.Geocoder();// 将地址解析结果显示在地图上,并调整地图视野
+	myGeo.getPoint(myValue, function(point){
+		if (point) {
+		    map.centerAndZoom(point, 16);
+		    map.addOverlay(new BMap.Marker(point));
+		  }
+		}, "北京");
+	}
 	</script>
 </head>
 
@@ -122,16 +185,16 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
         
         
             <div class="myHeader" id="myHeader">
-                <a href="/" class="logo"></a>
-                 
-                <input type="text" placeholder="输入详细地址查询" class="search-input" @click="resultFlag = !resultFlag">
+                <a href="" class="logo"></a>
+                <input type="text" id="suggestId" placeholder="输入详细地址查询" class="search-input" @click="resultFlag = !resultFlag">
                 <a class="search-btn"><i class="fa fa-search" aria-hidden="true"></i></a>
                 <div class="result-list" style="display: none;">
                     <ul>
-
                     </ul>
                 </div>
+                <!-- 
                 <div class="result-list" v-show="resultFlag" style="display:none;">
+                	<select style="display:none" name="" id="" multiple placeholder="请选择"> </select>
                     <ul>
                         <li class="hot-title">热门搜索</li>
                         <li>
@@ -163,6 +226,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
                         </li>
                     </ul>
                 </div>
+                 -->
                 
                 <div class="region-box" @mouseenter="over('region')" @mouseleave="out('region')">
                     <a href="javascript:;" id="regionTab" class="region" :class="{'expand':expand=='region'}" @click="">

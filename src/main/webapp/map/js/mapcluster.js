@@ -85,7 +85,6 @@ function addMarker(longitude,latitude){
 //	var marker = richMarker(point);
 	map.addOverlay(marker);
 	marker.addEventListener("click", function(){
-		alert(123);
 		infoBox.open(marker);
 	});
 }

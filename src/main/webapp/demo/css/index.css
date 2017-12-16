@@ -20,7 +20,7 @@
     height: 3.2rem;
     border-bottom: 0.05rem solid #ccc;
     box-shadow: 0 0.05rem 0.15rem rgba(0, 0, 0, .25);
-    z-index: 3;
+    /*z-index: 3;*/
     background: #fff;
 }
 

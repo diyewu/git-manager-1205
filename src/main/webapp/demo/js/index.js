@@ -312,7 +312,7 @@ new Vue({
     },
     mounted() {
     	// 百度地图API功能
-    	var map = new BMap.Map("allmap",{enableMapClick:false});    // 创建Map实例
+    	map = new BMap.Map("allmap",{enableMapClick:false});    // 创建Map实例
     	map.centerAndZoom(new BMap.Point(121.47, 31.23), 12);  // 初始化地图,设置中心点坐标和地图级别
     	map.addControl(new BMap.MapTypeControl());   //添加地图类型控件
     	map.addControl(new BMap.NavigationControl({enableGeolocation:true}));
@@ -356,8 +356,12 @@ new Vue({
     		});
     	markerClusterer.setMaxZoom(13);
     	markerClusterer.setGridSize(100);
-    },
+	},
     methods: {
+    	//地图search框
+
+    	
+    	//三级菜单关联操作
     	cascadeClose :function(){
             this.cascaderStatus = false
             this.firstIndex = ''
