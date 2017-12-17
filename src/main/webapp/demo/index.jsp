@@ -87,17 +87,24 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 	ac.addEventListener("onconfirm", function(e) {    //鼠标点击下拉列表后的事件
 	var _value = e.item.value;
 	    myValue = _value.province +  _value.city +  _value.district +  _value.street +  _value.business;
-	    setPlace();
+	    setPlace(myValue);
 	});
 	
-	function setPlace(){// 创建地址解析器实例
+	function setPlace(detailAddress){// 创建地址解析器实例
 		var myGeo = new BMap.Geocoder();// 将地址解析结果显示在地图上,并调整地图视野
 		myGeo.getPoint(myValue, function(point){
 			if (point) {
 			    map.centerAndZoom(point, 16);
 			    //map.addOverlay(new BMap.Marker(point));
-			  }
-			}, "上海");
+			}else{
+				alert("没有查询到相关信息");
+			}
+		}, "上海");
+	}
+	
+	function searchPlace(){
+		var input = $("#suggestId").val();
+		setPlace(input);
 	}
 	</script>
 </head>
@@ -197,7 +204,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
             <div class="myHeader" id="myHeader">
                 <a href="" class="logo"></a>
                 <input type="text"  id="suggestId" placeholder="输入详细地址查询" class="search-input" @click="resultFlag = !resultFlag">
-                <a class="search-btn"><i class="fa fa-search" aria-hidden="true"></i></a>
+                <a class="search-btn"  onclick="searchPlace();"><i class="fa fa-search" aria-hidden="true"></i></a>
                 
                 <div class="region-box" @mouseenter="over('region')" @mouseleave="out('region')">
                     <a href="javascript:;" id="regionTab" class="region" :class="{'expand':expand=='region'}" @click="">
