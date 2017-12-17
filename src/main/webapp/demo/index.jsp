@@ -13,6 +13,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
     <link href="plugins/font-awesome-4.7.0/css/font-awesome.min.css" rel="stylesheet">
     <script src="plugins/bootstrap-3.3.7-dist/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=plEzfOG4jm58EGxEsHw4kCPoG3UjOcNv"></script>
+    <!--<script type="text/javascript" src="http://api.map.baidu.com/api?v=1.2"></script>-->
     <script src="plugins/layer/layer.js"></script>
     <script src="js/common.js"></script>
     <link rel="stylesheet" href="css/index.css">
@@ -25,15 +26,18 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 	<!-- <link rel="stylesheet" type="text/css" href="css/loader.css"> -->
 	
 	
-	<link href="css/industry_map.css" rel="stylesheet">
+	<!-- <link href="css/industry_map.css" rel="stylesheet" /> -->
 	<script type="text/javascript" src="js/textIconOverlay.js"></script>
 	<script type="text/javascript" src="js/maplib.js"></script>
+	
+	
 	<!--[if IE]>
  		<script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
 	<![endif]-->
     <script type="text/javascript">         
     // 等待所有加载
     //$(window).load(function(){
+    var map ;
     $(document).ready(function() { 
     	$('#myContainer').hide();
         $('body').addClass('loaded');
@@ -48,7 +52,53 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 			interval: 3000,//自动轮播的时间，以毫秒为单位，默认3000毫秒
 			activeClass: "active",//小的控制按钮激活的样式，不包括作用两边，默认active
 		});
+		
+		
     }); 
+    
+	
+	var ac = new BMap.Autocomplete(    //建立一个自动完成的对象
+	    {"input" : "suggestId"
+	    ,"location" : map
+	    ,"onSearchComplete" : function(e) {
+	    	console.log(e);
+	    }
+	});
+	
+	ac.addEventListener("onhighlight", function(e) {  //鼠标放在下拉列表上的事件
+	var str = "";
+	var _value = e.fromitem.value;
+	var value = "";
+	if (e.fromitem.index > -1) {
+	        value = _value.province +  _value.city +  _value.district +  _value.street +  _value.business;
+	    }    
+	    str = "FromItem<br />index = " + e.fromitem.index + "<br />value = " + value;
+	
+	    value = "";
+	if (e.toitem.index > -1) {
+	        _value = e.toitem.value;
+	        value = _value.province +  _value.city +  _value.district +  _value.street +  _value.business;
+	    }    
+	    str += "<br />ToItem<br />index = " + e.toitem.index + "<br />value = " + value;
+	    //G("searchResultPanel").innerHTML = str;
+	});
+	
+	var myValue;
+	ac.addEventListener("onconfirm", function(e) {    //鼠标点击下拉列表后的事件
+	var _value = e.item.value;
+	    myValue = _value.province +  _value.city +  _value.district +  _value.street +  _value.business;
+	    setPlace();
+	});
+	
+	function setPlace(){// 创建地址解析器实例
+		var myGeo = new BMap.Geocoder();// 将地址解析结果显示在地图上,并调整地图视野
+		myGeo.getPoint(myValue, function(point){
+			if (point) {
+			    map.centerAndZoom(point, 16);
+			    //map.addOverlay(new BMap.Marker(point));
+			  }
+			}, "上海");
+	}
 	</script>
 </head>
 
@@ -121,212 +171,41 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
             </transition>
         
         
+        
+	     	 <div class="region-list slide-transition sh" style="display: none;" v-show="subFlag == 'region'" @mouseenter="subOver('region')"
+	                 @mouseleave="subOut('region')">
+	                 <ul class="first-info-list">
+	                     <li>所有</li>
+	                     <li data-dianji="price/100万以下">
+	                         <span class="text">测试 </span>
+	                     </li>
+	                     <li data-dianji="price/100-200万">
+	                     <span class="text"> 测试 </span></li>
+	                     <li data-dianji="price/200-300万">
+	                     <span class="text"> 测试 </span></li>
+						 <li data-dianji="price/300-400万">
+						 <span class="text">测试 </span></li>
+						 <li data-dianji="price/4001-500万"><span class="text">
+								测试 </span></li>
+						 <li data-dianji="price/4002-500万"><span class="text">
+								测试 </span></li>
+						 <li data-dianji="price/4003-500万"><span class="text">
+								测试 </span></li>
+				</ul>
+	        </div>
+        
             <div class="myHeader" id="myHeader">
-                <a href="/" class="logo"></a>
-                 
-                <input type="text" placeholder="输入详细地址查询" class="search-input" @click="resultFlag = !resultFlag">
+                <a href="" class="logo"></a>
+                <input type="text"  id="suggestId" placeholder="输入详细地址查询" class="search-input" @click="resultFlag = !resultFlag">
                 <a class="search-btn"><i class="fa fa-search" aria-hidden="true"></i></a>
-                <div class="result-list" style="display: none;">
-                    <ul>
-
-                    </ul>
-                </div>
-                <div class="result-list" v-show="resultFlag" style="display:none;">
-                    <ul>
-                        <li class="hot-title">热门搜索</li>
-                        <li>
-                            <span class="name-span">测试测试测试测试测试</span>
-                        </li>
-                        <li>
-                            <span class="name-span">测试测试测试测试测试</span>
-                        </li>
-                        <li>
-                            <span class="name-span">测试测试测试测试测试</span>
-                        </li>
-                        <li>
-                            <span class="name-span">测试测试测试测试测试</span>
-                        </li>
-                        <li>
-                            <span class="name-span">测试测试测试测试测试</span>
-                        </li>
-                        <li>
-                            <span class="name-span">测试测试测试测试测试</span>
-                        </li>
-                        <li>
-                            <span class="name-span">测试测试测试测试测试</span>
-                        </li>
-                        <li>
-                            <span class="name-span">测试测试测试测试测试</span>
-                        </li>
-                        <li>
-                            <span class="name-span">测试测试测试测试测试</span>
-                        </li>
-                    </ul>
-                </div>
                 
                 <div class="region-box" @mouseenter="over('region')" @mouseleave="out('region')">
                     <a href="javascript:;" id="regionTab" class="region" :class="{'expand':expand=='region'}" @click="">
-                                        <span>项目</span>
-                                        <i class="fa fa-sort-desc" aria-hidden="true"></i>                        
-                                    </a>
+                        <span>项目</span>
+                        <i class="fa fa-sort-desc" aria-hidden="true"></i>                        
+                    </a>
                 </div>
-                <div class="region-list slide-transition sh" style="display: none;" v-show="subFlag == 'region'" @mouseenter="subOver('region')"
-                    @mouseleave="subOut('region')">
-                    <ul class="first-info-list">
-                        <li>所有</li>
-                        <li data-dianji="price/100万以下">
-                            <span class="text">测试 </span>
-                        </li>
-                        <li data-dianji="price/100-200万">
-                        <span class="text"> 测试 </span></li>
-                        <li data-dianji="price/200-300万">
-                        <span class="text"> 测试 </span></li>
-						<li data-dianji="price/300-400万">
-						<span class="text">测试 </span></li>
-						<li data-dianji="price/4001-500万"><span class="text">
-								测试 </span></li>
-						<li data-dianji="price/4002-500万"><span class="text">
-								测试 </span></li>
-						<li data-dianji="price/4003-500万"><span class="text">
-								测试 </span></li>
-					</ul>
-                    <!--  
-                    <ul class="first-info-list">
-                        <li :class="{ 'selected': selected == 1 }" @mouseenter="selected = 1">不限</li>
-                        <li :class="{ 'selected': selected == 2 }" @mouseenter="selected = 2">区域</li>
-                        <li :class="{ 'selected': selected == 3 }" @mouseenter="selected = 3">地铁</li>
-                    </ul>
-                     -->
-                    <ul class="second-info-list data-list swing-transition" style="display: none;" v-show="selected == 3">
-                        <li>全部</li>
-                        <li data-dianji="区域/地铁/1号线">1号线号线号线号线号线号线号线号线号线</li>
-                        <li data-dianji="区域/地铁/2号线">2号线</li>
-                        <li data-dianji="区域/地铁/3号线">3号线</li>
-                        <li data-dianji="区域/地铁/4号线">4号线</li>
-                        <li data-dianji="区域/地铁/5号线">5号线</li>
-                        <li data-dianji="区域/地铁/6号线">6号线</li>
-                        <li data-dianji="区域/地铁/7号线">7号线</li>
-                        <li data-dianji="区域/地铁/8号线">8号线</li>
-                        <li data-dianji="区域/地铁/9号线">9号线</li>
-                        <li data-dianji="区域/地铁/10号线">10号线</li>
-                        <li data-dianji="区域/地铁/11号线">11号线</li>
-                        <li data-dianji="区域/地铁/12号线">12号线</li>
-                        <li data-dianji="区域/地铁/13号线">13号线</li>
-                        <li data-dianji="区域/地铁/16号线">16号线</li>
-                    </ul>
-                    <ul class="third-info-list data-list swing-transition" style="display: none;" v-show="selected == 2">
-                        <li>全部</li>
-                        <li data-dianji="bizcircle/华新">黄浦区</li>
-                        <li data-dianji="bizcircle/香花桥">徐汇区</li>
-                        <li data-dianji="bizcircle/徐泾">长宁区</li>
-                        <li data-dianji="bizcircle/夏阳">杨浦区</li>
-                        <li data-dianji="bizcircle/盈浦">虹口区</li>
-                        <li data-dianji="bizcircle/重固">普陀区 </li>
-                        <li data-dianji="bizcircle/朱家角">浦东新区 </li>
-                        <li data-dianji="bizcircle/赵巷">宝山区</li>
-                        <li data-dianji="bizcircle/赵巷">嘉定区</li>
-                        <li data-dianji="bizcircle/赵巷">闵行区</li>
-                        <li data-dianji="bizcircle/赵巷">松江区</li>
-                        <li data-dianji="bizcircle/赵巷">青浦区</li>
-                        <li data-dianji="bizcircle/赵巷">奉贤区</li>
-                        <li data-dianji="bizcircle/赵巷">金山区</li>
-                    </ul>
-                </div>
-                <!-- 
-                <div class="filter-box">
-                    <a href="javascript:;" class="filter price" :class="{'expand':expand=='price'}" @mouseenter="over('price')" @mouseleave="out('price')">
-                                        <span>属性</span>
-                                        <i class="fa fa-sort-desc" aria-hidden="true"></i>                        
-                                    </a>
-                </div>
-                <div class="info-list price slide-transition" style="display: none;" v-show="subFlag=='price'" @mouseenter="subOver('price')"
-                    @mouseleave="subOut('price')">
-                    <ul>
-                        <li>所有</li>
-                        <li data-dianji="price/100万以下">
-                            <span class="text">市容 </span>
-                        </li>
-                        <li data-dianji="price/100-200万">
-                        <span class="text"> 绿化 </span></li>
-                        <li data-dianji="price/200-300万">
-                        <span class="text"> 环卫 </span></li>
-						<li data-dianji="price/300-400万">
-						<span class="text">小区 </span></li>
-						<li data-dianji="price/400-500万"><span class="text">
-								城管 </span></li>
-					</ul>
-                </div>
-                 -->
-                <!-- 
-                <div class="filter-box">
-                    <a href="javascript:;" class="filter room" :class="{'expand':expand=='room'}" @mouseenter="over('room')" @mouseleave="out('room')">
-                                        <span>测试</span>
-                                        <i class="fa fa-sort-desc" aria-hidden="true"></i>                        
-                                    </a>
-                </div>
-                <div class="info-list room slide-transition" style="display: none;" v-show="subFlag=='room'" @mouseenter="subOver('room')"
-                    @mouseleave="subOut('room')">
-                    <ul>
-                        <li>不限</li>
-                        <li data-dianji="room/一室" @click="smcbSelect($event)">
-                            <span class="text">
-                                                一室
-                                            </span>
-                            <div class="checkbox checkbox-sm">
-                                <span class="check"></span>
-                            </div>
-                        </li>
-                        <li data-dianji="room/二室" @click="smcbSelect($event)">
-                            <span class="text">
-                                                二室
-                                            </span>
-                            <div class="checkbox checkbox-sm">
-                                <span class="check"></span>
-                            </div>
-                        </li>
-                        <li data-dianji="room/三室" @click="smcbSelect($event)">
-                            <span class="text">
-                                                三室
-                                            </span>
-                            <div class="checkbox checkbox-sm">
-                                <span class="check"></span>
-                            </div>
-                        </li>
-                        <li data-dianji="room/四室" @click="smcbSelect($event)">
-                            <span class="text">
-                                                四室
-                                            </span>
-                            <div class="checkbox checkbox-sm">
-                                <span class="check"></span>
-                            </div>
-                        </li>
-                        <li data-dianji="room/五室" @click="smcbSelect($event)">
-                            <span class="text">
-                                                五室
-                                            </span>
-                            <div class="checkbox checkbox-sm">
-                                <span class="check"></span>
-                            </div>
-                        </li>
-                        <li data-dianji="room/五室以上" @click="smcbSelect($event)">
-                            <span class="text">
-                                                五室以上
-                                            </span>
-                            <div class="checkbox checkbox-sm">
-                                <span class="check"></span>
-                            </div>
-                        </li>
-                    </ul>
-                </div>
-                 -->
-                 <!-- 
-                <div class="more-box" @mouseenter="over('more')" @mouseleave="out('more')">
-                    <a href="javascript:;" class="filter more " :class="{'expand':expand=='more'}">
-                                        <span>更多</span>
-                                        <i class="fa fa-sort-desc" aria-hidden="true"></i>                        
-                                    </a>
-                </div>
-                 -->
+               
                 <div class="filter-box" @click.stop="cascadeOpen()">
                     <a href="javascript:;"  class="filter price">
                                             <span>更多</span>
@@ -338,7 +217,6 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
                     <div class="condition-row">
                         <div class="condition-title">
                             <span>测试测试</span>
-
                         </div>
                         <div class="condition-colon">：</div>
                         <div class="condition-body">
@@ -396,66 +274,13 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
                         </div>
                     </div>
 
-					<!-- 
-                    <div class="condition-row">
-                        <div class="condition-title">
-                            <span>环</span>
-                            <span>线</span>
-                        </div>
-                        <div class="condition-colon">：</div>
-                        <div class="condition-body">
-                            <div class="condition-item" @click="cbSelect($event)">
-                                <div class="checkbox checkbox-lg">
-                                    <span class="check"></span>
-                                </div>
-                                <span class="condition-txt">内环内</span>
-                            </div>
-                            <div class="condition-item" @click="cbSelect($event)">
-                                <div class="checkbox checkbox-lg">
-                                    <span class="check"></span>
-                                </div>
-                                <span class="condition-txt">内中环</span>
-                            </div>
-                            <div class="condition-item" @click="cbSelect($event)">
-                                <div class="checkbox checkbox-lg">
-                                    <span class="check"></span>
-                                </div>
-                                <span class="condition-txt">中外环</span>
-                            </div>
-                            <div class="condition-item" @click="cbSelect($event)">
-                                <div class="checkbox checkbox-lg">
-                                    <span class="check"></span>
-                                </div>
-                                <span class="condition-txt">外环外</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="condition-row">
-                        <div class="condition-title">
-                            <span>特</span>
-                            <span>色</span>
-
-                        </div>
-                        <div class="condition-colon">：</div>
-                        <div class="condition-body">
-                            <div class="condition-item" @click="cbSelect($event)">
-                                <div class="checkbox checkbox-lg">
-                                    <span class="check"></span>
-                                </div>
-                                <span class="condition-txt">独栋</span>
-                            </div>
-                        </div>
-                    </div>
-                     -->
                 </div>
                 <div class="login-register">
                     <i class="fa fa-user" aria-hidden="true"></i>
                     <div class="typeUserInfo">
                         <div class="no-login">
-                            <a class="login login-user-btn btn-login ">登录</a> |
-                            <a href="" target="_blank"
-                                class="register">注册</a>
+                            <a class="login login-user-btn btn-login ">周润发</a>
+                            <a href="" target="_blank" class="register"></a>
                         </div>
                         <div class="logged" style="display: none;">
                             <a class="user-name" href=""></a>
@@ -463,7 +288,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
                         </div>
                     </div>
                 </div>
-                <a class="go-to-list"><i class="fa fa-list-ul" aria-hidden="true"></i>联系我们</a>
+                <a class="go-to-list"><i class="fa fa-list-ul" aria-hidden="true"></i>联系管理员</a> 
             </div>
             <div id="allmap" class="content"></div>
             <div class="expander fadeOut" @click="expander()">

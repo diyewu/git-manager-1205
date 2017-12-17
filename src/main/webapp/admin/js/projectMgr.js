@@ -530,39 +530,6 @@
        var satbar = new Ext.Toolbar({  
             renderTo : Ext.grid.GridPanel.tbar,// 其中grid是上边创建的grid容器  
             items :[{
-				text : '保存属性信息',
-				iconCls : 'Disk',
-				handler : function() {
-					var arr = [];//声明空数组  
-					var records = sastore.getModifiedRecords();  
-					Ext.each(records,function(record){//遍历行数据数组  
-					    arr.push(record.data);
-					});
-					if (arr === undefined || arr.length == 0) {
-						Ext.Msg.alert('提示', '数据没有改动，请确认。');
-						return;
-					}
-					var json=JSON.stringify(arr);
-					Ext.Ajax.request( {
-						  url : path + "/projectmgr/saveAttrType",
-						  method : 'post',
-						  params : {
-							 json : json
-						  },
-						  success : function(response, options) {
-						   var o = Ext.util.JSON.decode(response.responseText);
-						   if(o.i_type && "success"== o.i_type){
-							   Ext.Msg.alert('提示', '设置成功'); 
-						   }else{
-						   	   Ext.Msg.alert('提示', o.i_msg); 
-						   }
-						  },
-						  failure : function() {
-						  	
-						  }
-			 		});
-				}
-			},{
 				text : '设置勾选筛选条件',
 				iconCls : 'Accept',
 				handler : function() {
@@ -599,6 +566,39 @@
 							  }
 				 		});
 					}});
+				}
+			},{
+				text : '保存属性信息',
+				iconCls : 'Disk',
+				handler : function() {
+					var arr = [];//声明空数组  
+					var records = sastore.getModifiedRecords();  
+					Ext.each(records,function(record){//遍历行数据数组  
+					    arr.push(record.data);
+					});
+					if (arr === undefined || arr.length == 0) {
+						Ext.Msg.alert('提示', '数据没有改动，请确认。');
+						return;
+					}
+					var json=JSON.stringify(arr);
+					Ext.Ajax.request( {
+						  url : path + "/projectmgr/saveAttrType",
+						  method : 'post',
+						  params : {
+							 json : json
+						  },
+						  success : function(response, options) {
+						   var o = Ext.util.JSON.decode(response.responseText);
+						   if(o.i_type && "success"== o.i_type){
+							   Ext.Msg.alert('提示', '设置成功'); 
+						   }else{
+						   	   Ext.Msg.alert('提示', o.i_msg); 
+						   }
+						  },
+						  failure : function() {
+						  	
+						  }
+			 		});
 				}
 			}]
 
