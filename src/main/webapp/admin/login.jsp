@@ -98,7 +98,6 @@ String pathName = request.getParameter("pathName")==null?"index":request.getPara
 	}
 	
 	$("#logindiv").keypress(function(e) {
-	console.log(123123);
 		var keyCode = e.keyCode ? e.keyCode : e.which ? e.which : e.charCode;
 		if (keyCode == 13) {
 			login();
