@@ -16,8 +16,10 @@ public class HttpRequest {
 //        System.out.println(s);
         
         //发送 POST 请求  	login	getMenu	getMapInfo	getCoordinateInfo
-        String sr=HttpRequest.sendPost("http://localhost:8095/gismgr/app/login/", 
-        		"userName=admin&userPwd=admin&jsonIds=asd&coordinateId=00151323566662800014005056c00001");
+        String sr=HttpRequest.sendPost("http://localhost:8095/gismgr/app/getMapInfo/", 
+        		"userName=admin&userPwd=admin&"
+        		+ "jsonIds=[{\"attributes\":[{\"attribute_id\":\"00151324042912900011005056c00001\",\"conditions\":[{\"condition_id\":\"1957\"},{\"condition_id\":\"1956\"}]}],\"project_id\":\"00151323566661600000005056c00001\"}]"
+        		+ "&coordinateId=00151323566662800014005056c00001");
         System.out.println(sr);
     }
 	
@@ -99,7 +101,7 @@ public class HttpRequest {
 //            conn.setRequestProperty("connection", "Keep-Alive");
 //            conn.setRequestProperty("user-agent", "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1;SV1)");
             conn.setRequestProperty("phoneId", "asd1232");
-            conn.setRequestProperty("token", "c7a971f420574d809e64d125401d13a5");
+            conn.setRequestProperty("token", "2d0b1d86d0384e6c8dad05bb38948863");
             // 发送POST请求必须设置如下两行
             conn.setDoOutput(true);
             conn.setDoInput(true);

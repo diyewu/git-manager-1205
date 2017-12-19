@@ -61,7 +61,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 	    {"input" : "suggestId"
 	    ,"location" : map
 	    ,"onSearchComplete" : function(e) {
-	    	console.log(e);
+	    	//console.log(e);
 	    }
 	});
 	
@@ -90,11 +90,12 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 	    setPlace(myValue);
 	});
 	
+	var myGeo = new BMap.Geocoder();// 将地址解析结果显示在地图上,并调整地图视野
 	function setPlace(detailAddress){// 创建地址解析器实例
-		var myGeo = new BMap.Geocoder();// 将地址解析结果显示在地图上,并调整地图视野
-		myGeo.getPoint(myValue, function(point){
+		myGeo.getPoint(detailAddress, function(point){
+			console.log(point);
 			if (point) {
-			    map.centerAndZoom(point, 16);
+			    map.centerAndZoom(point, 14);
 			    //map.addOverlay(new BMap.Marker(point));
 			}else{
 				alert("没有查询到相关信息");
@@ -106,6 +107,15 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 		var input = $("#suggestId").val();
 		setPlace(input);
 	}
+	/*
+	$("#suggestId").keypress(function(e) {
+		console.log(e);
+		var keyCode = e.keyCode ? e.keyCode : e.which ? e.which : e.charCode;
+		if (keyCode == 13) {
+			searchPlace();
+		}
+	});
+	*/
 	</script>
 </head>
 
