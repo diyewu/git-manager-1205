@@ -2,13 +2,14 @@ package com.xz.service;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
-import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -19,12 +20,11 @@ import org.springframework.transaction.annotation.Transactional;
 import com.google.common.base.Joiner;
 import com.xz.common.ServerResult;
 import com.xz.entity.AppMenu;
-import com.xz.entity.CategoryTreeBeanCk;
-import com.xz.service.WebUserService.CategoryTreeBeanCKRowMapper;
 
 @Service
 @Transactional
 public class WebAndAppService {
+	
 	@Autowired  
 	private JdbcTemplate jdbcTemplate; 
 	
@@ -95,7 +95,125 @@ public class WebAndAppService {
 		}
 	}
 	
-	public List<Map<String, Object>> getMapInfo(String projectId,Map<String,List<String>> param){
+	public List<Map<String,Object>> getMapInfo(String projectId,Map<String,List<String>> param){
+		String attriSql = " select attribute_index from project_attribute where id = ? ";
+		List<Map<String, Object>> list = new ArrayList<Map<String,Object>>();
+		List<Map<String, Object>> resultList = new ArrayList<Map<String,Object>>();
+		StringBuilder sb = new StringBuilder();
+		String attriAllSql = " select pa.attribute_name,pat.alias_name,pa.attribute_index"
+				+ " from project_attribute pa left join project_attribute_type pat"
+				+ " on pa.attribute_type = pat.id where pa.project_id = ? ";
+		List<Map<String, Object>> attributeList = jdbcTemplate.queryForList(attriAllSql, projectId);
+		if(attributeList == null || attributeList.size() == 0){
+			return null;
+		}
+		List<String> conditionIdList = new ArrayList<String>();
+		if (param != null && param.size() > 0) {
+			String tempSql = "";
+			sb.append(" select ");
+			String aliasName = "";
+			for (int i = 0; i < attributeList.size(); i++) {
+				aliasName = (String)attributeList.get(i).get("alias_name");
+				if(StringUtils.isNotBlank(aliasName)){
+					if("detail_address".equals(aliasName) || "latitude".equals(aliasName) || "longitude".equals(aliasName) ){
+						sb.append(" pd.ext"+attributeList.get(i).get("attribute_index") +" as " + aliasName +",");
+					}
+				}
+			}
+			sb.append(" pd.id ");
+			sb.append(" from project_detail  pd ");
+			sb.append(" where project_id = ? ");
+			for (Map.Entry<String,List<String>> entry : param.entrySet()) {  
+//				sb = new StringBuilder();
+//			    System.out.println("Key = " + entry.getKey() + ", Value = " + entry.getValue());  
+				list = jdbcTemplate.queryForList(attriSql, entry.getKey());
+				tempSql = "and ext_index in(select attribute_condition from project_attribute_condition where id in (?) )";
+			    if(list != null && list.size()>0){
+			    	tempSql = tempSql.replace("_index", list.get(0).get("attribute_index")+"");
+			    	conditionIdList = entry.getValue();
+			    	if(conditionIdList != null && conditionIdList.size()>0){
+			    		tempSql = tempSql.replace("?", Joiner.on(",").join(conditionIdList));
+			    		sb.append(tempSql);
+//			    		sqlParam.add(Joiner.on(",").join(conditionIdList));
+			    	}
+			    }
+			}
+			resultList = jdbcTemplate.queryForList(sb.toString(), projectId);
+			if(resultList != null && resultList.size()>0){
+				Map<String, Object> resultmap = new HashMap<String, Object>();
+				String longitude = "";
+				String latitude = "";
+				String key = "";
+				DecimalFormat df = new DecimalFormat("#.00");
+				double longitudeF = 0;
+				double latitudeF = 0;
+				Set<String> set = new HashSet<String>();
+				
+				for (int i = 0; i < resultList.size(); i++) {
+					resultmap = resultList.get(i);
+					longitude = resultmap.get("longitude")+"";
+					latitude = resultmap.get("latitude")+"";
+					try {
+						longitudeF = Double.parseDouble(longitude);
+						latitudeF = Double.parseDouble(latitude);
+					} catch (Exception e) {
+						e.printStackTrace();
+						continue;
+					}
+					key = df.format(longitudeF) +","+ df.format(latitudeF);
+					set.add(key);
+				}
+				Map<String,Object> tMap = new HashMap<String, Object>();
+				List<String> dList = new ArrayList<String>();
+				for (int i = 0; i < resultList.size(); i++) {
+					resultmap = resultList.get(i);
+					longitude = resultmap.get("longitude")+"";
+					latitude = resultmap.get("latitude")+"";
+					try {
+						longitudeF = Double.parseDouble(longitude);
+						latitudeF = Double.parseDouble(latitude);
+					} catch (Exception e) {
+						e.printStackTrace();
+						continue;
+					}
+					key = df.format(longitudeF) +","+ df.format(latitudeF);
+					for(String setkey:set){
+						dList = new ArrayList<String>();
+						if(setkey.equals(key)){
+							if(tMap.containsKey(setkey)){
+								dList = (List<String>) tMap.get(setkey);
+								dList.add(resultmap.get("id")+"");
+							}else{
+								dList.add(resultmap.get("id")+"");
+								tMap.put(setkey, dList);
+							}
+						}
+					}
+				}
+				if(tMap != null && !tMap.isEmpty()){
+					Map<String,Object> sMap = new HashMap<String, Object>();
+					List<Map<String,Object>> sList = new ArrayList<Map<String,Object>>();
+					for (Map.Entry<String,Object> entry : tMap.entrySet()) {
+//						System.out.println("Key = " + entry.getKey() + ", Value = " + entry.getValue());
+						String[] ads = entry.getKey().split(",");
+						longitude = ads[0];
+						latitude = ads[1];
+						sMap.put("longitude", longitude);
+						sMap.put("latitude", latitude);
+						sMap.put("id", StringUtils.join((List<String>)entry.getValue(), ","));
+						sMap.put("detail_address", "");
+						sList.add(sMap);
+						sMap = new HashMap<String, Object>();
+					}
+					return sList;
+				}
+			}
+		}
+		return null;
+	}
+	
+	
+	public List<Map<String, Object>> getMapInfo_bak(String projectId,Map<String,List<String>> param){
 		String attriSql = " select attribute_index from project_attribute where id = ? ";
 		List<Map<String, Object>> list = new ArrayList<Map<String,Object>>();
 		List<Map<String, Object>> resultList = new ArrayList<Map<String,Object>>();
@@ -141,17 +259,6 @@ public class WebAndAppService {
 			}
 			resultList = jdbcTemplate.queryForList(sb.toString(), projectId);
 			if(resultList != null && resultList.size()>0){
-				List<Map<String,Object>> detailmap = new ArrayList<Map<String,Object>>();
-				Map<String, Object> resultmap = new HashMap<String, Object>();
-				for (int i = 0; i < resultList.size(); i++) {
-					resultmap = resultList.get(i);
-					
-				}
-				
-				
-				
-				
-				
 				return resultList;
 			}
 		}

@@ -1,6 +1,7 @@
 package com.xz.controller;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -20,7 +21,6 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.xz.common.ServerResult;
 import com.xz.entity.AppLoginBean;
-import com.xz.entity.AppMenu;
 import com.xz.entity.AppMenu;
 import com.xz.model.json.AppJsonModel;
 import com.xz.model.json.JsonModel;
@@ -197,6 +197,7 @@ public class WebAndAppController extends BaseController{
 		
 		List<Map<String, Object>> info = new ArrayList<Map<String,Object>>();
 		List<Map<String, Object>> list = new ArrayList<Map<String,Object>>();
+		Map<String, Object> map = new HashMap<String, Object>();
 		if(code == 0){
 			//TODO 根据jsonIds解析树形json
 //			String json = "[{\"attributes\":[{\"attribute_id\":\"00151280833338700003\",\"conditions\":[{\"condition_id\":\"442\"},{\"condition_id\":\"443\"}]},{\"attribute_id\":\"00151280833339000011\",\"conditions\":[{\"condition_id\":\"448\"},{\"condition_id\":\"449\"}]}],\"project_id\":\"00151280833337500000\"}]";
@@ -223,20 +224,56 @@ public class WebAndAppController extends BaseController{
 						param.put(AttriId, conditionList);
 					}
 				}
-//				info = webAndAppService.getMapInfo(projectId, param);
 				list = webAndAppService.getMapInfo(projectId, param);
-				if(list != null && list.size()>0){
+				if (list != null && list.size() > 0) {
 					info.addAll(list);
 				}
 			}
 		}
-		return new AppJsonModel(code, ServerResult.getCodeMsg(code, msg), list);
+		return new AppJsonModel(code, ServerResult.getCodeMsg(code, msg), info);
 	}
 	
 	
 	@RequestMapping("getCoordinateInfo")
 	@ResponseBody
 	public AppJsonModel getCoordinateInfo(HttpServletRequest request){
+		String token = request.getHeader("token");
+		String phoneId = request.getHeader("phoneId");
+		String coordinateId = request.getParameter("coordinateId");
+		String msg = "success";
+		int code = 0;
+		List<String> paramList = new ArrayList<String>();
+		paramList.add(token);
+		paramList.add(phoneId);
+		paramList.add(coordinateId);
+		AppLoginBean appLoginBean = new AppLoginBean();
+		code = globalCheck(paramList, token, phoneId,appLoginBean);
+		
+		List<String> coordinateIdList = new ArrayList<String>();
+		if(coordinateId.contains(",")){
+			coordinateIdList = Arrays.asList(coordinateId.split(","));  
+		}else{
+			coordinateIdList.add(coordinateId);
+		}
+		List<Map<String, Object>> list = new ArrayList<Map<String,Object>>();
+		List<Map<String, Object>> resplist = new ArrayList<Map<String,Object>>();
+		if(code == 0){
+			try {
+				for(String id:coordinateIdList){
+					list = webAndAppService.getCoordinateInfo(id);
+					resplist.addAll(list);
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+				msg = e.getMessage();
+				code = ServerResult.RESULT_SERVER_ERROR;
+			}
+		}
+		return new AppJsonModel(code, ServerResult.getCodeMsg(code, msg), resplist);
+	}
+//	@RequestMapping("getCoordinateInfo")
+//	@ResponseBody
+	public AppJsonModel getCoordinateInfo_bak(HttpServletRequest request){
 		String token = request.getHeader("token");
 		String phoneId = request.getHeader("phoneId");
 		String coordinateId = request.getParameter("coordinateId");

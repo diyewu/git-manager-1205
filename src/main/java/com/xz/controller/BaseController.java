@@ -72,15 +72,14 @@ public class BaseController {
 			try {
 				appLoginBean = (AppLoginBean) AgingCache.getCacheInfo(phoneId).getValue();
 			} catch (Exception e) {
+				code = ServerResult.RESULT_TOKEN_OVERTIME;
 			}
-			if(appLoginBean != null){
+			if (code == 0) {
 				AgingCache.updateCacheTimeOut(phoneId);
 				lastToken = appLoginBean.getToken();
 				if(!token.equals(lastToken)){
 					code = ServerResult.RESULT_TOKEN_CHECK_ERROR;
 				}
-			}else{
-				code = ServerResult.RESULT_TOKEN_OVERTIME;
 			}
 		}
 		
