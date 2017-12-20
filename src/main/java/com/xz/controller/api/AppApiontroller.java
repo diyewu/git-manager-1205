@@ -24,7 +24,7 @@ import com.xz.controller.BaseController;
 import com.xz.entity.AppLoginBean;
 import com.xz.entity.AppMenu;
 import com.xz.model.json.AppJsonModel;
-import com.xz.service.WebAndAppService;
+import com.xz.service.AppService;
 import com.xz.utils.AgingCache;
 
 import io.swagger.annotations.ApiOperation;
@@ -36,7 +36,7 @@ import io.swagger.annotations.ApiOperation;
 @RestController
 public class AppApiontroller extends BaseController{
 	@Autowired
-	private WebAndAppService webAndAppService;
+	private AppService webAndAppService;
 	
 	@ApiOperation(value = "登陆", notes = "测试地址：", httpMethod = "POST")
 	@RequestMapping("login")

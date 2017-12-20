@@ -128,10 +128,12 @@ public class ProjectServices {
 				ZipUtil.readFiles(desPathLocal, map);
 				//			System.out.println(map);
 				String attrIndex = attrList.get(0).get("attribute_index") + "";
-				sql = "select id, ext" + attrIndex + " as imgname from project_detail where project_id = ?";
+				sql = "select id, ext" + attrIndex + " as imgname,img_path from project_detail where project_id = ?";
 				if (map != null && map.size() > 0) {
 					List<Map<String, Object>> detailList = jdbcTemplate.queryForList(sql, projectId);
+					List<Map<String, Object>> remainList = new ArrayList<Map<String,Object>>();
 					if (detailList != null && detailList.size() > 0) {
+						remainList.addAll(detailList);
 						String imgName = "";
 						String detailId = "";
 						sql = " update project_detail set img_path = ? where id = ? ";
@@ -139,21 +141,32 @@ public class ProjectServices {
 							imgName = detailList.get(i).get("imgname") + "";
 							detailId = detailList.get(i).get("id") + "";
 							for (Map.Entry<String, String> entry : map.entrySet()) {
-								//System.out.println("key= " + entry.getKey() + " and value= " + entry.getValue());
 								if (imgName.equals(entry.getKey().split("\\.")[0])) {
 									jdbcTemplate.update(sql, entry.getValue(), detailId);
+									remainList.remove(detailList.get(i));
 								}
 							}
 						}
 					} else {
 						msg = "项目详细数据为空！";
 					}
+					if(remainList != null && remainList.size() > 0){
+						String remainPic = "";
+						Map<String, Object> tmap = new HashMap<String, Object>();
+						for (int i = 0; i < remainList.size(); i++) {
+							tmap = remainList.get(i);
+							if(StringUtils.isBlank(tmap.get("img_path")==null?"":tmap.get("img_path")+"")){
+								remainPic += tmap.get("imgname")+",";
+							}
+						}
+						msg = "以下图片名称没有匹配到图片：" + remainPic;
+					}
 				} else {
 					msg = "请确认zip压缩包有正确数据！";
 				}
 			} else {
 				msg = "请先设置项目图片属性，在提交图片数据！";
-			} 
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 			msg = e.getMessage();

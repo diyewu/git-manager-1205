@@ -10,7 +10,7 @@ Target Server Type    : MYSQL
 Target Server Version : 50629
 File Encoding         : 65001
 
-Date: 2017-12-15 16:26:14
+Date: 2017-12-20 15:26:52
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -361,8 +361,8 @@ CREATE TABLE `project_attribute_type` (
 -- Records of project_attribute_type
 -- ----------------------------
 INSERT INTO `project_attribute_type` VALUES ('0', '无', null);
-INSERT INTO `project_attribute_type` VALUES ('1', '经度', 'latitude');
-INSERT INTO `project_attribute_type` VALUES ('2', '纬度', 'longitude');
+INSERT INTO `project_attribute_type` VALUES ('1', '经度', 'longitude');
+INSERT INTO `project_attribute_type` VALUES ('2', '纬度', 'latitude');
 INSERT INTO `project_attribute_type` VALUES ('3', '详细地址', 'detail_address');
 INSERT INTO `project_attribute_type` VALUES ('4', '图片编号', 'img_url');
 INSERT INTO `project_attribute_type` VALUES ('5', '地图显示信息', 'coordinate_info');

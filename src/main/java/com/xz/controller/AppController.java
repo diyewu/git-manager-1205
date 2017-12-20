@@ -1,6 +1,7 @@
 package com.xz.controller;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -21,10 +22,9 @@ import com.alibaba.fastjson.JSONObject;
 import com.xz.common.ServerResult;
 import com.xz.entity.AppLoginBean;
 import com.xz.entity.AppMenu;
-import com.xz.entity.AppMenu;
 import com.xz.model.json.AppJsonModel;
 import com.xz.model.json.JsonModel;
-import com.xz.service.WebAndAppService;
+import com.xz.service.AppService;
 import com.xz.utils.AgingCache;
 
 
@@ -35,9 +35,9 @@ import com.xz.utils.AgingCache;
  */
 @RequestMapping("app")
 @Controller
-public class WebAndAppController extends BaseController{
+public class AppController extends BaseController{
 	@Autowired
-	private WebAndAppService webAndAppService;
+	private AppService appService;
 	
 	@RequestMapping("login")
 	@ResponseBody
@@ -56,7 +56,7 @@ public class WebAndAppController extends BaseController{
 		}
 		if(code == 0){
 			try {
-				list = webAndAppService.getUserInfoByNameandPwd(userName, userPwd);
+				list = appService.getUserInfoByNameandPwd(userName, userPwd);
 			} catch (Exception e) {
 				e.printStackTrace();
 				msg = e.getMessage();
@@ -74,7 +74,7 @@ public class WebAndAppController extends BaseController{
 			int allowSize = list.get(0).get("allow_phone_size") ==null?1:Integer.parseInt(list.get(0).get("allow_phone_size")+"");
 			String webUserId = list.get(0).get("id")+"";
 			try {
-				code = webAndAppService.checkPhoneId(phoneId, allowSize, webUserId);
+				code = appService.checkPhoneId(phoneId, allowSize, webUserId);
 			} catch (Exception e) {
 				e.printStackTrace();
 				msg = e.getMessage();
@@ -113,7 +113,7 @@ public class WebAndAppController extends BaseController{
 		List<AppMenu> newList = new ArrayList<AppMenu>();
 		if(code == 0){
 			List<AppMenu>  l = new ArrayList<AppMenu>();
-			l = webAndAppService.getMenu(appLoginBean.getUserRoleId());
+			l = appService.getMenu(appLoginBean.getUserRoleId());
 			Map<String,AppMenu> map = new LinkedHashMap<String,AppMenu>(); 
 			Map<String,AppMenu> map1 = new LinkedHashMap<String,AppMenu>(); 
 			for(AppMenu t:l){//list转换成map
@@ -197,6 +197,7 @@ public class WebAndAppController extends BaseController{
 		
 		List<Map<String, Object>> info = new ArrayList<Map<String,Object>>();
 		List<Map<String, Object>> list = new ArrayList<Map<String,Object>>();
+		Map<String, Object> map = new HashMap<String, Object>();
 		if(code == 0){
 			//TODO 根据jsonIds解析树形json
 //			String json = "[{\"attributes\":[{\"attribute_id\":\"00151280833338700003\",\"conditions\":[{\"condition_id\":\"442\"},{\"condition_id\":\"443\"}]},{\"attribute_id\":\"00151280833339000011\",\"conditions\":[{\"condition_id\":\"448\"},{\"condition_id\":\"449\"}]}],\"project_id\":\"00151280833337500000\"}]";
@@ -223,14 +224,13 @@ public class WebAndAppController extends BaseController{
 						param.put(AttriId, conditionList);
 					}
 				}
-//				info = webAndAppService.getMapInfo(projectId, param);
-				list = webAndAppService.getMapInfo(projectId, param);
-				if(list != null && list.size()>0){
+				list = appService.getMapInfo(projectId, param);
+				if (list != null && list.size() > 0) {
 					info.addAll(list);
 				}
 			}
 		}
-		return new AppJsonModel(code, ServerResult.getCodeMsg(code, msg), list);
+		return new AppJsonModel(code, ServerResult.getCodeMsg(code, msg), info);
 	}
 	
 	
@@ -249,10 +249,47 @@ public class WebAndAppController extends BaseController{
 		AppLoginBean appLoginBean = new AppLoginBean();
 		code = globalCheck(paramList, token, phoneId,appLoginBean);
 		
+		List<String> coordinateIdList = new ArrayList<String>();
+		if(coordinateId.contains(",")){
+			coordinateIdList = Arrays.asList(coordinateId.split(","));  
+		}else{
+			coordinateIdList.add(coordinateId);
+		}
+		List<Map<String, Object>> list = new ArrayList<Map<String,Object>>();
+		List<Map<String, Object>> resplist = new ArrayList<Map<String,Object>>();
+		if(code == 0){
+			try {
+				for(String id:coordinateIdList){
+					list = appService.getCoordinateInfo(id);
+					resplist.addAll(list);
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+				msg = e.getMessage();
+				code = ServerResult.RESULT_SERVER_ERROR;
+			}
+		}
+		return new AppJsonModel(code, ServerResult.getCodeMsg(code, msg), resplist);
+	}
+//	@RequestMapping("getCoordinateInfo")
+//	@ResponseBody
+	public AppJsonModel getCoordinateInfo_bak(HttpServletRequest request){
+		String token = request.getHeader("token");
+		String phoneId = request.getHeader("phoneId");
+		String coordinateId = request.getParameter("coordinateId");
+		String msg = "success";
+		int code = 0;
+		List<String> paramList = new ArrayList<String>();
+		paramList.add(token);
+		paramList.add(phoneId);
+		paramList.add(coordinateId);
+		AppLoginBean appLoginBean = new AppLoginBean();
+		code = globalCheck(paramList, token, phoneId,appLoginBean);
+		
 		List<Map<String, Object>> list = new ArrayList<Map<String,Object>>();
 		if(code == 0){
 			try {
-				list = webAndAppService.getCoordinateInfo(coordinateId);
+				list = appService.getCoordinateInfo(coordinateId);
 			} catch (Exception e) {
 				e.printStackTrace();
 				msg = e.getMessage();
