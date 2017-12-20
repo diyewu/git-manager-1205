@@ -141,6 +141,17 @@ public class WebAndAppService {
 			}
 			resultList = jdbcTemplate.queryForList(sb.toString(), projectId);
 			if(resultList != null && resultList.size()>0){
+				List<Map<String,Object>> detailmap = new ArrayList<Map<String,Object>>();
+				Map<String, Object> resultmap = new HashMap<String, Object>();
+				for (int i = 0; i < resultList.size(); i++) {
+					resultmap = resultList.get(i);
+					
+				}
+				
+				
+				
+				
+				
 				return resultList;
 			}
 		}
