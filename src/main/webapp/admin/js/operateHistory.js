@@ -11,10 +11,10 @@
    		    }  
    		}); 
    		
-   		var qrUrl = path + "/operate!";
+   		var qrUrl = path + "/operate/";
    		var order;
         store = new Ext.data.Store({
-			url : qrUrl+"list.action",
+			url : qrUrl+"list/",
 			reader : new Ext.data.JsonReader({
 				root : 'products',
 				totalProperty : 'totalCount',
@@ -28,8 +28,8 @@
 					{name : 'operateSummary'},
 					{name : 'id'}
 				]
-			}),
-			remoteSort : true
+			})//,
+//			remoteSort : true
 		});
 		store.load({params:{start:0,limit:100}});
         
@@ -48,8 +48,15 @@
 	            }},
 //	            {header:"操作用户IP",align:'center',dataIndex:"operateUserIp",sortable:true},
 	            {header:"操作详情",align:'center',dataIndex:"id",renderer: function (value, meta, record) {
+	            	var msg = 	(record.get('operateSummary')+'').replace(/\'/g,  '\\\'').replace(/\"/g,"“");
+	            	;
+//        			var formatStr = "<input id = 'bt_edit_" + record.get('id')
+//					+ "' onclick=\"Ext.Msg.alert('详情','" + 
+//					msg
+//					+ "');\" type='button' value='查看' width ='15px'/>&nbsp;&nbsp;"; 
         			var formatStr = "<input id = 'bt_edit_" + record.get('id')
-					+ "' onclick=\"Ext.Msg.alert('详情','" + (record.get('operateSummary')+'').replace(/\'/g,  '\\\'').replace(/\"/g,"“")
+					+ "'onclick=\"showErrInfo('" + 
+					msg
 					+ "');\" type='button' value='查看' width ='15px'/>&nbsp;&nbsp;"; 
 								            			
     				var resultStr = String.format(formatStr);
@@ -183,56 +190,43 @@
 			scope: store
 		});
 	}
-	
-	
-	function saveInfo(oldName,newName,_id){
-		//console.log(_id);
-		if(oldName != newName){
-			Ext.Msg.confirm('保存数据', '确认?',function (button,text){if(button == 'yes'){
-				Ext.Ajax.request( {
-					  url : path + "/deviceqr!updateNickName.action",
-					  method : 'post',
-					  params : {
-					   newName : newName,
-					   did : _id
-					  },
-					  success : function(response, options) {
-					   var o = Ext.util.JSON.decode(response.responseText);
-					   //alert(o.i_type);
-					   if(o.i_type && "success"== o.i_type){
-					   	
-					   }else{
-					   	   Ext.Msg.alert('提示', '保存失败'); 
-					   }
-					  },
-					  failure : function() {
-					  	
-					  }
-		 		});
-			}});
-		}
-	}
-	
-	function deleteUser(id){
-		Ext.Msg.confirm('删除数据', '确认?',function (button,text){if(button == 'yes'){
-			Ext.Ajax.request({
-				  url : path + "/user!deleteUser.action",
-				  method : 'post',
-				  params : {
-					  userId:id
-				  },
-				  success : function(response, options) {
-				   var o = Ext.util.JSON.decode(response.responseText);
-				   if(o.i_type && "success"== o.i_type){
-					   reloadData();
-				   }else{
-				   	   Ext.Msg.alert('提示', o.i_msg); 
-				   }
-				  },
-				  failure : function() {
-					  Ext.Msg.alert('提示', '删除失败'); 
-				  }
-	 		});
-		}});
-		
-	}
+   
+   function showErrInfo(msg){
+	   console.log(msg);
+    	var _importPanel = new Ext.Panel({
+    		layout : "fit",
+//    		layoutConfig : {
+//    			animate : true
+//    		},
+    		defaults:{
+    			height : '100%',
+    			readOnly: true
+    		},
+    		items : [{xtype:"textarea",value:msg}],
+    	});
+    	
+    	newWin = new Ext.Window({
+    		width : 520,
+    		height:200,
+    		title : '详情',
+    		defaults : {// 表示该窗口中所有子元素的特性
+    			border : false
+    			// 表示所有子元素都不要边框
+    		},
+    		plain : true,// 方角 默认
+    		modal : true,
+    		shim : true,
+    		collapsible : true,// 折叠
+    		closable : true, // 关闭
+    		closeAction: 'close',
+    		resizable : false,// 改变大小
+    		draggable : true,// 拖动
+    		minimizable : false,// 最小化
+    		maximizable : false,// 最大化
+    		animCollapse : true,
+    		constrainHeader : true,
+    		autoHeight : false,
+    		items : [_importPanel]
+    	});
+		newWin.show();
+   }

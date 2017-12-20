@@ -71,6 +71,67 @@ $(document).ready(function () {
         }
     })
     $("#loginBtn_").click(function(){
+    	var userName = $("#userName").val();
+    	var userPwd = $("#userPwd").val();
+    	var imgCode = $("#img").val();
+    	if($.trim(userName)==""){
+    		showTip(msg,'#userName');
+    		return;
+    	}
+    	if($.trim(userPwd)==""){
+    		showTip(msg,'#userPwd');
+    		return;
+    	}
+    	if($.trim(imgCode)==""){
+    		showTip(msg,'#img');
+    		return;
+    	}
+    	$.post("login!login.action", 
+		{
+    		userName:userName,
+    		userPwd:userPwd,
+    		imgCode:imgCode
+		},
+		function(result){
+			console.log(result);
+			var data = result.data;
+			var loginstatus = data.login_status;
+			if("success" == loginstatus){//登陆成功
+				window.location.href="index.jsp"; 
+			}else{
+				//提示层
+				layer.msg('登陆失败');
+			}
+		},'json');
     	window.location.href="index.jsp";
     });
+    
+    /**
+     * input失去焦点事件focusout
+     * 这跟blur事件区别在于，他可以在父元素上检测子元素失去焦点的情况。
+     */
+    $("#userName").focusout(function(e){
+        var msg="请填写用户名！";
+        if($.trim($(this).val())==""){
+        	showTip(msg,'#userName');
+        }
+    });
+    $("#userPwd").focusout(function(e){
+    	var msg="请填写用户密码！";
+    	if($.trim($(this).val())==""){
+    		showTip(msg,'#userPwd');
+    	}
+    });
+    $("#userImgCode").focusout(function(e){
+    	var msg="请填写验证码！";
+    	if($.trim($(this).val())==""){
+    		showTip(msg,'#img');
+    	}
+    });
 });
+
+function showTip(msg,id){
+	layer.tips(msg, id, {
+		tips: [2, '#CC0033'] //还可配置颜色
+	});
+}

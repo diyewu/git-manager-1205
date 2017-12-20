@@ -139,7 +139,7 @@ public class ProjectMgrController extends BaseController {
 						msg = "项目参数有误！";
 					}else{
 						if(!peojectServices.checkSetImg(webProjectId)){
-							msg = "请先设置项目图片属性，在提交图片数据！";
+							msg = "请先设置项目图片属性，再提交图片数据！";
 						}
 					}
 				}

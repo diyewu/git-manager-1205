@@ -15,6 +15,9 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
     <link rel="stylesheet" href="css/animate.min.css">
     <script src="js/jquery-3.2.1.min.js"></script>
 	<link rel="stylesheet" type="text/css" href="css/loader.css">
+	<link rel="stylesheet" type="text/css" href="plugins/layer/theme/default/layer.css">
+	
+	<script src="plugins/layer/layer.js"></script>
     <script type="text/javascript">         
     // 等待所有加载
     //$(window).load(function(){
@@ -41,14 +44,14 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 	</div>
     <div class="container">
         <div class="inputBox idBox">
-            <input type="text" class="form-control" placeholder="请输入账号" aria-describedby="basic-addon1">
+            <input type="text" class="form-control" id="userName" placeholder="请输入账号" aria-describedby="basic-addon1">
         </div>
         <div class="inputBox pwdBox">
-            <input type="text" class="form-control" placeholder="请输入密码" aria-describedby="basic-addon1">
+            <input type="text" class="form-control" id="userPwd" placeholder="请输入密码" aria-describedby="basic-addon1">
             <a href="#" class="forgetPwd">忘记密码</a>
         </div>
         <div class="inputBox codeBox">
-            <input type="text" class="form-control" placeholder="请输入验证码" aria-describedby="basic-addon1">
+            <input type="text" class="form-control" id="userImgCode" placeholder="请输入验证码" aria-describedby="basic-addon1">
             <!-- <img src="img/code.jpg" alt="code"> -->
             <img id="img" src="<%=path%>/authimg/generateImage" onclick="javascript:changeImg()" alt="点击切换"/>
         </div>
