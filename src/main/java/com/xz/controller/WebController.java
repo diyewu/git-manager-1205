@@ -1,6 +1,6 @@
 package com.xz.controller;
 
-import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -10,8 +10,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.StringUtils;
-import org.codehaus.jackson.JsonGenerationException;
-import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -20,6 +18,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.xz.common.SessionConstant;
 import com.xz.model.json.JsonModel;
+import com.xz.service.AppService;
 import com.xz.service.WebService;
 
 @RequestMapping("webctrl")
@@ -27,11 +26,13 @@ import com.xz.service.WebService;
 public class WebController extends BaseController{
 	@Autowired
 	private WebService webService;
+	
+	@Autowired
+	private AppService appService;
+	
 	@RequestMapping("login")
 	@ResponseBody
-	public JsonModel login(HttpServletRequest request,HttpServletResponse response) throws JsonGenerationException, JsonMappingException, IOException{
-		ObjectMapper mapper = new ObjectMapper();
-		Map<String,String> condition = new HashMap<String, String>();
+	public JsonModel login(HttpServletRequest request,HttpServletResponse response){
 		String userName = request.getParameter("userName");
 		String userPwd = request.getParameter("userPwd");
 		String imgCode = request.getParameter("imgCode");
@@ -56,18 +57,34 @@ public class WebController extends BaseController{
 			}
 		}
 		if(msg == null){
-			List<Map<String, Object>> userInfo = webService.getUserInfoByNameandPwd(userName, userPwd);
+			List<Map<String, Object>> userInfo = appService.getUserInfoByNameandPwd(userName, userPwd);
 			if (userInfo != null && userInfo.size() > 0) {
 				String userId = userInfo.get(0).get("id")+"";
 				String userRole = userInfo.get(0).get("user_role")+"";
+				String userRealName = userInfo.get(0).get("real_name")+"";
 				session.setAttribute(SessionConstant.WEB_USER_ID, userId);
 				session.setAttribute(SessionConstant.WEB_USER_NAME, userName);
 				session.setAttribute(SessionConstant.WEB_USER_ROLE, userRole);
+				session.setAttribute(SessionConstant.WEB_USER_REAL_NAME, userRealName);
 			}else{
 				msg = "用户名或密码错误！";
 			}
 		}
 		
 		return new JsonModel(msg == null, msg);
+	}
+	@RequestMapping("getObjectListByUserRole")
+	@ResponseBody
+	public JsonModel getObjectListByUserRole(HttpServletRequest request,HttpServletResponse response){
+		HttpSession session = request.getSession(); 
+		String userRole = session.getAttribute(SessionConstant.WEB_USER_ROLE)+"";
+		String msg = null;
+		List<Map<String, Object>> list = new ArrayList<Map<String,Object>>();
+		if(StringUtils.isNotBlank(userRole)){
+			list = webService.getObjectList(userRole);
+		}else{
+			msg = "尚未登陆！";
+		}
+		return new JsonModel(msg == null,msg,list);
 	}
 }

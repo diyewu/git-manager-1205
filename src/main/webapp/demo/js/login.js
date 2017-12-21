@@ -93,21 +93,15 @@ $(document).ready(function () {
     		imgCode:imgCode
 		},
 		function(result){
-			console.log(result);
 			if(result.success == true){//登陆成功
-				//window.location.href="index.jsp"; 
-				layer.msg('登陆成功');
-			}else{
-				//提示层
-//				layer.msg('登陆失败：'+result.msg);
-				layer.alert('内容', {
-					  icon: 1,
-					  skin: 'layer-ext-moon' //该皮肤由layer.seaning.com友情扩展。关于皮肤的扩展规则，去这里查阅
-				})
+				window.location.href="index.jsp"; 
+			}else {
+				layer.tips('登陆失败：'+result.msg, '#loginBtn_', {
+					tips: [2, '#CC0033']
+				});
 				changeImg()
 			}
 		},'json');
-//    	window.location.href="index.jsp";
     });
     
     /**

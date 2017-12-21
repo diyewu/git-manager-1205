@@ -1,4 +1,95 @@
-new Vue({
+	$(document).ready(function() { 
+    	$('#myContainer').hide();
+        $('body').addClass('loaded');
+        $('#loader-wrapper .load_title').remove();
+        
+    	$(".js-silder").silder({
+			auto: true,//自动播放，传入任何可以转化为true的值都会自动轮播
+			speed: 20,//轮播图运动速度
+			sideCtrl: true,//是否需要侧边控制按钮
+			bottomCtrl: true,//是否需要底部控制按钮
+			defaultView: 0,//默认显示的索引
+			interval: 3000,//自动轮播的时间，以毫秒为单位，默认3000毫秒
+			activeClass: "active",//小的控制按钮激活的样式，不包括作用两边，默认active
+		});
+    	getObjectList();//加载项目数据
+		
+    }); 
+    
+	function getObjectList(){
+		$.post(path+"/webctrl/getObjectListByUserRole/", 
+		{
+		},
+		function(result){
+			if(result.success == true){//登陆成功
+				$.each(result.data, function (index, obj) {
+	               var lis = "";
+	               trs = "<li id=\""+obj.id+"\"><span class=\"text\">"+obj.menu_name+"&nbsp;&nbsp;</span></li>";
+	               $(".first-info-list").append(trs);
+	           });
+			}else {
+				window.location.href="login.jsp"; 
+			}
+		},'json');
+	}
+	
+	
+	var ac = new BMap.Autocomplete(    //建立一个自动完成的对象
+	    {"input" : "suggestId"
+	    ,"location" : map
+	    ,"onSearchComplete" : function(e) {
+	    	//console.log(e);
+	    }
+	});
+	
+	ac.addEventListener("onhighlight", function(e) {  //鼠标放在下拉列表上的事件
+	var str = "";
+	var _value = e.fromitem.value;
+	var value = "";
+	if (e.fromitem.index > -1) {
+	        value = _value.province +  _value.city +  _value.district +  _value.street +  _value.business;
+	    }    
+	    str = "FromItem<br />index = " + e.fromitem.index + "<br />value = " + value;
+	
+	    value = "";
+	if (e.toitem.index > -1) {
+	        _value = e.toitem.value;
+	        value = _value.province +  _value.city +  _value.district +  _value.street +  _value.business;
+	    }    
+	    str += "<br />ToItem<br />index = " + e.toitem.index + "<br />value = " + value;
+	    //G("searchResultPanel").innerHTML = str;
+	});
+	
+	var myValue;
+	ac.addEventListener("onconfirm", function(e) {    //鼠标点击下拉列表后的事件
+	var _value = e.item.value;
+	    myValue = _value.province +  _value.city +  _value.district +  _value.street +  _value.business;
+	    setPlace(myValue);
+	});
+	
+	var myGeo = new BMap.Geocoder();// 将地址解析结果显示在地图上,并调整地图视野
+	function setPlace(detailAddress){// 创建地址解析器实例
+		myGeo.getPoint(detailAddress, function(point){
+			console.log(point);
+			if (point) {
+			    map.centerAndZoom(point, 14);
+			    //map.addOverlay(new BMap.Marker(point));
+			}else{
+				alert("没有查询到相关信息");
+			}
+		}, "上海");
+	}
+	
+	function searchPlace(){
+		var input = $("#suggestId").val();
+		setPlace(input);
+	}
+
+
+
+
+
+var vm = new Vue({
     el: '#myContainer',
     data: {
         resultFlag: false,
@@ -11,303 +102,33 @@ new Vue({
         secondIndex:'',//二级的坐标
         show:false,
         selectedIndex:[],//最终结果的数组
-        cascaderData:[{//三级联动数据
-            id:1,
-            value:'1',
-            children:[{
-                id:11,
-                value:'11',
-                children:[{
-                    id:111,
-                    value:'111',
-                    status:false
-                },{
-                    id:112,
-                    value:'112',
-                    status:false,
-                },{
-                    id:113,
-                    value:'113',
-                    status:false
-                },{
-                    id:114,
-                    value:'114',
-                    status:false
-                },{
-                    id:115,
-                    value:'115',
-                    status:false
-                }]
-            },{
-                id:12,
-                value:'12',
-                children:[{
-                    id:121,
-                    value:'111',
-                    status:false
-                },{
-                    id:122,
-                    value:'112',
-                    status:false
-                },{
-                    id:123,
-                    value:'113',
-                    status:false
-                },{
-                    id:124,
-                    value:'114',
-                    status:false
-                },{
-                    id:125,
-                    value:'115',
-                    status:false
-                }]
-            },{
-                id:13,
-                value:'13',
-                children:[{
-                    id:131,
-                    value:'111',
-                    status:false
-                },{
-                    id:132,
-                    value:'112',
-                    status:false
-                },{
-                    id:133,
-                    value:'113',
-                    status:false
-                },{
-                    id:134,
-                    value:'114',
-                    status:false
-                },{
-                    id:135,
-                    value:'115',
-                    status:false
-                }]
-            },{
-                id:14,
-                value:'14',
-                children:[{
-                    id:141,
-                    value:'111',
-                    status:false
-                },{
-                    id:142,
-                    value:'112',
-                    status:false
-                },{
-                    id:143,
-                    value:'113',
-                    status:false
-                },{
-                    id:144,
-                    value:'114',
-                    status:false
-                },{
-                    id:145,
-                    value:'115',
-                    status:false
-                }]
-            },{
-                id:15,
-                value:'15',
-                children:[{
-                    id:151,
-                    value:'111',
-                    status:false
-                },{
-                    id:152,
-                    value:'112',
-                    status:false
-                },{
-                    id:153,
-                    value:'113',
-                    status:false
-                },{
-                    id:154,
-                    value:'114',
-                    status:false
-                },{
-                    id:155,
-                    value:'155',
-                    status:false
-                }] 
-            }]
-        },{
-            id:2,
-            value:'1',
-            children:[{
-                id:21,
-                value:'21',
-                children:[{
-                    id:211,
-                    value:'111',
-                    status:false
-                },{
-                    id:212,
-                    value:'112',
-                    status:false
-                },{
-                    id:213,
-                    value:'113',
-                    status:false
-                },{
-                    id:214,
-                    value:'114',
-                    status:false
-                },{
-                    id:215,
-                    value:'115',
-                    status:false
-                }]
-            },{
-                id:22,
-                value:'22',
-                children:[{
-                    id:221,
-                    value:'111',
-                    status:false
-                },{
-                    id:222,
-                    value:'112',
-                    status:false
-                },{
-                    id:223,
-                    value:'113',
-                    status:false
-                },{
-                    id:224,
-                    value:'114',
-                    status:false
-                },{
-                    id:225,
-                    value:'115',
-                    status:false
-                }]
-            },{
-                id:23,
-                value:'23',
-                children:[{
-                    id:231,
-                    value:'111',
-                    status:false
-                },{
-                    id:232,
-                    value:'112',
-                    status:false
-                },{
-                    id:233,
-                    value:'113',
-                    status:false
-                },{
-                    id:234,
-                    value:'234',
-                    status:false
-                },{
-                    id:235,
-                    value:'235',
-                    status:false
-                }]
-            },{
-                id:24,
-                value:'24',
-                children:[{
-                    id:241,
-                    value:'241',
-                    status:false
-                },{
-                    id:242,
-                    value:'242',
-                    status:false
-                },{
-                    id:243,
-                    value:'243',
-                    status:false
-                },{
-                    id:244,
-                    value:'244',
-                    status:false
-                },{
-                    id:245,
-                    value:'245',
-                    status:false
-                }]
-            },{
-                id:25,
-                value:'25',
-                children:[{
-                    id:251,
-                    value:'251',
-                    status:false
-                },{
-                    id:252,
-                    value:'252',
-                    status:false
-                },{
-                    id:253,
-                    value:'253',
-                    status:false
-                },{
-                    id:254,
-                    value:'254',
-                    status:false
-                },{
-                    id:255,
-                    value:'255',
-                    status:false
-                }]
-            },{
-                id:26,
-                value:'26',
-                children:[{
-                    id:261,
-                    value:'261',
-                    status:false
-                },{
-                    id:262,
-                    value:'262',
-                    status:false
-                },{
-                    id:263,
-                    value:'263',
-                    status:false
-                },{
-                    id:264,
-                    value:'264',
-                    status:false
-                },{
-                    id:265,
-                    value:'265',
-                    status:false
-                }] 
-            },{
-                id:27,
-                value:'27',
-                children:[{
-                    id:271,
-                    value:'271',
-                    status:false
-                },{
-                    id:272,
-                    value:'272',
-                    status:false
-                },{
-                    id:273,
-                    value:'273',
-                    status:false
-                },{
-                    id:274,
-                    value:'274',
-                    status:false
-                },{
-                    id:275,
-                    value:'275',
-                    status:false
-                }] 
-            }]
-        }]
+      //三级联动数据
+        cascaderData:[{
+    		"checked":false,
+    		"children":[
+    			{
+    				"checked":false,
+    				"children":[
+    					{
+    						"checked":false,
+    						"children":null,
+    						"id":"2048",
+    						"leaf":true,
+    						"value":"吴秋明",
+    						"parent_id":"00151382364464901262005056c00001"
+    					}
+    				],
+    				"id":"00151382364464901262005056c00001",
+    				"leaf":false,
+    				"value":"检查人员",
+    				"parent_id":"00151382364464001251005056c00001"
+    			}
+    		],
+    		"id":"00151382364464001251005056c00001",
+    		"leaf":false,
+    		"value":"2017年10月上海城管小区问题清单",
+    		"parent_id":null
+    	}]
         
     },
     mounted() {
@@ -358,59 +179,92 @@ new Vue({
     	markerClusterer.setGridSize(100);
 	},
     methods: {
-    	//地图search框
-
-    	
     	//三级菜单关联操作
-    	cascadeClose :function(){
+    	cascadeClose :function(){//联动关闭
             this.cascaderStatus = false
             this.firstIndex = ''
             this.secondIndex = ''
         },
-        //联动关闭
-        cascadeOpen: function(){
+        
+        cascadeOpen: function(){//联动打开
             this.cascaderStatus = true
         },
-        //联动打开
-        firstClick :function(index){
-            console.log(index)
+        
+        firstOver :function(item,index){//选择第一级菜单
             this.firstIndex = index
+            this.cascaderData[this.firstIndex].children.map((v)=>{
+            	$.each(this.selectedIndex, function(idx, obj) {
+            	    if(obj.id == v.id){
+            	    	v.status == true;
+            	    }
+            	});
+            })
             if(this.secondIndex!==''){
                 this.secondIndex=''
             }
-            this.selectedIndex = []
         },
-        //选择第一级菜单
-        secondClick :function(index){
-            this.selectedIndex = []
-            console.log(this.secondIndex)
+        
+        secondOver :function(item,index){//选择第二级菜单
+            //this.selectedIndex = []
             if(this.secondIndex!==''&&this.firstIndex!==''){
-                // console.log(this.cascaderData[this.firstIndex])
                 this.cascaderData[this.firstIndex].children[this.secondIndex].children.map((v)=>{
-                    v.status = false
+                	$.each(this.selectedIndex, function(idx, obj) {
+                	    if(obj.id == v.id){
+                	    	v.status == true;
+                	    }
+                	});
                 })
             }
+            
             this.secondIndex = index
             // this.cascaderData[firstIndex].children[index].map((v)=>{
             //     console.log(v)
             // })
         },
-         //选择第二级菜单
-        thirdClick :function(item,index){
-            console.log(item)
-            if(item.status){   
-                item.status = false
-                this.selectedIndex.map((v,i)=>{
-                    if(v.id==item.id){
-                        this.selectedIndex.splice(i,1)
-                    }
-                })
-            }else{
-                this.selectedIndex.push(item)
-                item.status = true
-            }
+         
+        firstClick :function(item,index){//选择第一级菜单
+        	if(item.status){
+        		item.status = false
+        		this.selectedIndex.map((v,i)=>{
+        			if(v.id==item.id){
+        				this.selectedIndex.splice(i,1)
+        			}
+        		})
+        	}else{
+        		this.selectedIndex.push(item)
+        		item.status = true
+        	}
         },
-         //选择第三级菜单
+        
+        secondClick :function(item,index){//选择第二级菜单
+        	//this.selectedIndex = []
+        	if(item.status){
+        		item.status = false
+        		this.selectedIndex.map((v,i)=>{
+        			if(v.id==item.id){
+        				this.selectedIndex.splice(i,1)
+        			}
+        		})
+        	}else{
+        		this.selectedIndex.push(item)
+        		item.status = true
+        	}
+        },
+        
+        thirdClick :function(item,index){//选择第三级菜单
+        	if(item.status){   
+        		item.status = false
+        		this.selectedIndex.map((v,i)=>{
+        			if(v.id==item.id){
+        				this.selectedIndex.splice(i,1)
+        			}
+        		})
+        	}else{
+        		this.selectedIndex.push(item)
+        		item.status = true
+        	}
+        },
+         
         out: function (current) {
             setTimeout(() => {
                 if (this.mainFlag == 1) {
@@ -492,6 +346,8 @@ new Vue({
         }
     }
 })
+
+
 
 function showInfo(e){
 //	console.log(marker);
