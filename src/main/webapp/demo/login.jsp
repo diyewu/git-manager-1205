@@ -1,7 +1,12 @@
+<%@page import="javax.websocket.Session"%>
 <%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
 <%
-String path = request.getContextPath();
-String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+path+"/";
+	String path = request.getContextPath();
+	String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+path+"/";
+	session.removeAttribute("webUserId");
+	session.removeAttribute("webUserName");
+	session.removeAttribute("webUserRole");
+	session.removeAttribute("webUserRealName");
 %>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
@@ -48,7 +53,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
         </div>
         <div class="inputBox pwdBox">
             <input type="text" class="form-control" id="userPwd" placeholder="请输入密码" aria-describedby="basic-addon1">
-            <a href="#" class="forgetPwd">忘记密码</a>
+            <!-- <a href="#" class="forgetPwd">忘记密码</a> -->
         </div>
         <div class="inputBox codeBox">
             <input type="text" class="form-control" id="userImgCode" placeholder="请输入验证码" aria-describedby="basic-addon1">
@@ -65,7 +70,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
     </div>
     <div id="main" style="z-index:-1;position:absolute;top:0;left:0;bottom:0;right:0;"></div>
 </body>
-<script src="js/common.js"></script>
+	<script src="js/common.js"></script>
 	<script src="js/echarts.min.js"></script>
 	<script src="js/echarts-gl.min.js"></script>
 	<script type="text/javascript" src="js/login.js"></script>

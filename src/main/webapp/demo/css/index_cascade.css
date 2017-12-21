@@ -1,7 +1,7 @@
 /* css-------------------------------- */
 .myContainer .selectedContainer {
     position: absolute;
-    z-index:4;
+    z-index:9991;
     top:64px;
     left:100px;
     bottom:100px;
@@ -22,9 +22,12 @@
 }
 .myContainer .selectedContainer .selectedResult .selectedResultContainer{
     overflow-x:auto;
+    /*overflow-y:hidden;*/
     margin-left:60px;
     border-bottom:1px solid #ddd;
 }
+
+
 .myContainer .selectedContainer .selectedResult .selectedResultContainer .selectedResultWrap {
     height:42px;
     float:left;
@@ -35,22 +38,23 @@
 }
 .myContainer .selectedContainer .selectedResult .selectedResultContainer .selectedResultWrap .selectedResultWrapItem{
     display:inline-block;
-    width:80px;
+    width:auto;
     /* line-height:42px; */
     margin-right:20px;
     border:1px solid #3086c3;
     text-align:center
 }
+
 .myContainer .selectedContainer .selectedLine {
     width:33%;
     overflow-y:auto;
-    background:#fff;
+    background:#F7F7F7;
     position:absolute;
     bottom:0px;
     top:60px
 }
 .myContainer .selectedContainer .selectedLine .selectedItem {
-    height:30px;
+    height:auto;
     line-height:30px;
     padding-left:20px
 }
