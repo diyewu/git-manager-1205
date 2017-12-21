@@ -11,6 +11,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.xz.common.SessionConstant;
 import com.xz.utils.VerifyCodeUtils;
 
 @RequestMapping("authimg")
@@ -30,8 +31,8 @@ public class AuthImageController {
         //存入会话session 
         HttpSession session = request.getSession(true); 
         //删除以前的
-        session.removeAttribute("verCode");
-        session.setAttribute("verCode", verifyCode.toLowerCase()); 
+        session.removeAttribute(SessionConstant.WEB_IMG_CODE);
+        session.setAttribute(SessionConstant.WEB_IMG_CODE, verifyCode.toLowerCase()); 
         //生成图片 
         int w = 100, h = 30; 
         VerifyCodeUtils.outputImage(w, h, response.getOutputStream(), verifyCode); 

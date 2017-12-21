@@ -33,6 +33,10 @@ public class AppJsonModel implements java.io.Serializable{
 		this.msg = msg;
 		this.data = data;
 	}
+	public AppJsonModel( String msg, Object data) {
+		this.msg = msg;
+		this.data = data;
+	}
 
 	public String getMsg() {
 		return msg;

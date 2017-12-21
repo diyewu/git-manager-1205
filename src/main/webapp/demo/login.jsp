@@ -15,10 +15,10 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
     <link rel="stylesheet" href="css/animate.min.css">
     <script src="js/jquery-3.2.1.min.js"></script>
 	<link rel="stylesheet" type="text/css" href="css/loader.css">
-	<link rel="stylesheet" type="text/css" href="plugins/layer/theme/default/layer.css">
 	
 	<script src="plugins/layer/layer.js"></script>
-    <script type="text/javascript">         
+    <script type="text/javascript">
+    var path = "<%=path%>";
     // 等待所有加载
     //$(window).load(function(){
     $(document).ready(function() { 
