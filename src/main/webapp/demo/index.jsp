@@ -20,6 +20,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 <script src="plugins/layer/layer.js"></script>
 <script src="js/common.js"></script>
 <link rel="stylesheet" href="css/index.css">
+<link rel="stylesheet" href="css/checkbox.css">
 <link rel="stylesheet" href="css/index_cascade.css">
 <link rel="stylesheet" type="text/css"
 	href="plugins/earthmap/css/demo.css" />
@@ -79,9 +80,9 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 					:style="{width:firstIndex!==''?(secondIndex!==''?'99%':'66%'):'33%'}">
 					<div class="selectedResultBtn" @click="cascadeClose()">确定</div>
 					<div class="selectedResultContainer">
-						<div class="selectedResultWrap"	:style="{width:selectedIndex.length*100+50+'px'}">
-							<span class="selectedResultWrapText">结果：</span> <span
-								class="selectedResultWrapItem" v-for="(v,i) in selectedIndex">{{v.value}}</span>
+						<div class="selectedResultWrap"	:style="{width:selectedIndex.length*250+100+'px'}">
+							<span class="selectedResultWrapText">全部结果：</span> 
+							<span class="selectedResultWrapItem" v-for="(v,i) in selectedIndex">{{v.value}}</span>
 						</div>
 					</div>
 				</div>
@@ -91,8 +92,11 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 					:style="{borderRight:firstIndex!==''?'1px solid #ddd':''}">
 					<div class="selectedItem" :style="{color:firstIndex===i?'#3086c3':''}"
 						@click="firstClick(v,i)" @mouseenter="firstOver(v,i)" v-for="(v,i) in cascaderData">
-						<input style="width:auto;height:auto;margin:auto;padding:auto;float:none"
+						<!-- 
+						<input style="width:auto;height:auto;margin:5px;padding:auto;float:none"
 							:checked="v.status" type="checkbox">{{v.value}}
+						-->
+						<label><input type="checkbox" :checked="v.status"><i>✓</i>{{v.value}}</label>
 					</div>
 				</div>
 				<transition name="fade">
@@ -103,8 +107,11 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 						:style="{color:secondIndex===i?'#3086c3':''}"
 						@click="secondClick(v,i)" @mouseenter="secondOver(v,i)"
 						v-for="(v,i) in cascaderData[firstIndex].children">
-						<input style="width:auto;height:auto;margin:auto;padding:auto;float:none"
+						<!-- 
+						<input style="width:auto;height:auto;margin:5px;padding:auto;float:none"
 							:checked="v.status" type="checkbox">{{v.value}}
+						-->
+						<label><input type="checkbox" :checked="v.status"><i>✓</i>{{v.value}}</label>
 					</div>
 				</div>
 				</transition>
@@ -115,8 +122,12 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 					<div @click="thirdClick(v,i)" class="selectedItem"
 						:style="{color:v.status?'#3086c3':''}"
 						v-for="(v,i) in cascaderData[firstIndex].children[secondIndex].children">
-						<input style="width:auto;height:auto;margin:auto;padding:auto;float:none"
-							:checked="v.status" type="checkbox">{{v.value}}
+						<!-- 
+						<input style="width:auto;height:auto;margin:5px;padding:auto;float:none"
+							:checked="v.status" type="checkbox">
+							{{v.value}}
+						 -->
+						 <label><input type="checkbox" :checked="v.status"><i>✓</i>{{v.value}}</label>
 					</div>
 				</div>
 				</transition>

@@ -40,9 +40,15 @@
     display:inline-block;
     width:auto;
     /* line-height:42px; */
-    margin-right:20px;
-    border:1px solid #3086c3;
-    text-align:center
+    /*margin-right:20px;*/
+    /*border:1px solid #3086c3;*/
+    text-align:center;
+    border: 1px solid #DDD;
+	margin: 0 5px 5px 0;
+	padding: 0 26px 0 4px;
+	cursor: pointer;
+	background: #f3f3f3;
+    
 }
 
 .myContainer .selectedContainer .selectedLine {
@@ -56,7 +62,8 @@
 .myContainer .selectedContainer .selectedLine .selectedItem {
     height:auto;
     line-height:30px;
-    padding-left:20px
+    padding-left:20px;
+    cursor: pointer;
 }
 
 .myContainer .selectedContainer .selectedLine .selectedItem:hover{

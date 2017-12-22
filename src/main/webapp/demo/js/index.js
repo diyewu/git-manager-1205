@@ -195,7 +195,7 @@ var vm = new Vue({
             this.cascaderData[this.firstIndex].children.map((v)=>{
             	$.each(this.selectedIndex, function(idx, obj) {
             	    if(obj.id == v.id){
-            	    	v.status == true;
+            	    	v.status = true;
             	    }
             	});
             })
@@ -207,10 +207,10 @@ var vm = new Vue({
         secondOver :function(item,index){//选择第二级菜单
             //this.selectedIndex = []
             if(this.secondIndex!==''&&this.firstIndex!==''){
-                this.cascaderData[this.firstIndex].children[this.secondIndex].children.map((v)=>{
+                this.cascaderData[this.firstIndex].children[index].children.map((v)=>{
                 	$.each(this.selectedIndex, function(idx, obj) {
                 	    if(obj.id == v.id){
-                	    	v.status == true;
+                	    	v.status = true;
                 	    }
                 	});
                 })
@@ -229,25 +229,63 @@ var vm = new Vue({
         			if(v.id==item.id){
         				this.selectedIndex.splice(i,1)
         			}
-        		})
+        		});
+        		this.cascaderData[index].children.map((v,i)=>{
+        			v.status = false;
+        			this.selectedIndex.map((vs,i)=>{
+            			if(v.id==vs.id){
+            				this.selectedIndex.splice(i,1)
+            			}
+            		});
+        			this.cascaderData[index].children[i].children.map((vv)=>{
+        				vv.status = false;
+        				this.selectedIndex.map((vss,ii)=>{
+                			if(vv.id==vss.id){
+                				this.selectedIndex.splice(ii,1)
+                			}
+                		});
+        			});
+                })
         	}else{
         		this.selectedIndex.push(item)
         		item.status = true
+        		//设置子集为选中
+        		this.cascaderData[index].children.map((v)=>{
+        			v.status = true;
+//        			this.selectedIndex.push(v)
+        			$.each(v.children, function(idx, obj) {
+        				obj.status = true;
+//        				this.selectedIndex.push(obj)
+                	});
+                })
         	}
         },
         
         secondClick :function(item,index){//选择第二级菜单
         	//this.selectedIndex = []
         	if(item.status){
-        		item.status = false
+        		item.status = false;
         		this.selectedIndex.map((v,i)=>{
         			if(v.id==item.id){
         				this.selectedIndex.splice(i,1)
         			}
-        		})
+        		});
+        		this.cascaderData[this.firstIndex].children[index].children.map((v)=>{
+        			v.status = false;
+        			this.selectedIndex.map((vs,i)=>{
+            			if(v.id==vs.id){
+            				this.selectedIndex.splice(i,1)
+            			}
+            		});
+                })
+        		
         	}else{
         		this.selectedIndex.push(item)
         		item.status = true
+        		this.cascaderData[this.firstIndex].children[index].children.map((v)=>{
+        			v.status = true;
+//        			this.selectedIndex.push(v)
+                })
         	}
         },
         
