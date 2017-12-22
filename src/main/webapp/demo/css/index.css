@@ -548,7 +548,6 @@
 .myContainer .sh ul {
     /*height: auto;*/
     max-height: 15rem;
-    min-width:4.4rem;
     width: auto;
 }
 
