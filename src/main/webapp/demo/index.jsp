@@ -82,7 +82,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 					<div class="selectedResultContainer">
 						<div class="selectedResultWrap"	:style="{width:selectedIndex.length*250+100+'px'}">
 							<span class="selectedResultWrapText">全部结果：</span> 
-							<span class="selectedResultWrapItem" v-for="(v,i) in selectedIndex">{{v.value}}</span>
+							<span class="selectedResultWrapItem" v-for="(v,i) in selectedIndex">{{v.menuName}}</span>
 						</div>
 					</div>
 				</div>
@@ -96,7 +96,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 						<input style="width:auto;height:auto;margin:5px;padding:auto;float:none"
 							:checked="v.status" type="checkbox">{{v.value}}
 						-->
-						<label><input type="checkbox" :checked="v.status"><i>✓</i>{{v.value}}</label>
+						<label><input type="checkbox" :checked="v.status"><i>✓</i>{{v.menuName}}</label>
 					</div>
 				</div>
 				<transition name="fade">
@@ -111,7 +111,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 						<input style="width:auto;height:auto;margin:5px;padding:auto;float:none"
 							:checked="v.status" type="checkbox">{{v.value}}
 						-->
-						<label><input type="checkbox" :checked="v.status"><i>✓</i>{{v.value}}</label>
+						<label><input type="checkbox" :checked="v.status"><i>✓</i>{{v.menuName}}</label>
 					</div>
 				</div>
 				</transition>
@@ -127,7 +127,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 							:checked="v.status" type="checkbox">
 							{{v.value}}
 						 -->
-						 <label><input type="checkbox" :checked="v.status"><i>✓</i>{{v.value}}</label>
+						 <label><input type="checkbox" :checked="v.status"><i>✓</i>{{v.menuName}}</label>
 					</div>
 				</div>
 				</transition>
@@ -262,16 +262,14 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
                      -->
 				</div>
 				<div class="item-wrap" style="overflow-x:hidden;overflow-y:auto;">
-					<div class="list-item" @click="showDetail()"
-						data-dianji="go-to-detail" data-id="1617">
-						<img alt="" onerror="this.src='img/mz.jpg';this.onerror=null;"
-							src="img/mz.jpg">
+					<!-- 
+					<div class="list-item" @click="showDetail()">
+						<img alt="" onerror="this.src='img/mz.jpg';this.onerror=null;"	src="img/mz.jpg">
 						<div class="right-info">
 							<div>
-								<span class="title"> <a target="_blank"
-									href="/detail/lujinsheshanyuanzibs/">南龙谭苑小区</a>
+								<span class="title"> <a>南龙谭苑小区</a>
 								</span> <span class="villa-name">松江区</span>
-								<!-- <span class="sale-status" data-status="在售">正常</span> -->
+								<span class="sale-status" >正常</span>
 								<i class="iconfont favor-icon" style="display: none;"
 									data-dianji="favor/测试图片详情"></i>
 							</div>
@@ -287,295 +285,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 						</div>
 						<hr>
 					</div>
-					<div class="list-item" @click="showDetail()"
-						data-dianji="go-to-detail" data-id="1474">
-						<img alt="" onerror="this.src='img/mz.jpg';this.onerror=null;"
-							src="img/mz.jpg">
-						<div class="right-info">
-							<div>
-								<span class="title"> <a target="_blank"
-									href="/detail/xiangyitiandi/">XXXXXX</a>
-								</span> <span class="villa-name">饭店</span>
-								<!--<span class="sale-status" data-status="在售">在售</span>-->
-								<i class="iconfont favor-icon" style="display: none;"
-									data-dianji="favor/关注香溢花城"></i>
-							</div>
-							<div>
-								<span>XXXXXX</span> <span class="price">XXXXXX</span>
-							</div>
-							<div>
-								<span>XXXXXX</span>
-							</div>
-							<div>
-								<span>XXXXXX</span>
-							</div>
-						</div>
-						<hr>
-					</div>
-					<div class="list-item" @click="showDetail()"
-						data-dianji="go-to-detail" data-id="1616">
-						<img alt="" onerror="this.src='img/mz.jpg';this.onerror=null;"
-							src="img/mz.jpg">
-						<div class="right-info">
-							<div>
-								<span class="title"> <a target="_blank"
-									href="/detail/lujinsheshanyuanzi/">XXXXXX</a>
-								</span> <span class="villa-name">饭店</span>
-								<!--<span class="sale-status" data-status="在售">在售</span>-->
-								<i class="iconfont favor-icon" style="display: none;"
-									data-dianji="favor/测试图片详情"></i>
-							</div>
-							<div>
-								<span>XXXXXX</span> <span class="price">XXXXXX</span>
-							</div>
-							<div>
-								<span>XXXXXX</span>
-							</div>
-							<div>
-								<span>XXXXXX</span>
-							</div>
-						</div>
-						<hr>
-					</div>
-					<div class="list-item" @click="showDetail()"
-						data-dianji="go-to-detail" data-id="349">
-						<img alt="" onerror="this.src='img/mz.jpg';this.onerror=null;"
-							src="img/mz.jpg">
-						<div class="right-info">
-							<div>
-								<span class="title"> <a target="_blank"
-									href="/detail/shanghaivillabs/">XXXXXX</a>
-								</span> <span class="villa-name">饭店</span>
-								<!--<span class="sale-status" data-status="在售">在售</span>-->
-								<i class="iconfont favor-icon" style="display: none;"
-									data-dianji="favor/关注上海villa"></i>
-							</div>
-							<div>
-								<span>XXXXXX</span> <span class="price">XXXXXX</span>
-							</div>
-							<div>
-								<span>饭店测试</span>
-							</div>
-							<div>
-								<span>XXXXXX</span>
-							</div>
-						</div>
-						<hr>
-					</div>
-					<div class="list-item" @click="showDetail()"
-						data-dianji="go-to-detail" data-id="1618">
-						<img alt="" onerror="this.src='img/mz.jpg';this.onerror=null;"
-							src="img/mz.jpg">
-						<div class="right-info">
-							<div>
-								<span class="title"> <a target="_blank"
-									href="/detail/yuzhoufu/">XXXXXX</a>
-								</span> <span class="villa-name">饭店</span>
-								<!--<span class="sale-status" data-status="在售">在售</span>-->
-								<i class="iconfont favor-icon" style="display: none;"
-									data-dianji="favor/关注禹洲府"></i>
-							</div>
-							<div>
-								<span>XXXXXX</span> <span class="price">XXXXXX</span>
-							</div>
-							<div>
-								<span>XXXXXX</span>
-							</div>
-							<div>
-								<span>XXXXXX</span>
-							</div>
-						</div>
-						<hr>
-					</div>
-					<div class="list-item" @click="showDetail()"
-						data-dianji="go-to-detail" data-id="1253">
-						<img alt="" onerror="this.src='img/mz.jpg';this.onerror=null;"
-							src="img/mz.jpg">
-						<div class="right-info">
-							<div>
-								<span class="title"> <a target="_blank"
-									href="/detail/jindishijia/">XXXXXX</a>
-
-								</span> <span class="villa-name">饭店</span>
-								<!--<span class="sale-status" data-status="在售">在售</span>-->
-								<i class="iconfont favor-icon" style="display: none;"
-									data-dianji="favor/关注金地世家"></i>
-							</div>
-							<div>
-								<span>XXXXXX</span> <span class="price">XXXXXX</span>
-							</div>
-							<div>
-								<span>XXXXXX</span>
-							</div>
-							<div>
-								<span>XXXXXX</span>
-							</div>
-						</div>
-
-						<hr>
-					</div>
-					<div class="list-item" @click="showDetail()"
-						data-dianji="go-to-detail" data-id="1268">
-						<img alt="" onerror="this.src='img/mz.jpg';this.onerror=null;"
-							src="img/mz.jpg">
-						<div class="right-info">
-							<div>
-								<span class="title"> <a target="_blank"
-									href="/detail/biyunyilingbs/">XXXXXX</a>
-
-								</span> <span class="villa-name">饭店</span>
-								<!--<span class="sale-status" data-status="在售">在售</span>-->
-								<i class="iconfont favor-icon" style="display: none;"
-									data-dianji="favor/关注碧云壹零（饭店）"></i>
-							</div>
-							<div>
-								<span>XXXXXX</span> <span class="price">XXXXXX</span>
-							</div>
-							<div>
-								<span>饭店测试</span>
-							</div>
-							<div>
-								<span>XXXXXX</span>
-							</div>
-						</div>
-
-						<hr>
-					</div>
-					<div class="list-item" @click="showDetail()"
-						data-dianji="go-to-detail" data-id="73">
-						<img alt="" onerror="this.src='img/mz.jpg';this.onerror=null;"
-							src="img/mz.jpg">
-						<div class="right-info">
-							<div>
-								<span class="title"> <a target="_blank"
-									href="/detail/mingtianhuachengerqi/">XXXXXX</a>
-
-								</span> <span class="villa-name">饭店</span>
-								<!--<span class="sale-status" data-status="在售">在售</span>-->
-								<i class="iconfont favor-icon" style="display: none;"
-									data-dianji="favor/关注XXXXXX"></i>
-							</div>
-							<div>
-								<span>XXXXXX</span> <span class="price">XXXXXX</span>
-							</div>
-							<div>
-								<span>XXXXXX</span>
-							</div>
-							<div>
-								<span>XXXXXX</span>
-							</div>
-						</div>
-
-						<hr>
-					</div>
-					<div class="list-item" @click="showDetail()"
-						data-dianji="go-to-detail" data-id="127">
-						<img alt="" onerror="this.src='img/mz.jpg';this.onerror=null;"
-							src="img/mz.jpg">
-						<div class="right-info">
-							<div>
-								<span class="title"> <a target="_blank"
-									href="/detail/zhengrongguolingbs/">XXXXXX</a>
-
-								</span> <span class="villa-name">饭店</span>
-								<!--<span class="sale-status" data-status="在售">在售</span>-->
-								<i class="iconfont favor-icon" style="display: none;"
-									data-dianji="favor/XXXXXX"></i>
-							</div>
-							<div>
-								<span>115-360m²</span> <span class="price">XXXXXX</span>
-							</div>
-							<div>
-								<span>饭店测试</span>
-							</div>
-							<div>
-								<span>XXXXXX</span>
-							</div>
-						</div>
-
-						<hr>
-					</div>
-					<div class="list-item" @click="showDetail()"
-						data-dianji="go-to-detail" data-id="160">
-						<img alt="" onerror="this.src='img/mz.jpg';this.onerror=null;"
-							src="img/mz.jpg">
-						<div class="right-info">
-							<div>
-								<span class="title"> <a target="_blank"
-									href="/detail/hongqiaozhengrongfu/">XXXXXX</a>
-
-								</span> <span class="villa-name">饭店</span>
-								<!--<span class="sale-status" data-status="在售">在售</span>-->
-								<i class="iconfont favor-icon" style="display: none;"
-									data-dianji="favor/关注虹桥正荣府"></i>
-							</div>
-							<div>
-								<span>XXXXXX</span> <span class="price">XXXXXX</span>
-							</div>
-							<div>
-								<span>XXXXXX</span>
-							</div>
-							<div>
-								<span>XXXXXX</span>
-							</div>
-						</div>
-
-						<hr>
-					</div>
-					<div class="list-item" @click="showDetail()"
-						data-dianji="go-to-detail" data-id="390">
-						<img alt="" onerror="this.src='img/mz.jpg';this.onerror=null;"
-							src="img/mz.jpg">
-						<div class="right-info">
-							<div>
-								<span class="title"> <a target="_blank"
-									href="/detail/jiabaomengzhiyuanjingting/">XXXXXX</a>
-
-								</span> <span class="villa-name">饭店</span>
-								<!--<span class="sale-status" data-status="在售">在售</span>-->
-								<i class="iconfont favor-icon" style="display: none;"
-									data-dianji="favor/XXXXXX"></i>
-							</div>
-							<div>
-								<span>XXXXXX</span> <span class="price">XXXXXX</span>
-							</div>
-							<div>
-								<span>XXXXXX</span>
-							</div>
-							<div>
-								<span>XXXXXX</span>
-							</div>
-						</div>
-
-						<hr>
-					</div>
-					<div class="list-item" @click="showDetail()"
-						data-dianji="go-to-detail" data-id="768">
-						<img alt="" onerror="this.src='img/mz.jpg';this.onerror=null;"
-							src="img/mz.jpg">
-						<div class="right-info">
-							<div>
-								<span class="title"> <a target="_blank"
-									href="/detail/yuanchangxingfuli/">XXXXXX</a>
-
-								</span> <span class="villa-name">饭店</span>
-								<!--<span class="sale-status" data-status="在售">在售</span>-->
-								<i class="iconfont favor-icon" style="display: none;"
-									data-dianji="favor/XXXXXX"></i>
-							</div>
-							<div>
-								<span>XXXXXX</span> <span class="price">XXXXXX</span>
-							</div>
-							<div>
-								<span>XXXXXX</span>
-							</div>
-							<div>
-								<span>XXXXXX</span>
-							</div>
-						</div>
-
-						<hr>
-					</div>
+					-->
 				</div>
 			</div>
 			<div class="detail" style="display:none;overflow:hidden;">

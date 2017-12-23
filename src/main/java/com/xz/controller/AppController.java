@@ -112,46 +112,10 @@ public class AppController extends BaseController{
 		code = globalCheck(paramList, token, phoneId,appLoginBean);
 		List<AppMenu> newList = new ArrayList<AppMenu>();
 		if(code == 0){
-			List<AppMenu>  l = new ArrayList<AppMenu>();
-			l = appService.getMenu(appLoginBean.getUserRoleId());
-			Map<String,AppMenu> map = new LinkedHashMap<String,AppMenu>(); 
-			Map<String,AppMenu> map1 = new LinkedHashMap<String,AppMenu>(); 
-			for(AppMenu t:l){//list转换成map
-				map.put(t.getId(), t);
-				map1.put(t.getId(), t);
-			}
-			AppMenu c1 = null;
-			AppMenu c2 = null;
-			Iterator it = map.keySet().iterator();//遍历map
-			while (it.hasNext()) {
-				c1 = new AppMenu();
-				c1 = map.get(it.next());
-				if(c1.getId() == null ||"null".equals(c1.getId())){//第一级节点
-					
-				}else{
-					if(map1.containsKey(c1.getParent_id())){//
-						c2 = new AppMenu();
-						c2 = map1.get(c1.getParent_id());
-						if(c2.getChildren() != null){
-							c2.getChildren().add(c1);
-						}else{
-							List<AppMenu> childrens = new ArrayList<AppMenu>();
-							childrens.add(c1);
-							c2.setChildren(childrens);
-						}
-						map1.remove(c1.getId());
-					}
-				}
-			}
-			
-			Iterator i = map1.keySet().iterator();
-			while (i.hasNext()) {
-				newList.add((AppMenu)map.get(i.next()));
-			}
+			newList = appService.getMenulist(appLoginBean.getUserRoleId());
 		}
 		return new AppJsonModel(code, ServerResult.getCodeMsg(code, msg), newList);
 	}
-	
 //	@RequestMapping("getMenu")
 //	@ResponseBody
 	public AppJsonModel getMenu_bak(HttpServletRequest request){
@@ -248,21 +212,10 @@ public class AppController extends BaseController{
 		paramList.add(coordinateId);
 		AppLoginBean appLoginBean = new AppLoginBean();
 		code = globalCheck(paramList, token, phoneId,appLoginBean);
-		
-		List<String> coordinateIdList = new ArrayList<String>();
-		if(coordinateId.contains(",")){
-			coordinateIdList = Arrays.asList(coordinateId.split(","));  
-		}else{
-			coordinateIdList.add(coordinateId);
-		}
-		List<Map<String, Object>> list = new ArrayList<Map<String,Object>>();
 		List<Map<String, Object>> resplist = new ArrayList<Map<String,Object>>();
 		if(code == 0){
 			try {
-				for(String id:coordinateIdList){
-					list = appService.getCoordinateInfo(id);
-					resplist.addAll(list);
-				}
+				resplist = appService.getCoordinateInfoByIds(coordinateId);
 			} catch (Exception e) {
 				e.printStackTrace();
 				msg = e.getMessage();
@@ -271,6 +224,9 @@ public class AppController extends BaseController{
 		}
 		return new AppJsonModel(code, ServerResult.getCodeMsg(code, msg), resplist);
 	}
+	
+	
+	
 //	@RequestMapping("getCoordinateInfo")
 //	@ResponseBody
 	public AppJsonModel getCoordinateInfo_bak(HttpServletRequest request){
