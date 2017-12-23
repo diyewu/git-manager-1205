@@ -1,4 +1,11 @@
+	var markerClusterer;
 	$(document).ready(function() { 
+		
+		// 百度地图API功能
+		initMap();
+    	//===================
+		$('#autoShowList').trigger("click");
+		
     	$('#myContainer').hide();
         $('body').addClass('loaded');
         $('#loader-wrapper .load_title').remove();
@@ -13,7 +20,8 @@
 			activeClass: "active",//小的控制按钮激活的样式，不包括作用两边，默认active
 		});
     	getObjectList();//加载项目数据
-		
+    	getObjectDetail();//加载项目筛选条件数据
+    	
     }); 
     
 	function getObjectList(){
@@ -32,6 +40,40 @@
 			}
 		},'json');
 	}
+	function getObjectDetail(){
+		$.post(path+"/webctrl/getObjectDetail/", 
+		{
+		},
+		function(result){
+			if(result.success == true){//登陆成功
+				vm.cascaderData = result.data;
+			}else {
+				 
+			}
+		},'json');
+	}
+	
+	function generateCluster(array){
+		console.log(array);
+    	var markers = [];
+    	var pt = null;
+    	var k =0;
+    	for (var i in array) {
+			if(k == 0){
+				map.centerAndZoom(new BMap.Point(array[i].longitude , array[i].latitude), 12);
+			}
+    	   pt = new BMap.Point(array[i].longitude , array[i].latitude);
+    	   var marker = new BMap.Marker(pt);
+    	   marker.tid = array[i].id;
+    	   marker.addEventListener("click", showInfo)
+    	   markers.push(marker);
+    	   k++;
+    	}
+    	markerClusterer.clearMarkers();
+    	markerClusterer.addMarkers(markers) 
+	}
+	
+	
 	
 	
 	var ac = new BMap.Autocomplete(    //建立一个自动完成的对象
@@ -85,6 +127,52 @@
 		setPlace(input);
 	}
 
+	function initMap(){
+		map = new BMap.Map("allmap",{enableMapClick:false});    // 创建Map实例
+    	map.centerAndZoom(new BMap.Point(121.47, 31.23), 12);  // 初始化地图,设置中心点坐标和地图级别
+    	map.addControl(new BMap.MapTypeControl());   //添加地图类型控件
+    	map.addControl(new BMap.NavigationControl({enableGeolocation:true}));
+    	map.addControl(new BMap.OverviewMapControl());
+    	map.setCurrentCity("上海");          // 设置地图显示的城市 此项是必须设置的
+    	map.enableScrollWheelZoom(true);     //开启鼠标滚轮缩放
+    	
+    	var xy = [
+    		{'x':121.48123,'y':31.23123},
+    		{'x':121.4723,'y':31.25123},
+    		{'x':121.48223,'y':31.33123},
+    		{'x':121.46623,'y':31.35123},
+    		{'x':121.23123,'y':31.36123},
+    		{'x':121.25123,'y':31.22123},
+    		{'x':121.36123,'y':31.28123},
+    		{'x':121.45123,'y':31.12123},
+    		{'x':121.5623,'y':31.8123},
+    		{'x':121.45623,'y':31.73123},
+    		{'x':121.38123,'y':31.63123}
+    	];
+    	var markers = [];
+    	var pt = null;
+    	for (var i in xy) {
+    	   pt = new BMap.Point(xy[i].x , xy[i].y);
+    	   var marker = new BMap.Marker(pt);
+    	   marker.addEventListener("click", showInfo)
+    	   markers.push(marker);
+    	}
+    	//生成一个marker数组，然后调用markerClusterer类即可。
+    	markerClusterer = new BMapLib.MarkerClusterer(map,
+    		{
+    			markers:markers,
+    			girdSize : 100,
+    			styles : [{
+    	            url:'./img/blue.png',
+    	            size: new BMap.Size(92, 92),
+    	        	textColor: '#fff',  //文字颜色
+    	        	textSize: 20,  //字体大小
+    				backgroundColor : '#E64B4E'
+    			}],
+    		});
+    	markerClusterer.setMaxZoom(13);
+    	markerClusterer.setGridSize(100);
+	}
 
 
 
@@ -132,62 +220,37 @@ var vm = new Vue({
         
     },
     mounted() {
-    	// 百度地图API功能
-    	map = new BMap.Map("allmap",{enableMapClick:false});    // 创建Map实例
-    	map.centerAndZoom(new BMap.Point(121.47, 31.23), 12);  // 初始化地图,设置中心点坐标和地图级别
-    	map.addControl(new BMap.MapTypeControl());   //添加地图类型控件
-    	map.addControl(new BMap.NavigationControl({enableGeolocation:true}));
-    	map.addControl(new BMap.OverviewMapControl());
-    	map.setCurrentCity("上海");          // 设置地图显示的城市 此项是必须设置的
-    	map.enableScrollWheelZoom(true);     //开启鼠标滚轮缩放
-    	//===================
-    	var xy = [
-    		{'x':121.48123,'y':31.23123},
-    		{'x':121.4723,'y':31.25123},
-    		{'x':121.48223,'y':31.33123},
-    		{'x':121.46623,'y':31.35123},
-    		{'x':121.23123,'y':31.36123},
-    		{'x':121.25123,'y':31.22123},
-    		{'x':121.36123,'y':31.28123},
-    		{'x':121.45123,'y':31.12123},
-    		{'x':121.5623,'y':31.8123},
-    		{'x':121.45623,'y':31.73123},
-    		{'x':121.38123,'y':31.63123}
-    	];
-    	var markers = [];
-    	var pt = null;
-    	for (var i in xy) {
-    	   pt = new BMap.Point(xy[i].x , xy[i].y);
-    	   var marker = new BMap.Marker(pt);
-    	   marker.addEventListener("click", showInfo)
-    	   markers.push(marker);
-    	}
-    	//生成一个marker数组，然后调用markerClusterer类即可。
-    	var markerClusterer = new BMapLib.MarkerClusterer(map,
-    		{
-    			markers:markers,
-    			girdSize : 100,
-    			styles : [{
-    	            url:'./img/blue.png',
-    	            size: new BMap.Size(92, 92),
-    	        	textColor: '#fff',  //文字颜色
-    	        	textSize: 20,  //字体大小
-    				backgroundColor : '#E64B4E'
-    			}],
-    		});
-    	markerClusterer.setMaxZoom(13);
-    	markerClusterer.setGridSize(100);
+    	
 	},
     methods: {
+    	//地图操作
+    	
     	//三级菜单关联操作
     	cascadeClose :function(){//联动关闭
-            this.cascaderStatus = false
-            this.firstIndex = ''
-            this.secondIndex = ''
+//    		console.log(JSON.stringify(this.cascaderData));
+    		var jsonparam = JSON.stringify(this.cascaderData);
+            this.cascaderStatus = false;
+            this.firstIndex = '';
+            this.secondIndex = '';
+            $.post(path+"/webctrl/getMapInfo/", 
+    		{
+            	jsonIds:jsonparam
+    		},
+    		function(result){
+//    			console.log(result);
+    			if(result.success == true){//登陆成功
+    				//TODO 解析坐标点到地图上
+    				var data = result.data;
+//    				initMap();
+    				generateCluster(data);
+    			}else {
+    			}
+    		},'json');
+            
         },
         
         cascadeOpen: function(){//联动打开
-            this.cascaderStatus = true
+            this.cascaderStatus = true;
         },
         
         firstOver :function(item,index){//选择第一级菜单
@@ -286,6 +349,7 @@ var vm = new Vue({
         			v.status = true;
 //        			this.selectedIndex.push(v)
                 })
+                this.cascaderData[this.firstIndex].status = true;
         	}
         },
         
@@ -294,12 +358,14 @@ var vm = new Vue({
         		item.status = false
         		this.selectedIndex.map((v,i)=>{
         			if(v.id==item.id){
-        				this.selectedIndex.splice(i,1)
+        				this.selectedIndex.splice(i,1);
         			}
         		})
         	}else{
-        		this.selectedIndex.push(item)
-        		item.status = true
+        		this.selectedIndex.push(item);
+        		item.status = true;
+        		this.cascaderData[this.firstIndex].children[this.secondIndex].status = true;
+        		this.cascaderData[this.firstIndex].status = true;
         	}
         },
          
@@ -388,6 +454,58 @@ var vm = new Vue({
 
 
 function showInfo(e){
-//	console.log(marker);
-	console.log(e.point.lat+","+e.point.lng);
+	
+	if ($('.expander').hasClass("fadeIn")) {
+		$('#autoShowList').trigger("click");
+	}
+	
+	$(".item-wrap").empty();
+	
+	$.post(path+"/webctrl/getCoordinateInfo/", 
+	{
+    	ids:e.target.tid
+	},
+	function(result){
+    	console.log(result);
+		if(result.success == true){//登陆成功
+			var data = result.data;
+			var itemlength =  data.length;
+			if(itemlength){
+				$('#finditemlength').html(itemlength);
+			}
+			$.each(data, function (index, obj) {
+			   var htm = generateRightItem(obj.detail_address, '', basePath+'app/getImgBydetailId?id='+obj.id, "调研编号："+obj.research_number,
+					   "检查时间："+obj.check_time,"照片编号："+obj.img_url);
+               $(".item-wrap").append(htm);
+	        });
+		}else {
+		}
+	},'json');
+}
+
+function generateRightItem(title,subhead,imgSrc,detail1,detail2,detail3){
+	var html = "";
+	html += "<div class=\"list-item\" @click=\"showDetail()\">";
+	html += "	<img alt=\"\" onerror=\"this.src='"+imgSrc+"';this.onerror=null;\"	src=\""+imgSrc+"\">";
+	html += "	<div class=\"right-info\">";
+	html += "		<div>";
+	html += "			<span class=\"title\"> <a>"+title+"</a>";
+	html += "			</span> <span class=\"villa-name\">"+subhead+"</span>";
+//	html += "			<span class=\"sale-status\" >正常</span>";
+	html += "			<i class=\"iconfont favor-icon\" style=\"display: none;\"";
+	html += "				data-dianji=\"favor/图片详情\"></i>";
+	html += "		</div>";
+	html += "		<div>";
+	html += "			<span>"+detail1+"</span> <span class=\"price\">详情</span>";
+	html += "		</div>";
+	html += "		<div>";
+	html += "			<span>"+detail2+"</span>";
+	html += "		</div>";
+	html += "		<div>";
+	html += "			<span>"+detail3+"</span>";
+	html += "		</div>";
+	html += "	</div>";
+	html += "	<hr>";
+	html += "</div>";
+	return html;
 }

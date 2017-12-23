@@ -19,6 +19,7 @@
     text-align:center;
     border-right:1px solid #ddd;
     border-bottom:1px solid #ddd;
+    cursor: pointer;
 }
 .myContainer .selectedContainer .selectedResult .selectedResultContainer{
     overflow-x:auto;

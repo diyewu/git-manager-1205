@@ -4,8 +4,11 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -64,6 +67,46 @@ public class AppService {
 		return code;
 	}
 	
+	public List<AppMenu> getMenulist(String roleId){
+		List<AppMenu> newList = new ArrayList<AppMenu>();
+		List<AppMenu>  l = new ArrayList<AppMenu>();
+		l = this.getMenu(roleId);
+		Map<String,AppMenu> map = new LinkedHashMap<String,AppMenu>(); 
+		Map<String,AppMenu> map1 = new LinkedHashMap<String,AppMenu>(); 
+		for(AppMenu t:l){//list转换成map
+			map.put(t.getId(), t);
+			map1.put(t.getId(), t);
+		}
+		AppMenu c1 = null;
+		AppMenu c2 = null;
+		Iterator it = map.keySet().iterator();//遍历map
+		while (it.hasNext()) {
+			c1 = new AppMenu();
+			c1 = map.get(it.next());
+			if(c1.getId() == null ||"null".equals(c1.getId())){//第一级节点
+				
+			}else{
+				if(map1.containsKey(c1.getParent_id())){//
+					c2 = new AppMenu();
+					c2 = map1.get(c1.getParent_id());
+					if(c2.getChildren() != null){
+						c2.getChildren().add(c1);
+					}else{
+						List<AppMenu> childrens = new ArrayList<AppMenu>();
+						childrens.add(c1);
+						c2.setChildren(childrens);
+					}
+					map1.remove(c1.getId());
+				}
+			}
+		}
+		
+		Iterator i = map1.keySet().iterator();
+		while (i.hasNext()) {
+			newList.add((AppMenu)map.get(i.next()));
+		}
+		return newList;
+	}
 	
 	
 	public List<AppMenu> getMenu(String roleId){
@@ -74,7 +117,7 @@ public class AppService {
 		sb.append(" SELECT id,	pa.attribute_name AS menu_name,		pa.project_id AS parent_id,		0 AS leaf,		pa.id AS is_check	FROM 		project_attribute pa	WHERE		pa.attribute_active = 1 ");
 		sb.append(" union  ");
 		sb.append(" SELECT id,	pm.project_name AS menu_name,	NULL AS parent_id,	0 AS leaf,	pm.id AS is_check	FROM	project_main pm	 ");
-		sb.append(" )a left JOIN (  ");
+		sb.append(" )a inner JOIN (  ");
 		sb.append(" select * from project_condition_auth pca 	where pca.web_user_role_id = ?  ");
 		sb.append(" ) b on a.id = b.condition_id where a.is_check is not null ORDER BY a.id DESC  ");
 //		List<Map<String, Object>> list = jdbcTemplate.queryForList(sb.toString(),roleId);
@@ -265,6 +308,24 @@ public class AppService {
 		return null;
 	}
 	
+	
+	public List<Map<String, Object>> getCoordinateInfoByIds(String coordinateId){
+		List<String> coordinateIdList = new ArrayList<String>();
+		if(coordinateId.contains(",")){
+			coordinateIdList = Arrays.asList(coordinateId.split(","));  
+		}else{
+			coordinateIdList.add(coordinateId);
+		}
+		List<Map<String, Object>> list = new ArrayList<Map<String,Object>>();
+		List<Map<String, Object>> resplist = new ArrayList<Map<String,Object>>();
+		for(String id:coordinateIdList){
+			list = this.getCoordinateInfo(id);
+			resplist.addAll(list);
+		}
+		return resplist;
+	}
+	
+	
 	public List<Map<String, Object>> getCoordinateInfo(String detailId){
 		String attrSql = " SELECT pat.alias_name, attribute_index FROM project_attribute_type pat LEFT JOIN ( SELECT * FROM project_attribute WHERE project_id = ( SELECT project_id FROM project_detail WHERE id = ? )) pa ON pa.attribute_type = pat.id WHERE pat.alias_name IS NOT NULL ";
 		List<Map<String, Object>> list = jdbcTemplate.queryForList(attrSql, detailId);
@@ -284,6 +345,13 @@ public class AppService {
 		}
 		sb.append(" id from project_detail where id = ? ");
 		return jdbcTemplate.queryForList(sb.toString(), detailId);
+	}
+	
+	
+	public List<Map<String, Object>> getImgPath(String id){
+		String sql = " select img_path from project_detail where id = ? ";
+		List<Map<String, Object>> list = jdbcTemplate.queryForList(sql, id);
+		return list;
 	}
 	
 	
