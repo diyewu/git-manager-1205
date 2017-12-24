@@ -1,5 +1,6 @@
 package com.xz.controller;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -10,6 +11,8 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.StringUtils;
+import org.codehaus.jackson.JsonGenerationException;
+import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -35,6 +38,12 @@ public class WebController extends BaseController{
 	@Autowired
 	private AppService appService;
 	
+	/**
+	 * 登陆
+	 * @param request
+	 * @param response
+	 * @return
+	 */
 	@RequestMapping("login")
 	@ResponseBody
 	public JsonModel login(HttpServletRequest request,HttpServletResponse response){
@@ -78,6 +87,12 @@ public class WebController extends BaseController{
 		
 		return new JsonModel(msg == null, msg);
 	}
+	/**
+	 * 根据用户角色获取项目列表信息
+	 * @param request
+	 * @param response
+	 * @return
+	 */
 	@RequestMapping("getObjectListByUserRole")
 	@ResponseBody
 	public JsonModel getObjectListByUserRole(HttpServletRequest request,HttpServletResponse response){
@@ -93,6 +108,12 @@ public class WebController extends BaseController{
 		return new JsonModel(msg == null,msg,list);
 	}
 	
+	/**
+	 * 根据用户角色获取筛选条件，动态展示在地图上
+	 * @param request
+	 * @param response
+	 * @return
+	 */
 	@RequestMapping("getObjectDetail")
 	@ResponseBody
 	public JsonModel getObjectDetail(HttpServletRequest request,HttpServletResponse response){
@@ -108,66 +129,74 @@ public class WebController extends BaseController{
 		return new JsonModel(msg == null,msg,list);
 	}
 	
-	
+	/**
+	 * 根据用户选择的条件获取地图点信息
+	 * @param request
+	 * @return
+	 */
 	@RequestMapping("getMapInfo")
 	@ResponseBody
 	public JsonModel getMapInfoByMenu(HttpServletRequest request){
 		String msg = null;
 		String jsonIds = request.getParameter("jsonIds");
 		List<Map<String, Object>> info = new ArrayList<Map<String,Object>>();
-		List<Map<String, Object>> list = new ArrayList<Map<String,Object>>();
 		if(StringUtils.isNotBlank(jsonIds)){
 			JSONArray projectArray = JSONArray.parseArray(jsonIds);
-			String projectId = "";
-			Map<String,List<String>> param = new HashMap<String, List<String>>();
-			List<String> conditionList = new ArrayList<String>();
-			boolean projectStatus = false;
-			boolean attrStatus = false;
-			boolean detailStatus = false;
-			for (int k = 0; k < projectArray.size(); k++) {
-				param = new HashMap<String, List<String>>();
-				JSONObject jsonObject = projectArray.getJSONObject(k);
-				projectStatus =jsonObject.containsKey("status")?(Boolean) jsonObject.get("status"):false;
-				if(projectStatus){
-					projectId = jsonObject.get("id")+"";
-					JSONArray array = jsonObject.getJSONArray("children");
-					if(array != null && array.size()>0){
-						for (int i = 0; i < array.size(); i++) {
-							conditionList = new ArrayList<String>();
-							JSONObject attrObject = array.getJSONObject(i);
-							attrStatus = attrObject.containsKey("status")?(Boolean) attrObject.get("status"):false;
-							if(attrStatus){
-								String AttriId = attrObject.getString("id");
-								JSONArray conditionArray = attrObject.getJSONArray("children");
-								for(int m =0;m<conditionArray.size();m++){
-									JSONObject conditionObject = conditionArray.getJSONObject(m);
-//									conditionList.add(conditionObject.get("condition_id")+"");
-									detailStatus = conditionObject.containsKey("status")?(Boolean) conditionObject.get("status"):false;
-									if(detailStatus){
-										conditionList.add(conditionObject.get("id")+"");
-									}
-								}
-								if (conditionList != null && conditionList.size() > 0) {
-									param.put(AttriId, conditionList);
-								}
-							}
-						}
-					}
-					if (param != null && param.size() > 0) {
-						list = appService.getMapInfo(projectId, param);
-						if (list != null && list.size() > 0) {
-							info.addAll(list);
-						}
-					}
-				}
-			}
+			info = appService.analyzeJson(projectArray, "status");
+//			String projectId = "";
+//			Map<String,List<String>> param = new HashMap<String, List<String>>();
+//			List<String> conditionList = new ArrayList<String>();
+//			boolean projectStatus = false;
+//			boolean attrStatus = false;
+//			boolean detailStatus = false;
+//			for (int k = 0; k < projectArray.size(); k++) {
+//				param = new HashMap<String, List<String>>();
+//				JSONObject jsonObject = projectArray.getJSONObject(k);
+//				projectStatus =jsonObject.containsKey("status")?(Boolean) jsonObject.get("status"):false;
+//				if(projectStatus){
+//					projectId = jsonObject.get("id")+"";
+//					JSONArray array = jsonObject.getJSONArray("children");
+//					if(array != null && array.size()>0){
+//						for (int i = 0; i < array.size(); i++) {
+//							conditionList = new ArrayList<String>();
+//							JSONObject attrObject = array.getJSONObject(i);
+//							attrStatus = attrObject.containsKey("status")?(Boolean) attrObject.get("status"):false;
+//							if(attrStatus){
+//								String AttriId = attrObject.getString("id");
+//								JSONArray conditionArray = attrObject.getJSONArray("children");
+//								for(int m =0;m<conditionArray.size();m++){
+//									JSONObject conditionObject = conditionArray.getJSONObject(m);
+////									conditionList.add(conditionObject.get("condition_id")+"");
+//									detailStatus = conditionObject.containsKey("status")?(Boolean) conditionObject.get("status"):false;
+//									if(detailStatus){
+//										conditionList.add(conditionObject.get("id")+"");
+//									}
+//								}
+//								if (conditionList != null && conditionList.size() > 0) {
+//									param.put(AttriId, conditionList);
+//								}
+//							}
+//						}
+//					}
+//					if (param != null && param.size() > 0) {
+//						list = appService.getMapInfo(projectId, param);
+//						if (list != null && list.size() > 0) {
+//							info.addAll(list);
+//						}
+//					}
+//				}
+//			}
 		}else{
 			msg = "参数有误！";
 		}
 		return new JsonModel(msg == null,msg,info);
 	}
 	
-	
+	/**
+	 * 根据用户点击地图的点传递project_detail的ID获取详细信息
+	 * @param request
+	 * @return
+	 */
 	@RequestMapping("getCoordinateInfo")
 	@ResponseBody
 	public JsonModel getCoordinateInfo(HttpServletRequest request){
@@ -185,5 +214,41 @@ public class WebController extends BaseController{
 			msg = "参数有误！";
 		}
 		return new JsonModel(msg == null,msg,resplist);
+	}
+	
+	/**
+	 * 根据用户角色获取全部地图点信息,地图初始化时加载
+	 * @param request
+	 * @return
+	 */
+	@RequestMapping("getMapInfoByUserRole")
+	@ResponseBody
+	public JsonModel getMapInfoByUserRole(HttpServletRequest request){
+		HttpSession session = request.getSession(); 
+		String userRole = session.getAttribute(SessionConstant.WEB_USER_ROLE)+"";
+		String msg = null;
+		List<AppMenu> list = new ArrayList<AppMenu>();
+		if(StringUtils.isNotBlank(userRole)){
+			list = appService.getMenulist(userRole);
+		}else{
+			msg = "尚未登陆！";
+		}
+		List<Map<String, Object>> info = new ArrayList<Map<String,Object>>();
+		if(list != null && list.size()>0){
+			ObjectMapper mapper = new ObjectMapper();
+			try {
+				String jsonIds = mapper.writeValueAsString(list);
+				if(StringUtils.isNotBlank(jsonIds)){
+					JSONArray projectArray = JSONArray.parseArray(jsonIds);
+					info = appService.analyzeJson(projectArray, "is_check");
+				}
+				
+			} catch (Exception e) {
+				e.printStackTrace();
+				msg = e.getMessage();
+			}
+		}
+		
+		return new JsonModel(msg == null,msg,info);
 	}
 }

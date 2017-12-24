@@ -256,11 +256,6 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 				<div class="list-header">
 					<span class="total-count">共<em id='finditemlength'></em>条信息
 					</span>
-					<!-- 
-                    <span class="sort" data-dianji="time/排序">开盘时间<i class="fa fa-arrow-down" aria-hidden="true"></i></span>
-                    <span class="sort" data-dianji="price/排序">价格<i class="fa fa-arrow-up" aria-hidden="true"></i></span>
-                    <span class="sort on" data-dianji="default/排序">默认</span>
-                     -->
 				</div>
 				<div class="item-wrap" style="overflow-x:hidden;overflow-y:auto;">
 					<!-- 
@@ -291,11 +286,12 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 			</div>
 			<div class="detail" style="display:none;overflow:hidden;">
 				<div class="imgBox">
-					<div class="js-silder">
+					<img id='detailimg' src="" alt="">
+					<!--<div class="js-silder">
 						<div class="silder-scroll">
 							<div class="silder-main">
 								<div class="silder-main-img">
-									<img src="img/1.jpg" alt="">
+									<img  src="img/1.jpg" alt="">
 								</div>
 								<div class="silder-main-img">
 									<img src="img/2.jpg" alt="">
@@ -312,22 +308,20 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 							</div>
 						</div>
 					</div>
+					 -->
 				</div>
 				<div class="houseInfo" style="margin: 0.3rem 0.85rem;">
 					<span class="title" style="font-weight:bolder;font-size:0.9rem;">
-						<a target="_blank" href="">南龙谭苑小区</a>
-					</span> <span class="villa-name">松江区</span>
-					<!-- <span class="sale-status" data-status="在售"></span> -->
-					<i class="iconfont favor-icon" style="display: none;"
-						data-dianji="favor/关注路劲佘山院子（别墅）"></i>
+						<a target="_blank" href="" id='detailtitle'></a>
+					</span> <span class="villa-name" id = 'detailsubhead'></span>
+					<i class="iconfont favor-icon" style="display: none;"></i>
 					<div class="inlineText">
-						<span><span class="tag">检查人员</span><span>赵苏鸣</span></span><span
-							class="afterSpan"><span class="tag">完成时间：</span><span>2017-11-18
-								00:00:00</span></span>
+						<span><span class="tag" id = 'detailitem1'></span></span><span
+							class="afterSpan"><span class="tag" id = 'detailitem2'></span></span>
 					</div>
 					<div class="inlineText">
-						<span><span class="tag">调研编号：</span><span class="price">0701163pp</span></span><span
-							class="afterSpan"><span class="tag">地址：</span><span>岳阳街道中山二路125弄</span></span>
+						<span><span class="tag" id = 'detailitem3'></span></span><span
+							class="afterSpan"><span class="tag" id = 'detailitem4'></span></span>
 					</div>
 				</div>
 			</div>
