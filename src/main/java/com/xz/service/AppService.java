@@ -20,6 +20,8 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.google.common.base.Joiner;
 import com.xz.common.ServerResult;
 import com.xz.entity.AppMenu;
@@ -117,7 +119,7 @@ public class AppService {
 		sb.append(" SELECT id,	pa.attribute_name AS menu_name,		pa.project_id AS parent_id,		0 AS leaf,		pa.id AS is_check	FROM 		project_attribute pa	WHERE		pa.attribute_active = 1 ");
 		sb.append(" union  ");
 		sb.append(" SELECT id,	pm.project_name AS menu_name,	NULL AS parent_id,	0 AS leaf,	pm.id AS is_check	FROM	project_main pm	 ");
-		sb.append(" )a left JOIN (  ");
+		sb.append(" )a inner JOIN (  ");
 		sb.append(" select * from project_condition_auth pca 	where pca.web_user_role_id = ?  ");
 		sb.append(" ) b on a.id = b.condition_id where a.is_check is not null ORDER BY a.id DESC  ");
 //		List<Map<String, Object>> list = jdbcTemplate.queryForList(sb.toString(),roleId);
@@ -255,6 +257,74 @@ public class AppService {
 		return null;
 	}
 	
+	/**
+	 * status  is_check
+	 * @param projectArray
+	 * @param checkFlag
+	 * @return
+	 */
+	public List<Map<String, Object>> analyzeJson(JSONArray projectArray,String checkFlag){
+		List<Map<String, Object>> info = new ArrayList<Map<String,Object>>();
+		List<Map<String, Object>> list = new ArrayList<Map<String,Object>>();
+		String projectId = "";
+		Map<String,List<String>> param = new HashMap<String, List<String>>();
+		List<String> conditionList = new ArrayList<String>();
+		boolean projectStatus = false;
+		boolean attrStatus = false;
+		boolean detailStatus = false;
+		for (int k = 0; k < projectArray.size(); k++) {
+			param = new HashMap<String, List<String>>();
+			JSONObject jsonObject = projectArray.getJSONObject(k);
+			if("status".equals(checkFlag)){
+				projectStatus =jsonObject.containsKey(checkFlag)?(Boolean) jsonObject.get(checkFlag):false;
+			}else{
+//				projectStatus = jsonObject.containsKey(checkFlag)?(Boolean) jsonObject.get(checkFlag):false;
+				projectStatus = true;
+			}
+			if(projectStatus){
+				projectId = jsonObject.get("id")+"";
+				JSONArray array = jsonObject.getJSONArray("children");
+				if(array != null && array.size()>0){
+					for (int i = 0; i < array.size(); i++) {
+						conditionList = new ArrayList<String>();
+						JSONObject attrObject = array.getJSONObject(i);
+						if("status".equals(checkFlag)){
+							attrStatus = attrObject.containsKey(checkFlag)?(Boolean) attrObject.get(checkFlag):false;
+						}else{
+							attrStatus = true;
+						}
+						if(attrStatus){
+							String AttriId = attrObject.getString("id");
+							JSONArray conditionArray = attrObject.getJSONArray("children");
+							for(int m =0;m<conditionArray.size();m++){
+								JSONObject conditionObject = conditionArray.getJSONObject(m);
+//								conditionList.add(conditionObject.get("condition_id")+"");
+								if("status".equals(checkFlag)){
+									detailStatus = conditionObject.containsKey(checkFlag)?(Boolean) conditionObject.get(checkFlag):false;
+								}else{
+									detailStatus = true;
+								}
+								if(detailStatus){
+									conditionList.add(conditionObject.get("id")+"");
+								}
+							}
+							if (conditionList != null && conditionList.size() > 0) {
+								param.put(AttriId, conditionList);
+							}
+						}
+					}
+				}
+				if (param != null && param.size() > 0) {
+					list = this.getMapInfo(projectId, param);
+					if (list != null && list.size() > 0) {
+						info.addAll(list);
+					}
+				}
+			}
+		}
+		return info;
+	}
+	
 	
 	public List<Map<String, Object>> getMapInfo_bak(String projectId,Map<String,List<String>> param){
 		String attriSql = " select attribute_index from project_attribute where id = ? ";
@@ -345,6 +415,13 @@ public class AppService {
 		}
 		sb.append(" id from project_detail where id = ? ");
 		return jdbcTemplate.queryForList(sb.toString(), detailId);
+	}
+	
+	
+	public List<Map<String, Object>> getImgPath(String id){
+		String sql = " select img_path from project_detail where id = ? ";
+		List<Map<String, Object>> list = jdbcTemplate.queryForList(sql, id);
+		return list;
 	}
 	
 	

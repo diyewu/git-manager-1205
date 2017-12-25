@@ -4,23 +4,24 @@
 		// 百度地图API功能
 		initMap();
     	//===================
-    	
+		$('#autoShowList').trigger("click");
 		
-    	$('#myContainer').hide();
+//    	$('#myContainer').hide();
         $('body').addClass('loaded');
         $('#loader-wrapper .load_title').remove();
         
-    	$(".js-silder").silder({
-			auto: true,//自动播放，传入任何可以转化为true的值都会自动轮播
-			speed: 20,//轮播图运动速度
-			sideCtrl: true,//是否需要侧边控制按钮
-			bottomCtrl: true,//是否需要底部控制按钮
-			defaultView: 0,//默认显示的索引
-			interval: 3000,//自动轮播的时间，以毫秒为单位，默认3000毫秒
-			activeClass: "active",//小的控制按钮激活的样式，不包括作用两边，默认active
-		});
+//    	$(".js-silder").silder({
+//			auto: true,//自动播放，传入任何可以转化为true的值都会自动轮播
+//			speed: 20,//轮播图运动速度
+//			sideCtrl: true,//是否需要侧边控制按钮
+//			bottomCtrl: true,//是否需要底部控制按钮
+//			defaultView: 0,//默认显示的索引
+//			interval: 3000,//自动轮播的时间，以毫秒为单位，默认3000毫秒
+//			activeClass: "active",//小的控制按钮激活的样式，不包括作用两边，默认active
+//		});
     	getObjectList();//加载项目数据
     	getObjectDetail();//加载项目筛选条件数据
+    	initCluster();
     	
     }); 
     
@@ -52,17 +53,34 @@
 			}
 		},'json');
 	}
+	function initCluster(){
+		$.post(path+"/webctrl/getMapInfoByUserRole/", 
+		{
+		},
+		function(result){
+			if(result.success == true){//登陆成功
+				//TODO 解析坐标点到地图上
+				var data = result.data;
+				generateCluster(data);
+			}else {
+			}
+		},'json');
+	}
 	
 	function generateCluster(array){
-		console.log(array);
     	var markers = [];
     	var pt = null;
+    	var k =0;
     	for (var i in array) {
+			if(k == 0){
+				map.centerAndZoom(new BMap.Point(array[i].longitude , array[i].latitude), 12);
+			}
     	   pt = new BMap.Point(array[i].longitude , array[i].latitude);
     	   var marker = new BMap.Marker(pt);
     	   marker.tid = array[i].id;
     	   marker.addEventListener("click", showInfo)
     	   markers.push(marker);
+    	   k++;
     	}
     	markerClusterer.clearMarkers();
     	markerClusterer.addMarkers(markers) 
@@ -107,7 +125,6 @@
 	var myGeo = new BMap.Geocoder();// 将地址解析结果显示在地图上,并调整地图视野
 	function setPlace(detailAddress){// 创建地址解析器实例
 		myGeo.getPoint(detailAddress, function(point){
-			console.log(point);
 			if (point) {
 			    map.centerAndZoom(point, 14);
 			    //map.addOverlay(new BMap.Marker(point));
@@ -131,27 +148,27 @@
     	map.setCurrentCity("上海");          // 设置地图显示的城市 此项是必须设置的
     	map.enableScrollWheelZoom(true);     //开启鼠标滚轮缩放
     	
-    	var xy = [
-    		{'x':121.48123,'y':31.23123},
-    		{'x':121.4723,'y':31.25123},
-    		{'x':121.48223,'y':31.33123},
-    		{'x':121.46623,'y':31.35123},
-    		{'x':121.23123,'y':31.36123},
-    		{'x':121.25123,'y':31.22123},
-    		{'x':121.36123,'y':31.28123},
-    		{'x':121.45123,'y':31.12123},
-    		{'x':121.5623,'y':31.8123},
-    		{'x':121.45623,'y':31.73123},
-    		{'x':121.38123,'y':31.63123}
-    	];
+//    	var xy = [
+//    		{'x':121.48123,'y':31.23123},
+//    		{'x':121.4723,'y':31.25123},
+//    		{'x':121.48223,'y':31.33123},
+//    		{'x':121.46623,'y':31.35123},
+//    		{'x':121.23123,'y':31.36123},
+//    		{'x':121.25123,'y':31.22123},
+//    		{'x':121.36123,'y':31.28123},
+//    		{'x':121.45123,'y':31.12123},
+//    		{'x':121.5623,'y':31.8123},
+//    		{'x':121.45623,'y':31.73123},
+//    		{'x':121.38123,'y':31.63123}
+//    	];
     	var markers = [];
-    	var pt = null;
-    	for (var i in xy) {
-    	   pt = new BMap.Point(xy[i].x , xy[i].y);
-    	   var marker = new BMap.Marker(pt);
-    	   marker.addEventListener("click", showInfo)
-    	   markers.push(marker);
-    	}
+//    	var pt = null;
+//    	for (var i in xy) {
+//    	   pt = new BMap.Point(xy[i].x , xy[i].y);
+//    	   var marker = new BMap.Marker(pt);
+//    	   marker.addEventListener("click", showInfo)
+//    	   markers.push(marker);
+//    	}
     	//生成一个marker数组，然后调用markerClusterer类即可。
     	markerClusterer = new BMapLib.MarkerClusterer(map,
     		{
@@ -197,19 +214,19 @@ var vm = new Vue({
     						"children":null,
     						"id":"2048",
     						"leaf":true,
-    						"value":"吴秋明",
+    						"menu_name":"吴秋明",
     						"parent_id":"00151382364464901262005056c00001"
     					}
     				],
     				"id":"00151382364464901262005056c00001",
     				"leaf":false,
-    				"value":"检查人员",
+    				"menu_name":"检查人员",
     				"parent_id":"00151382364464001251005056c00001"
     			}
     		],
     		"id":"00151382364464001251005056c00001",
     		"leaf":false,
-    		"value":"2017年10月上海城管小区问题清单",
+    		"menu_name":"2017年10月上海城管小区问题清单",
     		"parent_id":null
     	}]
         
@@ -419,48 +436,66 @@ var vm = new Vue({
                 $('.expander').removeClass("fadeOut");
                 $('.expander').addClass("fadeIn");
             }
-        },
-        showDetail: function(total){
-            layer.open({
-                type: 1,
-                title: false,
-                closeBtn: 0,
-                area: ['40rem', '30rem'],
-                shadeClose: true,
-                scrollbar: false, 
-                content: $('.detail')
-            });
-            $(".js-silder").silder({
-                auto: true,//自动播放，传入任何可以转化为true的值都会自动轮播
-                speed: 20,//轮播图运动速度
-                sideCtrl: true,//是否需要侧边控制按钮
-                bottomCtrl: true,//是否需要底部控制按钮
-                defaultView: 0,//默认显示的索引
-                interval: 3000,//自动轮播的时间，以毫秒为单位，默认3000毫秒
-                activeClass: "active",//小的控制按钮激活的样式，不包括作用两边，默认active
-            });
-            $('.silder-ctrl-con').each((idx,val) => {
-                idx >= 5 ? $(val).remove() : val
-            });
         }
+        
     }
 })
 
+function showDetail(title,subhead,imgSrc,detail1,detail2,detail3,detail4){
+	$("#detailimg").attr("src",imgSrc);
+	$("#detailtitle").html(title);
+	$("#detailsubhead").html(subhead);
+	$("#detailitem1").html(detail1);
+	$("#detailitem2").html(detail2);
+	$("#detailitem3").html(detail3);
+	$("#detailitem4").html(detail4);
+    layer.open({
+        type: 1,
+        title: false,
+        closeBtn: 0,
+        area: ['40rem', '30rem'],
+        shadeClose: true,
+        scrollbar: false, 
+        content: $('.detail')
+    });
+    /*
+    $(".js-silder").silder({
+        auto: true,//自动播放，传入任何可以转化为true的值都会自动轮播
+        speed: 20,//轮播图运动速度
+        sideCtrl: true,//是否需要侧边控制按钮
+        bottomCtrl: true,//是否需要底部控制按钮
+        defaultView: 0,//默认显示的索引
+        interval: 3000,//自动轮播的时间，以毫秒为单位，默认3000毫秒
+        activeClass: "active",//小的控制按钮激活的样式，不包括作用两边，默认active
+    });
+    $('.silder-ctrl-con').each((idx,val) => {
+        idx >= 5 ? $(val).remove() : val
+    });
+    */
+}
 
 
 function showInfo(e){
-	console.log(e.target.tid);
-//	console.log(e.point.lat+","+e.point.lng);
+	
+	if ($('.expander').hasClass("fadeIn")) {
+		$('#autoShowList').trigger("click");
+	}
+	
+	$(".item-wrap").empty();
+	
 	$.post(path+"/webctrl/getCoordinateInfo/", 
 	{
     	ids:e.target.tid
 	},
 	function(result){
-    	console.log(result);
 		if(result.success == true){//登陆成功
 			var data = result.data;
-			$.each(result.data, function (index, obj) {
-			   var htm = generateRightItem(obj.detail_address, '', obj.img_url, "调研编号："+obj.research_number,
+			var itemlength =  data.length;
+			if(itemlength){
+				$('#finditemlength').html(itemlength);
+			}
+			$.each(data, function (index, obj) {
+			   var htm = generateRightItem(obj.detail_address, '详情', basePath+'app/getImgBydetailId?id='+obj.id, "调研编号："+obj.research_number,
 					   "检查时间："+obj.check_time,"照片编号："+obj.img_url);
                $(".item-wrap").append(htm);
 	        });
@@ -471,18 +506,18 @@ function showInfo(e){
 
 function generateRightItem(title,subhead,imgSrc,detail1,detail2,detail3){
 	var html = "";
-	html += "<div class=\"list-item\" @click=\"showDetail()\">";
+	html += "<div class=\"list-item\" >";
 	html += "	<img alt=\"\" onerror=\"this.src='"+imgSrc+"';this.onerror=null;\"	src=\""+imgSrc+"\">";
 	html += "	<div class=\"right-info\">";
-	html += "		<div>";
+	html += "		<div style='cursor: pointer;' onClick=\"showDetail('"+title+"','"+subhead+"','"+imgSrc+"','"+detail1+"','"+detail2+"','"+detail3+"')\">";
 	html += "			<span class=\"title\"> <a>"+title+"</a>";
-	html += "			</span> <span class=\"villa-name\">"+subhead+"</span>";
+	html += "			</span> <span class=\"villa-name\" >"+subhead+"</span>";
 //	html += "			<span class=\"sale-status\" >正常</span>";
 	html += "			<i class=\"iconfont favor-icon\" style=\"display: none;\"";
 	html += "				data-dianji=\"favor/图片详情\"></i>";
 	html += "		</div>";
 	html += "		<div>";
-	html += "			<span>"+detail1+"</span> <span class=\"price\">详情</span>";
+	html += "			<span>"+detail1+"</span> <span class=\"price\"></span>";
 	html += "		</div>";
 	html += "		<div>";
 	html += "			<span>"+detail2+"</span>";

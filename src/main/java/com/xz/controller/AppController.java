@@ -1,15 +1,17 @@
 package com.xz.controller;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +25,6 @@ import com.xz.common.ServerResult;
 import com.xz.entity.AppLoginBean;
 import com.xz.entity.AppMenu;
 import com.xz.model.json.AppJsonModel;
-import com.xz.model.json.JsonModel;
 import com.xz.service.AppService;
 import com.xz.utils.AgingCache;
 
@@ -253,6 +254,62 @@ public class AppController extends BaseController{
 			}
 		}
 		return new AppJsonModel(code, ServerResult.getCodeMsg(code, msg), list);
+	}
+	@RequestMapping("getImgBydetailId")
+	@ResponseBody
+	public void getImgBydetailId(HttpServletRequest request,HttpServletResponse response){
+//		String token = request.getHeader("token");
+//		String phoneId = request.getHeader("phoneId");
+//		String coordinateId = request.getParameter("coordinateId");
+//		String msg = "success";
+//		int code = 0;
+//		List<String> paramList = new ArrayList<String>();
+//		paramList.add(token);
+//		paramList.add(phoneId);
+//		paramList.add(coordinateId);
+//		AppLoginBean appLoginBean = new AppLoginBean();
+//		code = globalCheck(paramList, token, phoneId,appLoginBean);
+		
+        response.setHeader("Pragma", "No-cache"); 
+        response.setHeader("Cache-Control", "no-cache"); 
+        response.setDateHeader("Expires", 0); 
+        response.setContentType("image/jpeg"); 
+        String detailId = request.getParameter("id");
+        if(StringUtils.isBlank(detailId)){
+        	return;
+        }
+        List<Map<String, Object>> list = appService.getImgPath(detailId);
+        File imgfile = null;
+        if(list != null && list.size()>0){
+        	String path = list.get(0).get("img_path")==null?"":list.get(0).get("img_path")+"";
+        	if(StringUtils.isNotBlank(path)){
+        		imgfile = new File(path);
+        	}
+        }
+        if(imgfile != null){
+            OutputStream os = null;
+            FileInputStream fos = null;
+			try {
+				os = response.getOutputStream();
+				byte[] buffer = new byte[2048];
+				fos = new FileInputStream(imgfile.getPath());// 打开图片文件
+				int count;
+				while ((count = fos.read(buffer)) > 0) {
+					os.write(buffer, 0, count);
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			} finally{
+				try {
+					os.close();
+					fos.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+        }
+        
+		
 	}
 	//TODO 增加心跳包接口
 }
