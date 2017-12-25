@@ -611,7 +611,7 @@ var BMapLib = window.BMapLib = BMapLib || {};
  			//这个方法容易造成晃动
             thatMap.setViewport(thatBounds);
             var zoom = thatMap.getZoom();
-            console.log(zoom);
+//            console.log(zoom);
             zoom = zoom > 12 ? zoom : 12;
             console.log(zoom);
             thatMap.setZoom(zoom);

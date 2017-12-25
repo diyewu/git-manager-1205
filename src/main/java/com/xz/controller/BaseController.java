@@ -70,7 +70,10 @@ public class BaseController {
 		if(code == 0){
 			String lastToken = "";
 			try {
-				appLoginBean = (AppLoginBean) AgingCache.getCacheInfo(phoneId).getValue();
+				AppLoginBean appLoginBeanTemp = (AppLoginBean) AgingCache.getCacheInfo(phoneId).getValue();
+				appLoginBean.setUserId(appLoginBeanTemp.getUserId());
+				appLoginBean.setToken(appLoginBeanTemp.getToken());
+				appLoginBean.setUserRoleId(appLoginBeanTemp.getUserRoleId());
 			} catch (Exception e) {
 				code = ServerResult.RESULT_TOKEN_OVERTIME;
 			}

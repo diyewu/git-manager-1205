@@ -16,10 +16,10 @@ public class HttpRequest {
 //        System.out.println(s);
         
         //发送 POST 请求  	login	getMenu	getMapInfo	getCoordinateInfo
-        String sr=HttpRequest.sendPost("http://localhost:8095/gismgr/app/getCoordinateInfo/", 
+        String sr=HttpRequest.sendPost("http://localhost:8095/gismgr/app/getMenu/", 
         		"userName=admin&userPwd=admin&"
-        		+ "jsonIds=[{\"attributes\":[{\"attribute_id\":\"00151324042912900011005056c00001\",\"conditions\":[{\"condition_id\":\"1957\"},{\"condition_id\":\"1956\"}]}],\"project_id\":\"00151323566661600000005056c00001\"}]"
-        		+ "&coordinateId=00151382364465001265005056c00001,00151382364465101266005056c00001,00151382364465101267005056c00001,00151382364465201268005056c00001");
+        		+ "jsonIds=[{\"attributes\":[{\"attribute_id\":\"00151382364464901262005056c00001\",\"conditions\":[{\"condition_id\":\"00151382364464901262005056c00001\"}]}],\"project_id\":\"00151382364464001251005056c00001\"}]"
+        		+ "&coordinateId=00151382364465001265005056c00001,00151382364465101266005056c00001,00151382364465101267005056c00001,00151382364465301270005056c00001");
         System.out.println(sr);
     }
 	
@@ -100,8 +100,8 @@ public class HttpRequest {
             conn.setRequestProperty("accept", "*/*");
 //            conn.setRequestProperty("connection", "Keep-Alive");
 //            conn.setRequestProperty("user-agent", "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1;SV1)");
-            conn.setRequestProperty("phoneId", "asd1232");
-            conn.setRequestProperty("token", "90b31a48d01546c8a4b2a0f13ec25b1a");
+            conn.setRequestProperty("phoneId", "a4sd655555");
+            conn.setRequestProperty("token", "98b2b90df0e14c4e9be3d3ef2a82d027");
             // 发送POST请求必须设置如下两行
             conn.setDoOutput(true);
             conn.setDoInput(true);
