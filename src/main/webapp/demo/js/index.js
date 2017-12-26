@@ -8,7 +8,6 @@
 		
 //    	$('#myContainer').hide();
         $('body').addClass('loaded');
-        $('#loader-wrapper .load_title').remove();
         
 //    	$(".js-silder").silder({
 //			auto: true,//自动播放，传入任何可以转化为true的值都会自动轮播
@@ -22,7 +21,13 @@
     	getObjectList();//加载项目数据
     	getObjectDetail();//加载项目筛选条件数据
     	initCluster();
+    	$('#loader-wrapper .load_title').remove();
     	
+//    	$('img').each(function() {
+//            if (!this.complete || typeof this.naturalWidth == "undefined" || this.naturalWidth == 0) {
+//                this.src = 'images/01.jpg';
+//            }
+//        });
     }); 
     
 	function getObjectList(){
@@ -240,6 +245,10 @@ var vm = new Vue({
     	//三级菜单关联操作
     	cascadeClose :function(){//联动关闭
 //    		console.log(JSON.stringify(this.cascaderData));
+    		//loading层
+    		var layindex = layer.load(1, {
+    		  shade: [0.8,'#fff'] //0.1透明度的白色背景
+    		});
     		var jsonparam = JSON.stringify(this.cascaderData);
             this.cascaderStatus = false;
             this.firstIndex = '';
@@ -255,6 +264,7 @@ var vm = new Vue({
     				var data = result.data;
 //    				initMap();
     				generateCluster(data);
+    				layer.close(layindex); 
     			}else {
     			}
     		},'json');
@@ -507,7 +517,7 @@ function showInfo(e){
 function generateRightItem(title,subhead,imgSrc,detail1,detail2,detail3){
 	var html = "";
 	html += "<div class=\"list-item\" >";
-	html += "	<img alt=\"\" onerror=\"this.src='"+imgSrc+"';this.onerror=null;\"	src=\""+imgSrc+"\">";
+	html += "	<img alt=\"\" onerror=\"this.src='./img/white1.png';this.onerror=null;\"	src=\""+imgSrc+"\">";
 	html += "	<div class=\"right-info\">";
 	html += "		<div style='cursor: pointer;' onClick=\"showDetail('"+title+"','"+subhead+"','"+imgSrc+"','"+detail1+"','"+detail2+"','"+detail3+"')\">";
 	html += "			<span class=\"title\"> <a>"+title+"</a>";

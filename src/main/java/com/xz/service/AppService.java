@@ -202,7 +202,7 @@ public class AppService {
 						longitudeF = Double.parseDouble(longitude);
 						latitudeF = Double.parseDouble(latitude);
 					} catch (Exception e) {
-						e.printStackTrace();
+//						e.printStackTrace();
 						continue;
 					}
 					key = df.format(longitudeF) +","+ df.format(latitudeF);
@@ -218,7 +218,7 @@ public class AppService {
 						longitudeF = Double.parseDouble(longitude);
 						latitudeF = Double.parseDouble(latitude);
 					} catch (Exception e) {
-						e.printStackTrace();
+//						e.printStackTrace();
 						continue;
 					}
 					key = df.format(longitudeF) +","+ df.format(latitudeF);

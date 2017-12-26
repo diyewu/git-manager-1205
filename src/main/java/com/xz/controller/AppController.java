@@ -147,6 +147,7 @@ public class AppController extends BaseController{
 	@RequestMapping("getMapInfo")
 	@ResponseBody
 	public AppJsonModel getMapInfoByMenu(HttpServletRequest request){
+		long start = System.currentTimeMillis();
 		String token = request.getHeader("token");
 		String phoneId = request.getHeader("phoneId");
 		String jsonIds = request.getParameter("jsonIds");
@@ -195,6 +196,8 @@ public class AppController extends BaseController{
 				}
 			}
 		}
+		long end = System.currentTimeMillis();
+		System.out.println("getMapInfoByMenu="+(end - start));
 		return new AppJsonModel(code, ServerResult.getCodeMsg(code, msg), info);
 	}
 	
@@ -258,18 +261,6 @@ public class AppController extends BaseController{
 	@RequestMapping("getImgBydetailId")
 	@ResponseBody
 	public void getImgBydetailId(HttpServletRequest request,HttpServletResponse response){
-//		String token = request.getHeader("token");
-//		String phoneId = request.getHeader("phoneId");
-//		String coordinateId = request.getParameter("coordinateId");
-//		String msg = "success";
-//		int code = 0;
-//		List<String> paramList = new ArrayList<String>();
-//		paramList.add(token);
-//		paramList.add(phoneId);
-//		paramList.add(coordinateId);
-//		AppLoginBean appLoginBean = new AppLoginBean();
-//		code = globalCheck(paramList, token, phoneId,appLoginBean);
-		
         response.setHeader("Pragma", "No-cache"); 
         response.setHeader("Cache-Control", "no-cache"); 
         response.setDateHeader("Expires", 0); 
@@ -301,7 +292,9 @@ public class AppController extends BaseController{
 				e.printStackTrace();
 			} finally{
 				try {
-					os.close();
+					if (os != null)
+						os.close();
+					if (fos != null)
 					fos.close();
 				} catch (IOException e) {
 					e.printStackTrace();

@@ -5,6 +5,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.charset.Charset;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
@@ -37,7 +38,7 @@ public class ZipUtil {
 		if (!pathFile.exists()) {
 			pathFile.mkdirs();
 		}
-		ZipFile zip = new ZipFile(zipFile);
+		ZipFile zip = new ZipFile(zipFile,Charset.forName("GBK"));
 		for (Enumeration entries = zip.entries(); entries.hasMoreElements();) {
 			InputStream in = null;
 			OutputStream out = null;

@@ -53,7 +53,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 </jsp:include>
 <body style="overflow:hidden;" class="demo-1">
 
-	<div id="loader-wrapper">
+	<div id="loader-wrapper" >
 		<div id="loader"></div>
 		<div class="loader-section section-left"></div>
 		<div class="loader-section section-right"></div>
@@ -254,7 +254,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 			<div class="list-container">
 				<div class="overlay" style="display: none;"></div>
 				<div class="list-header">
-					<span class="total-count">共<em id='finditemlength'></em>条信息
+					<span class="total-count">共<em id='finditemlength'>0</em>条信息
 					</span>
 				</div>
 				<div class="item-wrap" style="overflow-x:hidden;overflow-y:auto;">
@@ -286,7 +286,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 			</div>
 			<div class="detail" style="display:none;overflow:hidden;">
 				<div class="imgBox">
-					<img id='detailimg' src="" alt="">
+					<img id='detailimg' onerror="this.src='img/white1.png';this.onerror=null;" src="" alt="">
 					<!--<div class="js-silder">
 						<div class="silder-scroll">
 							<div class="silder-main">

@@ -1,8 +1,6 @@
 package com.xz.controller;
 
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -11,8 +9,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.StringUtils;
-import org.codehaus.jackson.JsonGenerationException;
-import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -20,11 +16,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
-import com.xz.common.ServerResult;
 import com.xz.common.SessionConstant;
 import com.xz.entity.AppMenu;
-import com.xz.model.json.AppJsonModel;
 import com.xz.model.json.JsonModel;
 import com.xz.service.AppService;
 import com.xz.service.WebService;
@@ -117,6 +110,7 @@ public class WebController extends BaseController{
 	@RequestMapping("getObjectDetail")
 	@ResponseBody
 	public JsonModel getObjectDetail(HttpServletRequest request,HttpServletResponse response){
+		long start = System.currentTimeMillis();	
 		HttpSession session = request.getSession(); 
 		String userRole = session.getAttribute(SessionConstant.WEB_USER_ROLE)+"";
 		String msg = null;
@@ -126,6 +120,8 @@ public class WebController extends BaseController{
 		}else{
 			msg = "尚未登陆！";
 		}
+		long end = System.currentTimeMillis();
+		System.out.println("getObjectDetail="+(end - start));
 		return new JsonModel(msg == null,msg,list);
 	}
 	
@@ -137,58 +133,18 @@ public class WebController extends BaseController{
 	@RequestMapping("getMapInfo")
 	@ResponseBody
 	public JsonModel getMapInfoByMenu(HttpServletRequest request){
+		long start = System.currentTimeMillis();
 		String msg = null;
 		String jsonIds = request.getParameter("jsonIds");
 		List<Map<String, Object>> info = new ArrayList<Map<String,Object>>();
 		if(StringUtils.isNotBlank(jsonIds)){
 			JSONArray projectArray = JSONArray.parseArray(jsonIds);
 			info = appService.analyzeJson(projectArray, "status");
-//			String projectId = "";
-//			Map<String,List<String>> param = new HashMap<String, List<String>>();
-//			List<String> conditionList = new ArrayList<String>();
-//			boolean projectStatus = false;
-//			boolean attrStatus = false;
-//			boolean detailStatus = false;
-//			for (int k = 0; k < projectArray.size(); k++) {
-//				param = new HashMap<String, List<String>>();
-//				JSONObject jsonObject = projectArray.getJSONObject(k);
-//				projectStatus =jsonObject.containsKey("status")?(Boolean) jsonObject.get("status"):false;
-//				if(projectStatus){
-//					projectId = jsonObject.get("id")+"";
-//					JSONArray array = jsonObject.getJSONArray("children");
-//					if(array != null && array.size()>0){
-//						for (int i = 0; i < array.size(); i++) {
-//							conditionList = new ArrayList<String>();
-//							JSONObject attrObject = array.getJSONObject(i);
-//							attrStatus = attrObject.containsKey("status")?(Boolean) attrObject.get("status"):false;
-//							if(attrStatus){
-//								String AttriId = attrObject.getString("id");
-//								JSONArray conditionArray = attrObject.getJSONArray("children");
-//								for(int m =0;m<conditionArray.size();m++){
-//									JSONObject conditionObject = conditionArray.getJSONObject(m);
-////									conditionList.add(conditionObject.get("condition_id")+"");
-//									detailStatus = conditionObject.containsKey("status")?(Boolean) conditionObject.get("status"):false;
-//									if(detailStatus){
-//										conditionList.add(conditionObject.get("id")+"");
-//									}
-//								}
-//								if (conditionList != null && conditionList.size() > 0) {
-//									param.put(AttriId, conditionList);
-//								}
-//							}
-//						}
-//					}
-//					if (param != null && param.size() > 0) {
-//						list = appService.getMapInfo(projectId, param);
-//						if (list != null && list.size() > 0) {
-//							info.addAll(list);
-//						}
-//					}
-//				}
-//			}
 		}else{
 			msg = "参数有误！";
 		}
+		long end = System.currentTimeMillis();
+		System.out.println("getMapInfoByMenu="+(end - start));
 		return new JsonModel(msg == null,msg,info);
 	}
 	
