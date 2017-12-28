@@ -32,6 +32,14 @@ public class WebUserService {
 	
 	
 	public List<CategoryTreeBeanCk> getTreeCKListAuthDo(String roleId) {//赋予权限
+		List<CategoryTreeBeanCk> list = new ArrayList<CategoryTreeBeanCk>();
+		StringBuilder sb = new StringBuilder();
+		sb.append(" SELECT pac.id, pac.attribute_condition AS menu_name, pac.attribute_id AS parent_id, pac.leaf, pac.id AS is_check FROM project_attribute_condition pac LEFT JOIN ( SELECT * FROM project_condition_auth pca WHERE pca.web_user_role_id = ? )"
+				+ " b ON pac.id = b.condition_id ORDER BY pac.attribute_id DESC ");
+		list = (List<CategoryTreeBeanCk>)jdbcTemplate.query(sb.toString(), new CategoryTreeBeanCKRowMapper(),roleId);
+		return list;
+	}
+	public List<CategoryTreeBeanCk> getTreeCKListAuthDo_bak(String roleId) {//赋予权限
 		List<CategoryTreeBeanCk> list = new ArrayList();
 		StringBuilder sb = new StringBuilder();
 		sb.append(" select a.id,	a.menu_name,	a.parent_id,	a.leaf	,b.web_user_role_id as is_check from ");

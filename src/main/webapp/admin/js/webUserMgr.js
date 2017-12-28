@@ -306,7 +306,8 @@
     					Ext.Msg.alert('提示', '请填写允许登录手机数');
     					return;
     				}else{
-        		        var reg = /^\d$/;     
+        		        var reg = /^\d{1,10}$/;  
+        		        
         				if(phone.match(reg) == null){  
         					Ext.Msg.alert("error", "允许登录手机数只能填写数字");
         					return;

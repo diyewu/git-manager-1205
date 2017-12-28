@@ -286,7 +286,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 			</div>
 			<div class="detail" style="display:none;overflow:hidden;">
 				<div class="imgBox" >
-					<img id='detailimg' style="width:100%;height:100%;" onerror="javascript:this.src='img/white1.png';" src="" alt="">
+					<img id='detailimg' style="width:100%;height:100%;" onerror="javascript:this.src='img/white3.png';" src="" alt="">
 					<!--<div class="js-silder">
 						<div class="silder-scroll">
 							<div class="silder-main">

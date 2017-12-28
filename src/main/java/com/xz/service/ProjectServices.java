@@ -216,6 +216,29 @@ public class ProjectServices {
 	 * @param list
 	 */
 	public void addCondition(List<String> list,String projectId){
+		String sql = " select id, attribute_index,attribute_name from project_attribute where id = ? ";
+		String detailSql = "";
+		List<Map<String, Object>> attrList = new ArrayList<Map<String,Object>>();
+		String attributeIndex = "";
+		String attrSql = "insert into project_attribute_condition(attribute_condition,attribute_id,type)values(?,?,1)";
+		for (int i = 0; i < list.size(); i++) {
+			detailSql = " insert into project_attribute_condition(attribute_condition,attribute_id,type)"
+					+ "select DISTINCT(ext__index),?,0 from project_detail where project_id = ? ";
+			attrList = jdbcTemplate.queryForList(sql, list.get(i));
+			attributeIndex = attrList.get(0).get("attribute_index")+"";
+			detailSql=detailSql.replace("__index", attributeIndex);
+			jdbcTemplate.update(detailSql, list.get(i),projectId);
+			jdbcTemplate.update(attrSql, attrList.get(0).get("attribute_name"),projectId);
+		}
+		String mainSql = "insert into project_attribute_condition(attribute_condition,type)values((select project_name from project_main where id = ?),1)";
+		jdbcTemplate.update(mainSql,projectId);
+		
+	}
+	/**
+	 * 添加筛选条件
+	 * @param list
+	 */
+	public void addCondition_bak_bak(List<String> list,String projectId){
 		String sql = " select attribute_index from project_attribute where id = ? ";
 		String detailSql = "";
 		List<Map<String, Object>> attrList = new ArrayList<Map<String,Object>>();
@@ -251,6 +274,8 @@ public class ProjectServices {
 		jdbcTemplate.update(authSql, projectId);
 		
 		String sql = " delete from project_attribute_condition  where attribute_id in (select id from project_attribute where project_id = ?) ";
+		jdbcTemplate.update(sql, projectId);
+		sql = " delete from project_attribute_condition  where attribute_id in (?) ";
 		jdbcTemplate.update(sql, projectId);
 		sql = " update project_attribute set attribute_active = 0 where project_id = ? ";
 		jdbcTemplate.update(sql, projectId);
