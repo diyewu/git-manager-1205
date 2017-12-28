@@ -31,15 +31,14 @@ public class WebUserService {
 	
 	
 	
-	public List<CategoryTreeBeanCk> getTreeCKListAuthDo(String roleId) {//赋予权限
+	public List<CategoryTreeBeanCk> getTreeCKListAuthDo_bak(String roleId) {//赋予权限
 		List<CategoryTreeBeanCk> list = new ArrayList<CategoryTreeBeanCk>();
 		StringBuilder sb = new StringBuilder();
-		sb.append(" SELECT pac.id, pac.attribute_condition AS menu_name, pac.attribute_id AS parent_id, pac.leaf, pac.id AS is_check FROM project_attribute_condition pac LEFT JOIN ( SELECT * FROM project_condition_auth pca WHERE pca.web_user_role_id = ? )"
-				+ " b ON pac.id = b.condition_id ORDER BY pac.attribute_id DESC ");
+		sb.append(" SELECT CASE WHEN pac.type = 0 THEN pac.id ELSE pac.attribute_id END id, pac.attribute_condition AS menu_name, CASE WHEN pac.type = 2 THEN NULL ELSE pac.attribute_id END AS parent_id, pac.leaf, pac.id AS is_check FROM project_attribute_condition pac LEFT JOIN ( SELECT * FROM project_condition_auth pca WHERE pca.web_user_role_id = ? ) b ON pac.id = b.condition_id ORDER BY pac.id ASC; ");
 		list = (List<CategoryTreeBeanCk>)jdbcTemplate.query(sb.toString(), new CategoryTreeBeanCKRowMapper(),roleId);
 		return list;
 	}
-	public List<CategoryTreeBeanCk> getTreeCKListAuthDo_bak(String roleId) {//赋予权限
+	public List<CategoryTreeBeanCk> getTreeCKListAuthDo(String roleId) {//赋予权限
 		List<CategoryTreeBeanCk> list = new ArrayList();
 		StringBuilder sb = new StringBuilder();
 		sb.append(" select a.id,	a.menu_name,	a.parent_id,	a.leaf	,b.web_user_role_id as is_check from ");
@@ -47,7 +46,7 @@ public class WebUserService {
 		sb.append(" union  ");
 		sb.append(" SELECT id,	pa.attribute_name AS menu_name,		pa.project_id AS parent_id,		0 AS leaf,		pa.id AS is_check	FROM 		project_attribute pa	WHERE		pa.attribute_active = 1 ");
 		sb.append(" union  ");
-		sb.append(" SELECT id,	pm.project_name AS menu_name,	NULL AS parent_id,	0 AS leaf,	pm.id AS is_check	FROM	project_main pm	 ");
+		sb.append(" SELECT id,	pm.project_name AS menu_name,	NULL AS parent_id,	0 AS leaf,	pm.id AS is_check	FROM	project_main pm where pm.type = 1	 ");
 		sb.append(" )a left JOIN (  ");
 		sb.append(" select * from project_condition_auth pca 	where pca.web_user_role_id = ?  ");
 		sb.append(" ) b on a.id = b.condition_id ORDER BY a.id DESC  ");

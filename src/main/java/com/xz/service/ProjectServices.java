@@ -215,7 +215,7 @@ public class ProjectServices {
 	 * 添加筛选条件
 	 * @param list
 	 */
-	public void addCondition(List<String> list,String projectId){
+	public void addCondition_bak_bak(List<String> list,String projectId){
 		String sql = " select id, attribute_index,attribute_name from project_attribute where id = ? ";
 		String detailSql = "";
 		List<Map<String, Object>> attrList = new ArrayList<Map<String,Object>>();
@@ -230,15 +230,15 @@ public class ProjectServices {
 			jdbcTemplate.update(detailSql, list.get(i),projectId);
 			jdbcTemplate.update(attrSql, attrList.get(0).get("attribute_name"),projectId);
 		}
-		String mainSql = "insert into project_attribute_condition(attribute_condition,type)values((select project_name from project_main where id = ?),1)";
-		jdbcTemplate.update(mainSql,projectId);
+		String mainSql = "insert into project_attribute_condition(attribute_condition,attribute_id,type)values((select project_name from project_main where id = ?),?,2)";
+		jdbcTemplate.update(mainSql,projectId,projectId);
 		
 	}
 	/**
 	 * 添加筛选条件
 	 * @param list
 	 */
-	public void addCondition_bak_bak(List<String> list,String projectId){
+	public void addCondition(List<String> list,String projectId){
 		String sql = " select attribute_index from project_attribute where id = ? ";
 		String detailSql = "";
 		List<Map<String, Object>> attrList = new ArrayList<Map<String,Object>>();
@@ -251,7 +251,8 @@ public class ProjectServices {
 			detailSql=detailSql.replace("__index", attributeIndex);
 			jdbcTemplate.update(detailSql, list.get(i),projectId);
 		}
-		
+		String mainSql = " update project_main set type = 1 where id = ? ";
+		jdbcTemplate.update(mainSql, projectId);
 	}
 	/**
 	 * 删除筛选条件
