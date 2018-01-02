@@ -20,7 +20,8 @@
 //		});
     	getObjectList();//加载项目数据
     	getObjectDetail();//加载项目筛选条件数据
-    	initCluster();
+//    	initCluster();//根据项目生成markercluster
+    	initProjectMarker();
     	$('#loader-wrapper .load_title').remove();
     	
 //    	$('img').each(function() {
@@ -29,6 +30,67 @@
 //            }
 //        });
     }); 
+	
+	function initProjectMarker(){
+		$.post(path+"/webctrl/getMapInfoByUserRole/", 
+		{
+		},
+		function(result){
+			if(result.success == true){//登陆成功
+				var data = result.data;
+//				generateCluster(data);
+				generateMarker(data,12);
+			}else {
+			}
+		},'json');
+	}
+	
+	function generateMarker(array,level){
+    	var pt = null;
+    	var k = 0;
+    	for (var i in array) {
+			if(k == 0){
+				map.centerAndZoom(new BMap.Point(array[i].longitude , array[i].latitude), level);
+			}
+    	   pt = new BMap.Point(array[i].longitude , array[i].latitude);
+    	   var marker = new BMap.Marker(pt);
+    	   map.addOverlay(marker);
+    	   marker.tkey = array[i].key;
+    	   
+    	   (function() {  
+    		    var key = array[i].key;
+	       		var cacheKey = array[i].cacheKey;
+	       		var currentLevel = array[i].currentLevel;
+	       		var nextLevel = array[i].nextLevel;
+               marker.addEventListener("click", function(){
+            	   console.log(key);
+            	   showNextLevel(level,key,cacheKey,currentLevel,nextLevel);
+               });
+           })();  
+    	   
+    	   
+    	   k++;
+    	}
+	}
+	
+	function showNextLevel(level,key,cacheKey,currentLevel,nextLevel){
+	   	initMap();
+		$.post(path+"/webctrl/getMapInfoByKey/", 
+		{
+			key:key,
+			cacheKey:cacheKey,
+			currentLevel:currentLevel,
+			nextLevel:nextLevel
+		},
+		function(result){
+			if(result.success == true){
+				var data = result.data;
+				generateMarker(data,level+1);
+			}else {
+				 
+			}
+		},'json');
+	}
     
 	function getObjectList(){
 		$.post(path+"/webctrl/getObjectListByUserRole/", 
@@ -153,27 +215,9 @@
     	map.setCurrentCity("上海");          // 设置地图显示的城市 此项是必须设置的
     	map.enableScrollWheelZoom(true);     //开启鼠标滚轮缩放
     	
-//    	var xy = [
-//    		{'x':121.48123,'y':31.23123},
-//    		{'x':121.4723,'y':31.25123},
-//    		{'x':121.48223,'y':31.33123},
-//    		{'x':121.46623,'y':31.35123},
-//    		{'x':121.23123,'y':31.36123},
-//    		{'x':121.25123,'y':31.22123},
-//    		{'x':121.36123,'y':31.28123},
-//    		{'x':121.45123,'y':31.12123},
-//    		{'x':121.5623,'y':31.8123},
-//    		{'x':121.45623,'y':31.73123},
-//    		{'x':121.38123,'y':31.63123}
-//    	];
+    	/* 
+    	 * 下面是markerclusterer逻辑
     	var markers = [];
-//    	var pt = null;
-//    	for (var i in xy) {
-//    	   pt = new BMap.Point(xy[i].x , xy[i].y);
-//    	   var marker = new BMap.Marker(pt);
-//    	   marker.addEventListener("click", showInfo)
-//    	   markers.push(marker);
-//    	}
     	//生成一个marker数组，然后调用markerClusterer类即可。
     	markerClusterer = new BMapLib.MarkerClusterer(map,
     		{
@@ -189,6 +233,7 @@
     		});
     	markerClusterer.setMaxZoom(13);
     	markerClusterer.setGridSize(100);
+    	*/
 	}
 
 
@@ -490,9 +535,7 @@ function showInfo(e){
 	if ($('.expander').hasClass("fadeIn")) {
 		$('#autoShowList').trigger("click");
 	}
-	
 	$(".item-wrap").empty();
-	
 	$.post(path+"/webctrl/getCoordinateInfo/", 
 	{
     	ids:e.target.tid

@@ -210,12 +210,14 @@ public class ProjectMgrController extends BaseController {
 			Map<String, Object> pMap = new HashMap<String, Object>();
 			String id = "";
 			String typeName = "";
+			String infoTypeName = "";
 			if(paramList != null && paramList.size() > 0){
 				for(int i=0;i<paramList.size();i++){
 					pMap = paramList.get(i);
 					id = pMap.get("id")+"";
 					typeName = pMap.get("type_name")+"";
-					peojectServices.updateAttrType(id, typeName);
+					infoTypeName = pMap.get("info_type_name")+"";
+					peojectServices.updateAttrType(id, typeName,infoTypeName);
 				}
 			}
 		}else{
@@ -234,7 +236,9 @@ public class ProjectMgrController extends BaseController {
     
     @RequestMapping("getAttrType")
     public void getAttrType(HttpServletRequest request,HttpServletResponse response) throws JsonParseException, JsonMappingException, IOException{
-    	Page<Map<String, Object>> page = peojectServices.getAttrType();
+    	String type = request.getParameter("type");
+    	int typeInt = type == null?0:Integer.parseInt(type);
+    	Page<Map<String, Object>> page = peojectServices.getAttrType(typeInt);
     	resultSuccess(null, page.getResult(), page.getTotalCount(),response);
     }
     @RequestMapping("setAttrActive")

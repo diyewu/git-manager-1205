@@ -336,9 +336,11 @@ public class ProjectServices {
 	public Page<Map<String, Object>> getProjectAttr(String projectId,int start,int limit){
 		Page<Map<String, Object>> page = new Page<Map<String, Object>>(start, limit, false);
 		List<Object> params = new ArrayList<Object>();
-		StringBuilder sql = new StringBuilder(" select pa.id,pa.project_id,pm.project_name,pa.attribute_name,pat.type_name,pa.attribute_type,pa.attribute_active  ");
+		StringBuilder sql = new StringBuilder(" select pa.id,pa.project_id,pm.project_name,pa.attribute_name,pat.type_name,patt.type_name as info_type_name,pa.attribute_type,pa.attribute_active  ");
 		sql.append(" from project_attribute pa left join project_main pm on pa.project_id = pm.id ");
-		sql.append(" left join project_attribute_type pat on pa.attribute_type = pat.id and pat.id <> 0 where 1=1 ");
+		sql.append(" left join project_attribute_type pat on pa.attribute_type = pat.id AND pat.id <> 0 and pat.type = 0  ");
+		sql.append(" LEFT JOIN project_attribute_type patt ON pa.attribute_info_type = patt.id AND patt.id <> 0 and patt.type = 1 ");
+		sql.append(" where 1=1 ");
 		if(StringUtils.isNotBlank(projectId)){
 			sql.append(" and pm.id = ? ");
 			params.add(projectId);
@@ -355,15 +357,18 @@ public class ProjectServices {
 	}
 	
 	
-	public void updateAttrType(String id,String typeName){
+	public void updateAttrType(String id,String typeName,String infoTypeName){
 		StringBuilder sb = new StringBuilder();
-		String sql = " update project_attribute set attribute_type = (select id from project_attribute_type where type_name = ? ) where project_attribute.id = ? ";
-		jdbcTemplate.update(sql,typeName,id);
+		String sql = " update project_attribute set "
+				+ "attribute_type = (select id from project_attribute_type where type_name = ? and type = 0 ) "
+				+ ",attribute_info_type = (select id from project_attribute_type where type_name = ? and type = 1 ) "
+				+ "where project_attribute.id = ? ";
+		jdbcTemplate.update(sql,typeName,infoTypeName,id);
 	}
-	public Page<Map<String, Object>> getAttrType(){
+	public Page<Map<String, Object>> getAttrType(int type){
 		Page<Map<String, Object>> page = new Page<Map<String, Object>>(0, 1010, false);
-		String sql = " select id as value,type_name as text from project_attribute_type ";
-		List<Map<String, Object>> list = jdbcTemplate.queryForList(sql);
+		String sql = " select id as value,type_name as text from project_attribute_type where type = ? ";
+		List<Map<String, Object>> list = jdbcTemplate.queryForList(sql,type);
 		page.setTotalCount(list.size());
 		page.setResult(list);
 		return page;

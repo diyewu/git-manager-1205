@@ -177,9 +177,9 @@ public class WebController extends BaseController{
 	 * @param request
 	 * @return
 	 */
-	@RequestMapping("getMapInfoByUserRole")
-	@ResponseBody
-	public JsonModel getMapInfoByUserRole(HttpServletRequest request){
+//	@RequestMapping("getMapInfoByUserRole")
+//	@ResponseBody
+	public JsonModel getMapInfoByUserRole_bak(HttpServletRequest request){
 		HttpSession session = request.getSession(); 
 		String userRole = session.getAttribute(SessionConstant.WEB_USER_ROLE)+"";
 		String msg = null;
@@ -203,6 +203,67 @@ public class WebController extends BaseController{
 				e.printStackTrace();
 				msg = e.getMessage();
 			}
+		}
+		
+		return new JsonModel(msg == null,msg,info);
+	}
+	/**
+	 * 根据用户角色获取全部地图点信息,地图初始化时加载
+	 * @param request
+	 * @return
+	 */
+	@RequestMapping("getMapInfoByUserRole")
+	@ResponseBody
+	public JsonModel getMapInfoByUserRole(HttpServletRequest request){
+		HttpSession session = request.getSession(); 
+		String userRole = session.getAttribute(SessionConstant.WEB_USER_ROLE)+"";
+		String msg = null;
+		List<AppMenu> list = new ArrayList<AppMenu>();
+		if(StringUtils.isNotBlank(userRole)){
+			list = appService.getMenulist(userRole);
+		}else{
+			msg = "尚未登陆！";
+		}
+		List<Map<String, Object>> info = new ArrayList<Map<String,Object>>();
+		if(list != null && list.size()>0){
+			ObjectMapper mapper = new ObjectMapper();
+			try {
+				String jsonIds = mapper.writeValueAsString(list);
+				System.out.println(jsonIds);
+				if(StringUtils.isNotBlank(jsonIds)){
+					JSONArray projectArray = JSONArray.parseArray(jsonIds);
+					info = appService.analyzeJson(projectArray, "is_check");
+				}
+				
+			} catch (Exception e) {
+				e.printStackTrace();
+				msg = e.getMessage();
+			}
+		}
+		
+		return new JsonModel(msg == null,msg,info);
+	}
+	
+	/**
+	 * 根据用户选择的坐标点，获取该坐标点的下一级坐标
+	 * @param request
+	 * @return
+	 */
+	@RequestMapping("getMapInfoByKey")
+	@ResponseBody
+	public JsonModel getMapInfoByKey(HttpServletRequest request){
+		HttpSession session = request.getSession(); 
+		String userRole = session.getAttribute(SessionConstant.WEB_USER_ROLE)+"";
+		String cacheKey = request.getParameter("cacheKey");
+		String key = request.getParameter("key");
+		String nextLevel = request.getParameter("nextLevel");
+		String currentLevel = request.getParameter("currentLevel");
+		String msg = null;
+		List<Map<String, Object>> info = new ArrayList<Map<String,Object>>();
+		if(StringUtils.isNotBlank(userRole)){
+			info = appService.generateCod(key,AppService.cacheMap.get(cacheKey), cacheKey,currentLevel,nextLevel);
+		}else{
+			msg = "尚未登陆！";
 		}
 		
 		return new JsonModel(msg == null,msg,info);

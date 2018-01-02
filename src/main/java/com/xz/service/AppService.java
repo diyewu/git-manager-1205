@@ -12,6 +12,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +26,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.google.common.base.Joiner;
 import com.xz.common.ServerResult;
 import com.xz.entity.AppMenu;
+import com.xz.entity.AreaBean;
 
 @Service
 @Transactional
@@ -32,6 +34,22 @@ public class AppService {
 	
 	@Autowired  
 	private JdbcTemplate jdbcTemplate; 
+	
+	private static List<String> keyList = new ArrayList<String>();
+	private static Map<String,String> lvlMap = new HashMap<String, String>();
+	
+	static{
+		keyList.add("first_area");
+		keyList.add("second_area");
+		keyList.add("third_area");
+		keyList.add("forth_area");
+		keyList.add("longitude");
+		keyList.add("latitude");
+		lvlMap.put("first_area", "second_area");
+		lvlMap.put("second_area", "third_area");
+		lvlMap.put("third_area", "forth_area");
+	}
+	public static Map<String,List<Map<String, Object>>> cacheMap = new HashMap<String, List<Map<String,Object>>>();
 	
 	public List<Map<String, Object>> getUserInfoByNameandPwd(String name,String pwd){
 		String sql = "  select * from web_user_login where user_name = ? and user_password = ? and is_delete = 0 ";
@@ -140,7 +158,152 @@ public class AppService {
 		}
 	}
 	
-	public List<Map<String,Object>> getMapInfo(String projectId,Map<String,List<String>> param){
+	public List<Map<String,Object>> getMapInfo(String projectId,Map<String,
+			List<String>> param,String cacheKey,String currentLevel,String nextLevel){
+		if(StringUtils.isBlank(cacheKey)){
+			String attriSql = " select attribute_index from project_attribute where id = ? ";
+			List<Map<String, Object>> list = new ArrayList<Map<String,Object>>();
+			List<Map<String, Object>> resultList = new ArrayList<Map<String,Object>>();
+			StringBuilder sb = new StringBuilder();
+			String attriAllSql = " select pa.attribute_name,pat.alias_name,pa.attribute_index"
+					+ " from project_attribute pa left join project_attribute_type pat"
+					+ " on pa.attribute_type = pat.id and pat.type = 0 where pa.project_id = ? ORDER BY pat.id ";
+			List<Map<String, Object>> attributeList = jdbcTemplate.queryForList(attriAllSql, projectId);
+			if(attributeList == null || attributeList.size() == 0){
+				return null;
+			}
+			List<String> conditionIdList = new ArrayList<String>();
+			if (param != null && param.size() > 0) {
+				String tempSql = "";
+				sb.append(" select ");
+				String aliasName = "";
+				for (int i = 0; i < attributeList.size(); i++) {
+					aliasName = (String)attributeList.get(i).get("alias_name");
+					if(StringUtils.isNotBlank(aliasName)){
+						/**
+						 * keyList={first_area,second_area,third_area,forth_area,latitude,longitude}
+						 */
+						if(keyList.contains(aliasName)){
+							sb.append(" pd.ext"+attributeList.get(i).get("attribute_index") +" as " + aliasName +",");
+						}
+					}
+				}
+				sb.append(" pd.id ");
+				sb.append(" from project_detail  pd ");
+				sb.append(" where project_id = ? ");
+				for (Map.Entry<String,List<String>> entry : param.entrySet()) {  
+					list = jdbcTemplate.queryForList(attriSql, entry.getKey());
+					tempSql = "and ext_index in(select attribute_condition from project_attribute_condition where id in (?) )";
+				    if(list != null && list.size()>0){
+				    	tempSql = tempSql.replace("_index", list.get(0).get("attribute_index")+"");
+				    	conditionIdList = entry.getValue();
+				    	if(conditionIdList != null && conditionIdList.size()>0){
+				    		tempSql = tempSql.replace("?", Joiner.on(",").join(conditionIdList));
+				    		sb.append(tempSql);
+	//			    		sqlParam.add(Joiner.on(",").join(conditionIdList));
+				    	}
+				    }
+				}
+				resultList = jdbcTemplate.queryForList(sb.toString(), projectId);
+				if(resultList != null && resultList.size()>0){
+					String tkey = UUID.randomUUID().toString().replaceAll("-", "");
+					cacheMap.put(tkey, resultList);
+					List<Map<String, Object>> cod = generateCod(null,resultList,tkey,currentLevel,nextLevel);
+					return cod;
+				}
+			}
+		}else{
+			List<Map<String, Object>> cod = generateCod(null,cacheMap.get(cacheKey),cacheKey,currentLevel,nextLevel);
+			return cod;
+		}
+		return null;
+	}
+	public List<Map<String,Object>> generateCod(String key,List<Map<String, Object>> resultList,
+			String cacheKey,String currentLevel,String nextLevel){
+		Map<String, Object> tMap = new HashMap<String, Object>();
+		Map<String,AreaBean> areaMap = new HashMap<String, AreaBean>();
+		AreaBean areaBean = new AreaBean();
+		String currentArea = "";
+		String nextArea = "";
+		double longitudeF = 0;
+		double latitudeF = 0;
+		for (int i = 0; i < resultList.size(); i++) {
+			areaBean = new AreaBean();
+			tMap = resultList.get(i);
+			currentArea = tMap.get(currentLevel)+"";
+			nextArea = tMap.get(nextLevel)+"";
+			if(StringUtils.isNotBlank(key)){
+				if(key.equals(tMap.get(currentLevel))){
+					if(areaMap.containsKey(nextArea)){
+						areaBean = areaMap.get(nextArea);
+						try {
+							longitudeF = tMap.get("longitude")==null?0:Double.parseDouble(tMap.get("longitude")+"");
+							latitudeF = tMap.get("latitude")==null?0:Double.parseDouble(tMap.get("latitude")+"");
+						} catch (Exception e) {
+						}
+						if(longitudeF != 0 && latitudeF != 0){
+							areaBean.setTotalLongitude(areaBean.getTotalLongitude()+longitudeF);
+							areaBean.setTotalLatitude(areaBean.getTotalLatitude()+latitudeF);
+							areaBean.setCount(areaBean.getCount()+1);
+							areaMap.put(nextArea, areaBean);
+						}else{
+							continue;
+						}
+					}else{
+						areaMap.put(nextArea, areaBean);
+					}
+				}else{
+					continue;
+				}
+			}else{
+				if(areaMap.containsKey(currentArea)){
+					areaBean = areaMap.get(currentArea);
+					try {
+						longitudeF = tMap.get("longitude")==null?0:Double.parseDouble(tMap.get("longitude")+"");
+						latitudeF = tMap.get("latitude")==null?0:Double.parseDouble(tMap.get("latitude")+"");
+					} catch (Exception e) {
+					}
+					if(longitudeF != 0 && latitudeF != 0){
+						areaBean.setTotalLongitude(areaBean.getTotalLongitude()+longitudeF);
+						areaBean.setTotalLatitude(areaBean.getTotalLatitude()+latitudeF);
+						areaBean.setCount(areaBean.getCount()+1);
+						areaMap.put(currentArea, areaBean);
+					}else{
+						continue;
+					}
+				}else{
+					areaMap.put(currentArea, areaBean);
+				}
+			}
+				
+		}
+		if(areaMap != null && !areaMap.isEmpty()){
+			Map<String,Object> sMap = new HashMap<String, Object>();
+			List<Map<String,Object>> sList = new ArrayList<Map<String,Object>>();
+			for (Map.Entry<String,AreaBean> entry : areaMap.entrySet()) {
+				areaBean = new AreaBean();
+				areaBean = entry.getValue();
+				sMap.put("key", entry.getKey());
+				if(StringUtils.isNotBlank(key)){
+					sMap.put("currentLevel", nextLevel);
+					sMap.put("nextLevel", lvlMap.get(nextLevel));
+				}else{
+					sMap.put("currentLevel", currentLevel);
+					sMap.put("nextLevel", lvlMap.get(currentLevel));
+				}
+				sMap.put("cacheKey", cacheKey);
+				sMap.put("text", entry.getKey());
+				sMap.put("longitude", areaBean.getTotalLongitude()/areaBean.getCount());
+				sMap.put("latitude", areaBean.getTotalLatitude()/areaBean.getCount());
+				sList.add(sMap);
+				sMap = new HashMap<String, Object>();
+			}
+//			System.out.println(sList);
+			return sList;
+		}
+		return null;
+	}
+	public List<Map<String,Object>> getMapInfo_bak20180102(String projectId,Map<String,List<String>> param){
 		String attriSql = " select attribute_index from project_attribute where id = ? ";
 		List<Map<String, Object>> list = new ArrayList<Map<String,Object>>();
 		List<Map<String, Object>> resultList = new ArrayList<Map<String,Object>>();
@@ -173,15 +336,15 @@ public class AppService {
 //			    System.out.println("Key = " + entry.getKey() + ", Value = " + entry.getValue());  
 				list = jdbcTemplate.queryForList(attriSql, entry.getKey());
 				tempSql = "and ext_index in(select attribute_condition from project_attribute_condition where id in (?) )";
-			    if(list != null && list.size()>0){
-			    	tempSql = tempSql.replace("_index", list.get(0).get("attribute_index")+"");
-			    	conditionIdList = entry.getValue();
-			    	if(conditionIdList != null && conditionIdList.size()>0){
-			    		tempSql = tempSql.replace("?", Joiner.on(",").join(conditionIdList));
-			    		sb.append(tempSql);
+				if(list != null && list.size()>0){
+					tempSql = tempSql.replace("_index", list.get(0).get("attribute_index")+"");
+					conditionIdList = entry.getValue();
+					if(conditionIdList != null && conditionIdList.size()>0){
+						tempSql = tempSql.replace("?", Joiner.on(",").join(conditionIdList));
+						sb.append(tempSql);
 //			    		sqlParam.add(Joiner.on(",").join(conditionIdList));
-			    	}
-			    }
+					}
+				}
 			}
 			resultList = jdbcTemplate.queryForList(sb.toString(), projectId);
 			if(resultList != null && resultList.size()>0){
@@ -315,7 +478,7 @@ public class AppService {
 					}
 				}
 				if (param != null && param.size() > 0) {
-					list = this.getMapInfo(projectId, param);
+					list = this.getMapInfo(projectId, param, null,"first_area","second_area");
 					if (list != null && list.size() > 0) {
 						info.addAll(list);
 					}
