@@ -254,8 +254,10 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 			<div class="list-container">
 				<div class="overlay" style="display: none;"></div>
 				<div class="list-header">
-					<span class="total-count">共<em id='finditemlength'>0</em>条信息
-					</span>
+					<span class="total-count">共<em id='finditemlength'>0</em>条信息</span>
+					<span class="sort" onClick="turnback();">&nbsp;&nbsp;返回上一级<i class="fa fa-reply-all" aria-hidden="true"></i>&nbsp;&nbsp;</span>
+                    <!-- <span class="sort" >&nbsp;&nbsp;主页<i class="fa fa-home"  aria-hidden="true">&nbsp;&nbsp;</i></span> -->
+                    <!-- <span class="sort on" data-dianji="default/排序">默认</span> -->
 				</div>
 				<div class="item-wrap" style="overflow-x:hidden;overflow-y:auto;">
 					<!-- 

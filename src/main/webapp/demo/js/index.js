@@ -1,6 +1,13 @@
 	var markerClusterer;
+	var ComplexCustomOverlay;
+	var _level;
+	var _key;
+	var _cacheKey;
+	var _currentLevel;
+	var _nextLevel;
+	var _ids;
 	$(document).ready(function() { 
-		
+		document.title = 'xxxxxx';
 		// 百度地图API功能
 		initMap();
     	//===================
@@ -29,6 +36,82 @@
 //                this.src = 'images/01.jpg';
 //            }
 //        });
+    	//自定义覆盖物*************************************
+        ComplexCustomOverlay = function(point, text, mouseoverText){
+          this._point = point;
+          this._text = text;
+          this._overText = mouseoverText;
+        }
+        ComplexCustomOverlay.prototype = new BMap.Overlay();
+        ComplexCustomOverlay.prototype.initialize = function(map){
+          this._map = map;
+          var div = this._div = document.createElement("div");
+          div.style.borderRadius="4px";
+          div.style.boxShadow="1px 1px 2px 1px rgba(0, 0, 0, 0.24)";
+//          div.style.background="rgba(57, 172, 106, 0.98)";
+          
+          div.style.position = "absolute";
+          div.style.zIndex = BMap.Overlay.getZIndex(this._point.lat);
+          div.style.backgroundColor = "#EE5D5B";
+          div.style.border = "1px solid #BC3B3A";
+          div.style.color = "white";
+//          div.style.height = "18px";
+//          div.style.padding = "2px";
+          div.style.padding = "2px";
+          div.style.lineHeight = "25px";
+          div.style.whiteSpace = "nowrap";
+          div.style.MozUserSelect = "none";
+          div.style.fontSize = "15px"
+          var span = this._span = document.createElement("span");
+          div.appendChild(span);
+          span.appendChild(document.createTextNode(this._text));      
+          var that = this;
+
+          var arrow = this._arrow = document.createElement("div");
+          arrow.style.background = "url(./img/label.png) no-repeat";
+          arrow.style.position = "absolute";
+          arrow.style.width = "11px";
+          arrow.style.height = "10px";
+          arrow.style.top = "29px";
+          arrow.style.left = "10px";
+          arrow.style.overflow = "hidden";
+          div.appendChild(arrow);
+         
+          div.onmouseover = function(){
+        	  this.style.zIndex = 100;
+        	  this.style.cursor = "pointer";
+        	
+            this.style.backgroundColor = "#6BADCA";
+            this.style.borderColor = "#0000ff";
+            this.getElementsByTagName("span")[0].innerHTML = that._overText;
+            arrow.style.backgroundPosition = "0px -20px";
+          }
+
+          div.onmouseout = function(){
+        	this.style.zIndex = BMap.Overlay.getZIndex(that._point.lat);
+            this.style.backgroundColor = "#EE5D5B";
+            this.style.borderColor = "#BC3B3A";
+            this.getElementsByTagName("span")[0].innerHTML = that._text;
+            arrow.style.backgroundPosition = "0px 0px";
+          }
+
+          map.getPanes().labelPane.appendChild(div);
+          
+          return div;
+        }
+        ComplexCustomOverlay.prototype.draw = function(){
+          var map = this._map;
+          var pixel = map.pointToOverlayPixel(this._point);
+          this._div.style.left = pixel.x - parseInt(this._arrow.style.left) + "px";
+          this._div.style.top  = pixel.y - 30 + "px";
+        }
+        //添加监听事件  
+        ComplexCustomOverlay.prototype.addEventListener = function(event,fun){  
+            this._div['on'+event] = fun;  
+        }
+    	//自定义覆盖物*************************************
+    	
+    	
     }); 
 	
 	function initProjectMarker(){
@@ -49,31 +132,51 @@
     	var pt = null;
     	var k = 0;
     	for (var i in array) {
+    		pt = new BMap.Point(array[i].longitude , array[i].latitude);
 			if(k == 0){
-				map.centerAndZoom(new BMap.Point(array[i].longitude , array[i].latitude), level);
+				if(array[i].nextLevel){
+					map.centerAndZoom(pt, level);
+				}else{
+					map.centerAndZoom(pt, 19);
+				}
 			}
-    	   pt = new BMap.Point(array[i].longitude , array[i].latitude);
     	   var marker = new BMap.Marker(pt);
-    	   map.addOverlay(marker);
+    	   var mouseoverTxt = array[i].key + " " + array[i].totalitem + "点" ;
+    	   var myCompOverlay = new ComplexCustomOverlay(pt, array[i].key,mouseoverTxt);
+    	   map.addOverlay(myCompOverlay);
     	   marker.tkey = array[i].key;
-    	   
-    	   (function() {  
-    		    var key = array[i].key;
-	       		var cacheKey = array[i].cacheKey;
-	       		var currentLevel = array[i].currentLevel;
-	       		var nextLevel = array[i].nextLevel;
-               marker.addEventListener("click", function(){
-            	   console.log(key);
-            	   showNextLevel(level,key,cacheKey,currentLevel,nextLevel);
-               });
-           })();  
-    	   
-    	   
+    	   if(array[i].nextLevel){
+	    	   (function() {  
+	    		    var key = array[i].key;
+		       		var cacheKey = array[i].cacheKey;
+		       		var currentLevel = array[i].currentLevel;
+		       		var nextLevel = array[i].nextLevel;
+		       		var ids = array[i].ids;
+		       		myCompOverlay.addEventListener("click", function(){
+	            	   showNextLevel(level,key,cacheKey,currentLevel,nextLevel,ids);
+	            	   showInfo(ids);
+	               });
+	           })();  
+    	   }else{
+    		   (function() {  
+    			    var ids = array[i].ids;
+		       		myCompOverlay.addEventListener("click", function(){
+	            	   showInfo(ids);
+	               });
+	           })(); 
+    	   }
     	   k++;
     	}
 	}
 	
-	function showNextLevel(level,key,cacheKey,currentLevel,nextLevel){
+	function showNextLevel(level,key,cacheKey,currentLevel,nextLevel,ids){
+		_key = key;
+		_cacheKey = cacheKey;
+		_currentLevel = currentLevel;
+		_nextLevel = nextLevel;
+		_level = map.getZoom();
+		_ids = ids;
+		
 	   	initMap();
 		$.post(path+"/webctrl/getMapInfoByKey/", 
 		{
@@ -88,6 +191,25 @@
 				generateMarker(data,level+1);
 			}else {
 				 
+			}
+		},'json');
+	}
+	function showPreLevel(level,key,cacheKey,currentLevel){
+		initMap();
+		$.post(path+"/webctrl/getFatherMapInfoByKey/", 
+		{
+			key:key,
+			cacheKey:cacheKey,
+			currentLevel:currentLevel
+		},
+		function(result){
+			if(result.success == true){
+				var data = result.data;
+				_key = data[0].key;
+				console.log(_key);
+				generateMarker(data,level-1);
+			}else {
+				
 			}
 		},'json');
 	}
@@ -530,15 +652,15 @@ function showDetail(title,subhead,imgSrc,detail1,detail2,detail3,detail4){
 }
 
 
-function showInfo(e){
-	
+function showInfo(ids){
+//	console.log("ids="+ids);
 	if ($('.expander').hasClass("fadeIn")) {
 		$('#autoShowList').trigger("click");
 	}
 	$(".item-wrap").empty();
 	$.post(path+"/webctrl/getCoordinateInfo/", 
 	{
-    	ids:e.target.tid
+    	ids:ids
 	},
 	function(result){
 		if(result.success == true){//登陆成功
@@ -582,4 +704,19 @@ function generateRightItem(title,subhead,imgSrc,detail1,detail2,detail3){
 	html += "	<hr>";
 	html += "</div>";
 	return html;
+}
+
+
+function turnback(){
+//	generateMarker(_data, _level);
+	console.log(_key);
+	console.log(_cacheKey);
+	console.log(_currentLevel);
+	console.log(_nextLevel);
+	console.log(_level);
+	if("first_area" == _currentLevel){
+		showNextLevel(_level-1, "", _cacheKey, _currentLevel, _nextLevel, _ids);
+	}else{
+		showPreLevel(_level, _key, _cacheKey, _currentLevel);
+	}
 }

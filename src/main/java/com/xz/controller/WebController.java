@@ -268,4 +268,30 @@ public class WebController extends BaseController{
 		
 		return new JsonModel(msg == null,msg,info);
 	}
+	
+	/**
+	 * 返回上一级坐标
+	 * @param request
+	 * @return
+	 */
+	@RequestMapping("getFatherMapInfoByKey")
+	@ResponseBody
+	public JsonModel getFatherMapInfoByKey(HttpServletRequest request){
+		HttpSession session = request.getSession(); 
+		String userRole = session.getAttribute(SessionConstant.WEB_USER_ROLE)+"";
+		
+		String cacheKey = request.getParameter("cacheKey");
+		String key = request.getParameter("key");
+		String currentLevel = request.getParameter("currentLevel");
+		
+		String msg = null;
+		List<Map<String, Object>> info = new ArrayList<Map<String,Object>>();
+		if(StringUtils.isNotBlank(userRole)){
+			info = appService.turnback(cacheKey, key, currentLevel);
+		}else{
+			msg = "尚未登陆！";
+		}
+		
+		return new JsonModel(msg == null,msg,info);
+	}
 }

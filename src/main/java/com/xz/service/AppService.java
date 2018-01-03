@@ -37,6 +37,7 @@ public class AppService {
 	
 	private static List<String> keyList = new ArrayList<String>();
 	private static Map<String,String> lvlMap = new HashMap<String, String>();
+	private static Map<String,String> preMap = new HashMap<String, String>();
 	
 	static{
 		keyList.add("first_area");
@@ -48,6 +49,10 @@ public class AppService {
 		lvlMap.put("first_area", "second_area");
 		lvlMap.put("second_area", "third_area");
 		lvlMap.put("third_area", "forth_area");
+		
+		preMap.put("second_area", "first_area");
+		preMap.put("third_area", "second_area");
+		preMap.put("forth_area", "third_area");
 	}
 	public static Map<String,List<Map<String, Object>>> cacheMap = new HashMap<String, List<Map<String,Object>>>();
 	
@@ -227,11 +232,13 @@ public class AppService {
 		String nextArea = "";
 		double longitudeF = 0;
 		double latitudeF = 0;
+		String id = "";
 		for (int i = 0; i < resultList.size(); i++) {
 			areaBean = new AreaBean();
 			tMap = resultList.get(i);
 			currentArea = tMap.get(currentLevel)+"";
 			nextArea = tMap.get(nextLevel)+"";
+			id = tMap.get("id")+"";
 			if(StringUtils.isNotBlank(key)){
 				if(key.equals(tMap.get(currentLevel))){
 					if(areaMap.containsKey(nextArea)){
@@ -245,12 +252,27 @@ public class AppService {
 							areaBean.setTotalLongitude(areaBean.getTotalLongitude()+longitudeF);
 							areaBean.setTotalLatitude(areaBean.getTotalLatitude()+latitudeF);
 							areaBean.setCount(areaBean.getCount()+1);
+							areaBean.setIds(areaBean.getIds()+","+id);
 							areaMap.put(nextArea, areaBean);
 						}else{
 							continue;
 						}
 					}else{
 						areaMap.put(nextArea, areaBean);
+						try {
+							longitudeF = tMap.get("longitude")==null?0:Double.parseDouble(tMap.get("longitude")+"");
+							latitudeF = tMap.get("latitude")==null?0:Double.parseDouble(tMap.get("latitude")+"");
+						} catch (Exception e) {
+						}
+						if(longitudeF != 0 && latitudeF != 0){
+							areaBean.setTotalLongitude(areaBean.getTotalLongitude()+longitudeF);
+							areaBean.setTotalLatitude(areaBean.getTotalLatitude()+latitudeF);
+							areaBean.setCount(areaBean.getCount()+1);
+							areaBean.setIds(id);
+							areaMap.put(nextArea, areaBean);
+						}else{
+							continue;
+						}
 					}
 				}else{
 					continue;
@@ -267,12 +289,29 @@ public class AppService {
 						areaBean.setTotalLongitude(areaBean.getTotalLongitude()+longitudeF);
 						areaBean.setTotalLatitude(areaBean.getTotalLatitude()+latitudeF);
 						areaBean.setCount(areaBean.getCount()+1);
+						areaBean.setIds(areaBean.getIds()+","+id);
 						areaMap.put(currentArea, areaBean);
 					}else{
 						continue;
 					}
 				}else{
 					areaMap.put(currentArea, areaBean);
+					
+					try {
+						longitudeF = tMap.get("longitude")==null?0:Double.parseDouble(tMap.get("longitude")+"");
+						latitudeF = tMap.get("latitude")==null?0:Double.parseDouble(tMap.get("latitude")+"");
+					} catch (Exception e) {
+					}
+					if(longitudeF != 0 && latitudeF != 0){
+						areaBean.setTotalLongitude(areaBean.getTotalLongitude()+longitudeF);
+						areaBean.setTotalLatitude(areaBean.getTotalLatitude()+latitudeF);
+						areaBean.setCount(areaBean.getCount()+1);
+						areaBean.setIds(id);
+						areaMap.put(currentArea, areaBean);
+					}else{
+						continue;
+					}
+					
 				}
 			}
 				
@@ -295,6 +334,8 @@ public class AppService {
 				sMap.put("text", entry.getKey());
 				sMap.put("longitude", areaBean.getTotalLongitude()/areaBean.getCount());
 				sMap.put("latitude", areaBean.getTotalLatitude()/areaBean.getCount());
+				sMap.put("ids", areaBean.getIds());
+				sMap.put("totalitem", areaBean.getCount());
 				sList.add(sMap);
 				sMap = new HashMap<String, Object>();
 			}
@@ -303,6 +344,24 @@ public class AppService {
 		}
 		return null;
 	}
+	public List<Map<String, Object>> turnback(String cacheKey,String key,String currentLevel){
+		List<Map<String, Object>> resultList = cacheMap.get(cacheKey);
+		Map<String, Object> map = new HashMap<String, Object>();
+		String fatherKey = "";
+		String fatherLvl = preMap.get(currentLevel);
+		for(int i=0;i<resultList.size();i++){
+			map = resultList.get(i);
+			if(key.equals(map.get(currentLevel))){
+				fatherKey = map.get(fatherLvl)+"";
+				break;
+			}
+		}
+		List<Map<String, Object>> list = this.generateCod(fatherKey, resultList, cacheKey, fatherLvl, currentLevel);
+		return list;
+	}
+	
+	
+	
 	public List<Map<String,Object>> getMapInfo_bak20180102(String projectId,Map<String,List<String>> param){
 		String attriSql = " select attribute_index from project_attribute where id = ? ";
 		List<Map<String, Object>> list = new ArrayList<Map<String,Object>>();
