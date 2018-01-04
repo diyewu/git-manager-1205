@@ -27,6 +27,7 @@ import com.google.common.base.Joiner;
 import com.xz.common.ServerResult;
 import com.xz.entity.AppMenu;
 import com.xz.entity.AreaBean;
+import com.xz.model.json.JsonModel;
 
 @Service
 @Transactional
@@ -335,6 +336,8 @@ public class AppService {
 				sMap.put("longitude", areaBean.getTotalLongitude()/areaBean.getCount());
 				sMap.put("latitude", areaBean.getTotalLatitude()/areaBean.getCount());
 				sMap.put("ids", areaBean.getIds());
+				sMap.put("preKey", key);
+				sMap.put("preLevel", currentLevel);
 				sMap.put("totalitem", areaBean.getCount());
 				sList.add(sMap);
 				sMap = new HashMap<String, Object>();

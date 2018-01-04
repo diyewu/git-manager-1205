@@ -104,6 +104,7 @@ public class ProjectServices {
 				}
 			}
 		}
+		insertOperateHistory(session, type, msg);
 		return projectId;
 	}
 	public boolean checkSetImg(String projectId){

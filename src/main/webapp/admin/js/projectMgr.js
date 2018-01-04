@@ -442,7 +442,8 @@
 	    							}
 	    						},
 	    						failure : function(form, action) {
-	    							Ext.Msg.alert("Error",'上传失败！',function(){  
+	    							var data = Ext.decode(action.response.responseText);
+	    							Ext.Msg.alert("Error",data.msg,function(){  
 		    							newWin.close();
 		    							reloadData();
 	    							});

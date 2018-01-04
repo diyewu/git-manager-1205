@@ -25,6 +25,10 @@ public class UserLogin {
     
     private String realName;
     
+    private String enableTime;
+    
+    private String disableTime;
+    
 
     public String getId() {
         return id;
@@ -121,5 +125,21 @@ public class UserLogin {
 	public void setIsAllowWeblogin(Integer isAllowWeblogin) {
 		this.isAllowWeblogin = isAllowWeblogin;
 	}
-    
+
+	public String getEnableTime() {
+		return enableTime;
+	}
+
+	public void setEnableTime(String enableTime) {
+		this.enableTime = enableTime;
+	}
+
+	public String getDisableTime() {
+		return disableTime;
+	}
+
+	public void setDisableTime(String disableTime) {
+		this.disableTime = disableTime;
+	}
+	
 }

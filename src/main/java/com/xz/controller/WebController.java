@@ -1,6 +1,10 @@
 package com.xz.controller;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -69,10 +73,29 @@ public class WebController extends BaseController{
 				String userId = userInfo.get(0).get("id")+"";
 				String userRole = userInfo.get(0).get("user_role")+"";
 				String userRealName = userInfo.get(0).get("real_name")+"";
-				session.setAttribute(SessionConstant.WEB_USER_ID, userId);
-				session.setAttribute(SessionConstant.WEB_USER_NAME, userName);
-				session.setAttribute(SessionConstant.WEB_USER_ROLE, userRole);
-				session.setAttribute(SessionConstant.WEB_USER_REAL_NAME, userRealName);
+				
+				String enableTime = userInfo.get(0).get("enable_time")+"";
+				String disableTime = userInfo.get(0).get("disable_time")+"";
+				if(StringUtils.isNotBlank(enableTime) && StringUtils.isNotBlank(disableTime)){
+					Date d = new Date();
+					DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+					try {
+						df.parse(enableTime);
+						df.parse(disableTime);
+						if(d.getTime() < df.parse(enableTime).getTime() || d.getTime() > df.parse(disableTime).getTime() ){
+							msg = "您好，您的账户已经失效，如需继续使用，请联系管理员。";
+						}
+					} catch (ParseException e) {
+					}
+				}else{
+					msg = "您好，您的账户已经失效，如需继续使用，请联系管理员。";
+				}
+				if(msg == null){
+					session.setAttribute(SessionConstant.WEB_USER_ID, userId);
+					session.setAttribute(SessionConstant.WEB_USER_NAME, userName);
+					session.setAttribute(SessionConstant.WEB_USER_ROLE, userRole);
+					session.setAttribute(SessionConstant.WEB_USER_REAL_NAME, userRealName);
+				}
 			}else{
 				msg = "用户名或密码错误！";
 			}
@@ -274,9 +297,9 @@ public class WebController extends BaseController{
 	 * @param request
 	 * @return
 	 */
-	@RequestMapping("getFatherMapInfoByKey")
+	@RequestMapping("getPreMapInfoByKey")
 	@ResponseBody
-	public JsonModel getFatherMapInfoByKey(HttpServletRequest request){
+	public JsonModel getPreMapInfoByKey(HttpServletRequest request){
 		HttpSession session = request.getSession(); 
 		String userRole = session.getAttribute(SessionConstant.WEB_USER_ROLE)+"";
 		

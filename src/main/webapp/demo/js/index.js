@@ -6,8 +6,8 @@
 	var _currentLevel;
 	var _nextLevel;
 	var _ids;
+	var divIdIndex = 0;
 	$(document).ready(function() { 
-		document.title = 'xxxxxx';
 		// 百度地图API功能
 		initMap();
     	//===================
@@ -46,6 +46,7 @@
         ComplexCustomOverlay.prototype.initialize = function(map){
           this._map = map;
           var div = this._div = document.createElement("div");
+          div.id = "_creatdivid"+divIdIndex;
           div.style.borderRadius="4px";
           div.style.boxShadow="1px 1px 2px 1px rgba(0, 0, 0, 0.24)";
 //          div.style.background="rgba(57, 172, 106, 0.98)";
@@ -111,7 +112,6 @@
         }
     	//自定义覆盖物*************************************
     	
-    	
     }); 
 	
 	function initProjectMarker(){
@@ -127,10 +127,14 @@
 			}
 		},'json');
 	}
-	
+	var overlays = new Array();
 	function generateMarker(array,level){
+		for(var k in overlays){
+			map.removeOverlay(overlays[k]);
+		}
     	var pt = null;
     	var k = 0;
+    	_level = level;
     	for (var i in array) {
     		pt = new BMap.Point(array[i].longitude , array[i].latitude);
 			if(k == 0){
@@ -140,11 +144,13 @@
 					map.centerAndZoom(pt, 19);
 				}
 			}
-    	   var marker = new BMap.Marker(pt);
-    	   var mouseoverTxt = array[i].key + " " + array[i].totalitem + "点" ;
+//    	   var marker = new BMap.Marker(pt);
+    	   var mouseoverTxt = array[i].key + " " + array[i].totalitem + "条问题点" ;
     	   var myCompOverlay = new ComplexCustomOverlay(pt, array[i].key,mouseoverTxt);
+    	   divIdIndex++;
     	   map.addOverlay(myCompOverlay);
-    	   marker.tkey = array[i].key;
+    	   overlays.push(myCompOverlay);
+//    	   marker.tkey = array[i].key;
     	   if(array[i].nextLevel){
 	    	   (function() {  
 	    		    var key = array[i].key;
@@ -174,10 +180,8 @@
 		_cacheKey = cacheKey;
 		_currentLevel = currentLevel;
 		_nextLevel = nextLevel;
-		_level = map.getZoom();
 		_ids = ids;
 		
-	   	initMap();
 		$.post(path+"/webctrl/getMapInfoByKey/", 
 		{
 			key:key,
@@ -188,26 +192,46 @@
 		function(result){
 			if(result.success == true){
 				var data = result.data;
-				generateMarker(data,level+1);
+//				console.log(data);
+				generateMarker(data,level+2);
 			}else {
 				 
 			}
 		},'json');
 	}
 	function showPreLevel(level,key,cacheKey,currentLevel){
-		initMap();
-		$.post(path+"/webctrl/getFatherMapInfoByKey/", 
+		_level = level-2;
+//		initMap();
+//		map.reset();
+		$.post(path+"/webctrl/getPreMapInfoByKey/", 
 		{
 			key:key,
 			cacheKey:cacheKey,
 			currentLevel:currentLevel
 		},
 		function(result){
+//			console.log(result);
 			if(result.success == true){
 				var data = result.data;
-				_key = data[0].key;
-				console.log(_key);
-				generateMarker(data,level-1);
+				if(data){
+					_key = data[0].preKey;
+					_currentLevel = data[0].preLevel;
+//					console.log(data);
+					generateMarker(data,level-2);
+					var ids ="";
+					for (var i in data) {
+						ids = ids + data[i].ids+",";
+					}
+					showInfo(ids);
+				}else{
+					showNextLevel(10, "", _cacheKey, _currentLevel, _nextLevel, _ids);
+					if ($('.expander').hasClass("fadeOut")) {
+						$('#autoShowList').trigger("click");
+					}
+					$(".item-wrap").empty();
+					$('#finditemlength').html(0);
+					
+				}
 			}else {
 				
 			}
@@ -219,8 +243,13 @@
 		{
 		},
 		function(result){
-			if(result.success == true){//登陆成功
+			if(result.success == true){
+				var kk = 0;
 				$.each(result.data, function (index, obj) {
+					if(kk == 0){
+						document.title = obj.menu_name;
+					}
+					kk++;
 	               var lis = "";
 	               trs = "<li id=\""+obj.id+"\"><span class=\"text\">"+obj.menu_name+"&nbsp;&nbsp;</span></li>";
 	               $(".first-info-list").append(trs);
@@ -653,7 +682,6 @@ function showDetail(title,subhead,imgSrc,detail1,detail2,detail3,detail4){
 
 
 function showInfo(ids){
-//	console.log("ids="+ids);
 	if ($('.expander').hasClass("fadeIn")) {
 		$('#autoShowList').trigger("click");
 	}
@@ -674,6 +702,9 @@ function showInfo(ids){
 					   "检查时间："+obj.check_time,"照片编号："+obj.img_url);
                $(".item-wrap").append(htm);
 	        });
+			$("#container").viewer({
+				
+			});
 		}else {
 		}
 	},'json');
@@ -682,9 +713,9 @@ function showInfo(ids){
 function generateRightItem(title,subhead,imgSrc,detail1,detail2,detail3){
 	var html = "";
 	html += "<div class=\"list-item\" >";
-	html += "	<img alt=\"\" onerror=\"this.src='./img/white1.png';this.onerror=null;\"	src=\""+imgSrc+"\">";
+	html += "	<img alt=\""+title+"\" onerror=\"this.src='./img/white1.png';this.onerror=null;\" data-original=\""+imgSrc+"\"	src=\""+imgSrc+"\">";
 	html += "	<div class=\"right-info\">";
-	html += "		<div style='cursor: pointer;' onClick=\"showDetail('"+title+"','"+subhead+"','"+imgSrc+"','"+detail1+"','"+detail2+"','"+detail3+"')\">";
+	html += "		<div style='cursor: pointer;'  onClick=\"showDetail('"+title+"','"+subhead+"','"+imgSrc+"','"+detail1+"','"+detail2+"','"+detail3+"')\">";
 	html += "			<span class=\"title\"> <a>"+title+"</a>";
 	html += "			</span> <span class=\"villa-name\" >"+subhead+"</span>";
 //	html += "			<span class=\"sale-status\" >正常</span>";
@@ -709,13 +740,13 @@ function generateRightItem(title,subhead,imgSrc,detail1,detail2,detail3){
 
 function turnback(){
 //	generateMarker(_data, _level);
-	console.log(_key);
-	console.log(_cacheKey);
-	console.log(_currentLevel);
-	console.log(_nextLevel);
-	console.log(_level);
-	if("first_area" == _currentLevel){
-		showNextLevel(_level-1, "", _cacheKey, _currentLevel, _nextLevel, _ids);
+//	console.log(_key);
+//	console.log(_cacheKey);
+//	console.log(_currentLevel);
+//	console.log(_nextLevel);
+//	console.log(_level);
+	if(!_key){
+		return null;
 	}else{
 		showPreLevel(_level, _key, _cacheKey, _currentLevel);
 	}

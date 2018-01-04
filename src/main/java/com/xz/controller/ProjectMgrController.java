@@ -39,7 +39,7 @@ public class ProjectMgrController extends BaseController {
     private CustomConfig customConfig; 
 	
 	@Autowired
-	private ProjectServices peojectServices;
+	private ProjectServices projectServices;
 	
 	
 	ExecutorService threadPool = Executors.newCachedThreadPool();
@@ -68,10 +68,10 @@ public class ProjectMgrController extends BaseController {
 	    	String resp = "";
 	    	try {
 	    		if(zipFile != null && StringUtils.isNotBlank(webProjectId)){
-	    			peojectServices.addRelateImg(session,webProjectId, zipFile, desPath);;
+	    			projectServices.addRelateImg(session,webProjectId, zipFile, desPath);;
 	    		}
 	    		if(xlsFile != null){
-	    			peojectServices.importProjectData(session, xlsFile, title,createUser);
+	    			projectServices.importProjectData(session, xlsFile, title,createUser);
 	    		}
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -93,65 +93,69 @@ public class ProjectMgrController extends BaseController {
 		String webProjectId = request.getParameter("projrctId");
 		String title = request.getParameter("importTitle");
 		String comment = request.getParameter("importComment");
-		CommonsMultipartResolver multipartResolver = new CommonsMultipartResolver(request.getSession().getServletContext());
-		if (multipartResolver.isMultipart(request)) {
-			MultipartHttpServletRequest multiRequest = (MultipartHttpServletRequest) request;
-			Iterator iter = multiRequest.getFileNames();
-			File xlsFile = null;
-			String xlsPath = "";
-			File zipFile = null;
-			String zipPath = "";
-			String desPath = "";//解压路径
-			while (iter.hasNext()) {
-				// 一次遍历所有文件
-				MultipartFile file = multiRequest.getFile(iter.next().toString());
-				if (file != null) {
-//					String path = "E:/springUpload" + file.getOriginalFilename();
-					SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
-					Date d = new Date();  
-			        String dateNowStr = sdf.format(d);
-			        String uploadPath = customConfig.getClientFileUpladPath()+File.separator+dateNowStr;
-			        File uploadPathFile =new File(uploadPath);
-					if(!uploadPathFile.exists() && !uploadPathFile.isDirectory() ){
-						uploadPathFile.mkdir();
+		try{
+			CommonsMultipartResolver multipartResolver = new CommonsMultipartResolver(request.getSession().getServletContext());
+			if (multipartResolver.isMultipart(request)) {
+				MultipartHttpServletRequest multiRequest = (MultipartHttpServletRequest) request;
+				Iterator iter = multiRequest.getFileNames();
+				File xlsFile = null;
+				String xlsPath = "";
+				File zipFile = null;
+				String zipPath = "";
+				String desPath = "";//解压路径
+				while (iter.hasNext()) {
+					// 一次遍历所有文件
+					MultipartFile file = multiRequest.getFile(iter.next().toString());
+					if (file != null) {
+	//					String path = "E:/springUpload" + file.getOriginalFilename();
+						SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+						Date d = new Date();  
+				        String dateNowStr = sdf.format(d);
+				        String uploadPath = customConfig.getClientFileUpladPath()+File.separator+dateNowStr;
+				        File uploadPathFile =new File(uploadPath);
+						if(!uploadPathFile.exists() && !uploadPathFile.isDirectory() ){
+							uploadPathFile.mkdir();
+						}
+						//xls
+						String path=customConfig.getClientFileUpladPath()+File.separator+dateNowStr+File.separator+new Date().getTime()+file.getOriginalFilename();
+						// 上传
+						file.transferTo(new File(path));
+						if(StringUtils.isNotBlank(webProjectId)){
+							if((file.getOriginalFilename()).contains(".zip")){
+								zipFile = new File(path);
+								desPath = uploadPath+File.separator+zipFile.getName();
+							}
+						}else{
+							if((file.getOriginalFilename()).contains(".xls")){//上传EXCEL文件
+								xlsFile = new File(path);
+								xlsPath = path;
+							}
+						}
 					}
-					//xls
-					String path=customConfig.getClientFileUpladPath()+File.separator+dateNowStr+File.separator+new Date().getTime()+file.getOriginalFilename();
-					// 上传
-					file.transferTo(new File(path));
-					if(StringUtils.isNotBlank(webProjectId)){
-						if((file.getOriginalFilename()).contains(".zip")){
-							zipFile = new File(path);
-							desPath = uploadPath+File.separator+zipFile.getName();
+	
+				}
+				if(xlsFile != null || zipFile != null){
+					if(zipFile != null){
+						if(StringUtils.isBlank(webProjectId)){
+							msg = "项目参数有误！";
+						}else{
+							if(!projectServices.checkSetImg(webProjectId)){
+								msg = "请先设置项目图片属性，再提交图片数据！";
+							}
 						}
-					}else{
-						if((file.getOriginalFilename()).contains(".xls")){//上传EXCEL文件
-							xlsFile = new File(path);
-							xlsPath = path;
-						}
+					}
+					if(msg == null){
+						//线程处理
+						RecCallable cb = new RecCallable(session, xlsFile, title, userId,zipFile,desPath,webProjectId);
+						threadPool.submit(cb);
 					}
 				}
-
 			}
-			if(xlsFile != null || zipFile != null){
-				if(zipFile != null){
-					if(StringUtils.isBlank(webProjectId)){
-						msg = "项目参数有误！";
-					}else{
-						if(!peojectServices.checkSetImg(webProjectId)){
-							msg = "请先设置项目图片属性，再提交图片数据！";
-						}
-					}
-				}
-				if(msg == null){
-					//线程处理
-					RecCallable cb = new RecCallable(session, xlsFile, title, userId,zipFile,desPath,webProjectId);
-					threadPool.submit(cb);
-				}
-			}
+			long endTime = System.currentTimeMillis();
+		}catch(Exception e){
+			e.printStackTrace();
+			msg = e.getMessage();
 		}
-		long endTime = System.currentTimeMillis();
-		System.out.println("方法三的运行时间：" + String.valueOf(endTime - startTime) + "ms");
 		map.put("success", "true");
 		if (msg == null) {
 			map.put("i_type", "success");
@@ -179,7 +183,7 @@ public class ProjectMgrController extends BaseController {
 		if(StringUtils.isNotBlank(limitParam)){
 			limit = Integer.parseInt(limitParam);
 		}
-		Page<Map<String, Object>> page = peojectServices.getProjectMain(projectName, start, limit, startDate, endDate);
+		Page<Map<String, Object>> page = projectServices.getProjectMain(projectName, start, limit, startDate, endDate);
 		resultSuccess(null, page.getResult(), page.getTotalCount(),response);
 	}
     @RequestMapping("listAttr")
@@ -195,7 +199,7 @@ public class ProjectMgrController extends BaseController {
     	if(StringUtils.isNotBlank(limitParam)){
     		limit = Integer.parseInt(limitParam);
     	}
-    	Page<Map<String, Object>> page = peojectServices.getProjectAttr(projectId, start, limit);
+    	Page<Map<String, Object>> page = projectServices.getProjectAttr(projectId, start, limit);
     	resultSuccess(null, page.getResult(), page.getTotalCount(),response);
     }
     
@@ -217,7 +221,7 @@ public class ProjectMgrController extends BaseController {
 					id = pMap.get("id")+"";
 					typeName = pMap.get("type_name")+"";
 					infoTypeName = pMap.get("info_type_name")+"";
-					peojectServices.updateAttrType(id, typeName,infoTypeName);
+					projectServices.updateAttrType(id, typeName,infoTypeName);
 				}
 			}
 		}else{
@@ -238,7 +242,7 @@ public class ProjectMgrController extends BaseController {
     public void getAttrType(HttpServletRequest request,HttpServletResponse response) throws JsonParseException, JsonMappingException, IOException{
     	String type = request.getParameter("type");
     	int typeInt = type == null?0:Integer.parseInt(type);
-    	Page<Map<String, Object>> page = peojectServices.getAttrType(typeInt);
+    	Page<Map<String, Object>> page = projectServices.getAttrType(typeInt);
     	resultSuccess(null, page.getResult(), page.getTotalCount(),response);
     }
     @RequestMapping("setAttrActive")
@@ -250,14 +254,14 @@ public class ProjectMgrController extends BaseController {
     	String json = request.getParameter("json");
     	String projectId = request.getParameter("projectId");
     	if(StringUtils.isNotBlank(json)){
-    		List<Map<String, Object>> olist = peojectServices.getAttrInfoByProjectId(projectId);
+    		List<Map<String, Object>> olist = projectServices.getAttrInfoByProjectId(projectId);
     		List<Map<String, Object>> paramList = mapper.readValue(json, List.class);
     		Map<String, Object> pMap = new HashMap<String, Object>();
     		List<String> addList = new ArrayList<String>();
     		String id = "";
     		if(paramList != null && paramList.size() > 0 && olist != null && olist.size() > 0){
     			//有更改，先全部删除项目相关condition，并把attribute初始化,再添加新选择condition
-    			peojectServices.delConditionByProjectId(projectId);
+    			projectServices.delConditionByProjectId(projectId);
     			for(int i=0;i<paramList.size();i++){
     				pMap = paramList.get(i);
     				id = pMap.get("id")+"";
@@ -265,9 +269,9 @@ public class ProjectMgrController extends BaseController {
     			}
     			if(addList != null && addList.size()>0){
     				for(String attrId:addList){
-    					peojectServices.setAttrActive(attrId,1);
+    					projectServices.setAttrActive(attrId,1);
     				}
-    				peojectServices.addCondition(addList,projectId);
+    				projectServices.addCondition(addList,projectId);
     			}
     		}
     	}else{
@@ -291,7 +295,7 @@ public class ProjectMgrController extends BaseController {
     	String json = request.getParameter("json");
     	String projectId = request.getParameter("projectId");
     	if(StringUtils.isNotBlank(json)){
-    		List<Map<String, Object>> olist = peojectServices.getAttrInfoByProjectId(projectId);
+    		List<Map<String, Object>> olist = projectServices.getAttrInfoByProjectId(projectId);
     		List<Map<String, Object>> paramList = mapper.readValue(json, List.class);
     		Map<String, Object> pMap = new HashMap<String, Object>();
     		String id = "";
@@ -330,15 +334,15 @@ public class ProjectMgrController extends BaseController {
     			} 
     			if(addList != null && addList.size()>0){
     				for(int i=0;i<addList.size();i++){//添加筛选条件
-    					peojectServices.setAttrActive(addList.get(i),1);
+    					projectServices.setAttrActive(addList.get(i),1);
     				}
-    				peojectServices.addCondition(addList,projectId);
+    				projectServices.addCondition(addList,projectId);
     			}
     			if(delList != null && delList.size()>0){
     				for(int i=0;i<delList.size();i++){//删除筛选条件
-    					peojectServices.setAttrActive(delList.get(i),0);
+    					projectServices.setAttrActive(delList.get(i),0);
     				}
-    				peojectServices.delCondition(delList);
+    				projectServices.delCondition(delList);
     			}
     		}
     	}else{
@@ -362,7 +366,7 @@ public class ProjectMgrController extends BaseController {
     	String projectId = request.getParameter("id");
     	if(StringUtils.isNotBlank(projectId)){
     		try {
-				peojectServices.deleteProjectById(projectId);
+				projectServices.deleteProjectById(projectId);
 			} catch (Exception e) {
 				e.printStackTrace();
 				msg = e.getMessage();

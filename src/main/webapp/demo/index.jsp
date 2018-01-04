@@ -7,10 +7,12 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>主页</title>
+<title>加载中</title>
+<link rel="icon" href="img/title.png" type="img/x-ico" />
 <script src="js/jquery-3.2.1.min.js"></script>
-<link href="plugins/bootstrap-3.3.7-dist/css/bootstrap.min.css"
-	rel="stylesheet">
+
+<link href="plugins/bootstrap-3.3.7-dist/css/bootstrap.min.css"	rel="stylesheet">
+<link href="css/viewer.min.css"	rel="stylesheet">
 <link href="plugins/font-awesome-4.7.0/css/font-awesome.min.css"
 	rel="stylesheet">
 <script src="plugins/bootstrap-3.3.7-dist/js/bootstrap.min.js"></script>
@@ -45,7 +47,6 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
     var map ;
     var path = "<%=path%>";
     var basePath = "<%=basePath%>";
-    
 	</script>
 </head>
 <jsp:include page="permission.jsp">
@@ -259,7 +260,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
                     <!-- <span class="sort" >&nbsp;&nbsp;主页<i class="fa fa-home"  aria-hidden="true">&nbsp;&nbsp;</i></span> -->
                     <!-- <span class="sort on" data-dianji="default/排序">默认</span> -->
 				</div>
-				<div class="item-wrap" style="overflow-x:hidden;overflow-y:auto;">
+				<div class="item-wrap" id="right-item-wrap" style="overflow-x:hidden;overflow-y:auto;">
 					<!-- 
 					<div class="list-item" @click="showDetail()">
 						<img alt="" onerror="this.src='img/mz.jpg';this.onerror=null;"	src="img/mz.jpg">
@@ -329,8 +330,10 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 			</div>
 		</div>
 </body>
+<script src="js/viewer-jquery.min.js"></script>
 <script src="js/vue.min.js"></script>
 <script src="js/index.js"></script>
 <script src="plugins/earthmap/js/classie.js"></script>
 <script src="plugins/slider/wySilder.min.js" type="text/javascript"></script>
+
 </html>

@@ -24,6 +24,8 @@
 					{name : 'real_name'},
 					{name : 'allow_phone_size'},
 					{name : 'use_phone_size'},
+					{name : 'enable_time'},
+					{name : 'disable_time'},
 					{name : 'id'}
 				]
 			})
@@ -38,8 +40,10 @@
             	{header:"用户名",align:'center',dataIndex:"user_name",sortable:true}, 
 	            {header:"角色类别",align:'center',dataIndex:"user_role",sortable:true},
 	            {header:"用户别名",align:'center',dataIndex:"real_name",sortable:true},
-	            {header:"允许登陆手机数",align:'center',dataIndex:"allow_phone_size",sortable:true},
-	            {header:"已用手机数",align:'center',dataIndex:"use_phone_size",sortable:true},
+	            {header:"启用时间",align:'center',dataIndex:"enable_time",sortable:true},
+	            {header:"禁止时间",align:'center',dataIndex:"disable_time",sortable:true},
+	            {header:"允许登陆手机数",align:'center',dataIndex:"allow_phone_size",width:50,sortable:true},
+	            {header:"已用手机数",align:'center',dataIndex:"use_phone_size",width:50,sortable:true},
 	            {header:"操作",align:'center',dataIndex:"id",width:50,
 	            renderer: function (value, meta, record) {
 //	            	console.log(record);
@@ -49,7 +53,9 @@
 							+ record.get('user_role') + "','"
 							+ record.get('user_role_id') + "','"
 							+ record.get('real_name') + "','"
-							+ record.get('allow_phone_size')
+							+ record.get('allow_phone_size')+ "','"
+							+ record.get('enable_time')+ "','"
+							+ record.get('disable_time')
 							+ "');\" type='button' value='编辑' width ='15px'/>&nbsp;&nbsp;"; 
 
 										     var deleteBtn = "<input id = 'bt_delete_" + record.get('id')
@@ -217,7 +223,7 @@
 		}});
 		
 	}
-    function showEditUser(_userId,_userName,_userRoleName,_userRole,_realName,_phoneval){
+    function showEditUser(_userId,_userName,_userRoleName,_userRole,_realName,_phoneval,_enableTime,_disableTime){
     	var isHidden = true;
     	var pwdval = "******";
     	if(typeof(_userId) == "undefined" || _userId  == ""){
@@ -255,6 +261,9 @@
 	        if (_userRole)  
 	        	co.setValue(_userRole);  
 	    }); 
+		//*******************启用禁用时间
+		
+		//*******************启用禁用时间
     	var _fileForm =  new Ext.form.FormPanel({
             frame: true,
             autoHeight: true,
@@ -267,10 +276,61 @@
                {xtype:"textfield", width:180,id: "enewpwd",name: "enewpwd", fieldLabel: "用户密码",value:pwdval},
                {xtype:"textfield", width:180,id: "enrealName",name: "enrealName", fieldLabel: "用户别名",value:_realName},
                {xtype:"textfield", width:180,id: "phoneval",name: "phoneval", fieldLabel: "允许登录手机数",value:_phoneval},
+               {
+                   layout:'column', 
+                   style:"margin-bottom:5px",
+                   items:[  
+                	   {  
+                           columnWidth:.195,  
+                           items:[
+                        	   {
+                                   xtype : 'label',
+                                   text:"生效时间:"
+                        	   }
+                            ]  
+                          },
+                   {  
+                    columnWidth:.35, 
+                    items:[
+                    	{
+     					   xtype: "datefield",
+     					   id: "startdate",
+     					   name: "startdate",
+     					   fieldLabel: "开始日期",
+     					   editable: false,
+     					   emptyText: "--请选择开始日期--",
+     					   format: "Y-m-d",//日期的格式
+     					   altFormats: "Y/m/d|Ymd",
+     					   width: 150
+                    	}
+                     ]  
+                   },{  
+                       columnWidth:.35,  
+                       items:[
+                    	   {
+        					   xtype: "datefield",
+        					   id: "enddate",
+        					   name: "enddate",
+        					   fieldLabel: "结束日期",
+        					   editable: false,
+        					   emptyText: "--请选择结束日期--",
+        					   format: "Y-m-d",//日期的格式
+        					   altFormats: "Y/m/d|Ymd",
+        					   width: 150
+        				}
+                        ]  
+                      }  
+                   ]  
+                   },
                co
             ],
          });
-    	
+    	if(typeof(_enableTime) != "undefined" && _enableTime  != ""){
+    		Ext.getCmp('startdate').setValue(_enableTime);
+    	}
+    	if(typeof(_disableTime) != "undefined" && _disableTime  != ""){
+    		Ext.getCmp('enddate').setValue(_disableTime);
+    	}
     	var _importPanel = new Ext.Panel({
     		layout : "fit",
     		layoutConfig : {
@@ -285,7 +345,26 @@
     				var pwd = Ext.getCmp('enewpwd').getValue();
     				var realName = Ext.getCmp('enrealName').getValue();
     				var phone = Ext.getCmp('phoneval').getValue();
+    				var beginTime = Ext.getCmp('startdate').getValue();
+    				var endTime = Ext.getCmp('enddate').getValue();
+    				console.log(beginTime);
     				var role = co.getValue();
+    				if(typeof(beginTime) == "undefined" || beginTime  == ""){
+    					Ext.Msg.alert('提示', '请选择生效时间');
+    					return;
+    				}
+    				if(typeof(endTime) == "undefined" || endTime  == ""){
+    					Ext.Msg.alert('提示', '请选择生效时间');
+    					return;
+    				}
+    				
+    				if (beginTime && endTime) {
+	                    if(endTime < beginTime){
+	                    	Ext.MessageBox.alert("提示","生效结束时间不能早于开始时间！");
+	                    	return;
+	                    }
+    				}
+    				
     				if(typeof(name) == "undefined" || name  == ""){
     					Ext.Msg.alert('提示', '请填写用户名');
     					return;
@@ -323,6 +402,8 @@
     						  userPwd:pwd,
     						  realName:realName,
     						  phoneSize:phone,
+    						  beginTime:beginTime,
+    						  endTime:endTime,
     						  userRole:role
     					  },
     					  success : function(response, options) {

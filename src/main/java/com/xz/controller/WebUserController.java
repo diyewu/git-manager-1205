@@ -204,9 +204,14 @@ public class WebUserController extends BaseController {
 		String realName = request.getParameter("realName");
 		String userRole = request.getParameter("userRole");
 		String phoneSize = request.getParameter("phoneSize");
+		
+		String beginTime = request.getParameter("beginTime") == null?"":request.getParameter("beginTime").substring(0, 10);
+		String endTime = request.getParameter("endTime")== null?"":request.getParameter("endTime").substring(0, 10);
+		
 		String msg = null;
 		if(!StringUtils.isNotBlank(userName) || !StringUtils.isNotBlank(userPwd) || 
-				!StringUtils.isNotBlank(userRole) || !StringUtils.isNotBlank(realName) || !StringUtils.isNotBlank(phoneSize)){
+				!StringUtils.isNotBlank(userRole) || !StringUtils.isNotBlank(realName) 
+				|| !StringUtils.isNotBlank(phoneSize) || StringUtils.isBlank(beginTime) || StringUtils.isBlank(endTime)){
 			msg = "参数有误!";
 		}
 		int role = 1;
@@ -233,7 +238,7 @@ public class WebUserController extends BaseController {
 					if (msg == null) {
 						try {
 //							userPwd = Md5Util.generatePassword(userPwd);
-							webUserService.addUser(userName, userPwd, role,realName,phoneSizeInt);
+							webUserService.addUser(userName, userPwd, role,realName,phoneSizeInt,beginTime,endTime);
 						} catch (Exception e) {
 							e.printStackTrace();
 							msg = e.getMessage();
@@ -256,6 +261,8 @@ public class WebUserController extends BaseController {
 					user.setRealName(realName);
 					user.setId(userId);
 					user.setAllowPhoneSize(phoneSizeInt);
+					user.setEnableTime(beginTime);
+					user.setDisableTime(endTime);
 					try {
 						webUserService.editUser(user);
 					} catch (Exception e) {
