@@ -7,6 +7,7 @@
 	var _nextLevel;
 	var _ids;
 	var divIdIndex = 0;
+	var viewer ;
 	$(document).ready(function() { 
 		// 百度地图API功能
 		initMap();
@@ -112,7 +113,24 @@
         }
     	//自定义覆盖物*************************************
     	
+        
     }); 
+	//图片查看插件**********************************************
+//	$(document).on('mousedown','.nullclass',function () {
+//		if($(this).attr('src')){
+//			$('.list-container').viewer(
+//					{
+//						'hidden': function (e) {
+//							console.log(e.type);
+//						},
+//					}
+//			);
+//		}
+//		else{
+//			return false;
+//		}
+//	});
+	//图片查看插件**********************************************
 	
 	function initProjectMarker(){
 		$.post(path+"/webctrl/getMapInfoByUserRole/", 
@@ -702,7 +720,7 @@ function showInfo(ids){
 					   "检查时间："+obj.check_time,"照片编号："+obj.img_url);
                $(".item-wrap").append(htm);
 	        });
-			$("#container").viewer({
+			viewer = new Viewer(document.getElementById('list-container-id'), {
 				
 			});
 		}else {
@@ -713,7 +731,7 @@ function showInfo(ids){
 function generateRightItem(title,subhead,imgSrc,detail1,detail2,detail3){
 	var html = "";
 	html += "<div class=\"list-item\" >";
-	html += "	<img alt=\""+title+"\" onerror=\"this.src='./img/white1.png';this.onerror=null;\" data-original=\""+imgSrc+"\"	src=\""+imgSrc+"\">";
+	html += "	<img alt=\""+title+"\" class=\"nullclass\" onerror=\"this.src='./img/white1.png';this.onerror=null;\" data-original=\""+imgSrc+"\"	src=\""+imgSrc+"\">";
 	html += "	<div class=\"right-info\">";
 	html += "		<div style='cursor: pointer;'  onClick=\"showDetail('"+title+"','"+subhead+"','"+imgSrc+"','"+detail1+"','"+detail2+"','"+detail3+"')\">";
 	html += "			<span class=\"title\"> <a>"+title+"</a>";

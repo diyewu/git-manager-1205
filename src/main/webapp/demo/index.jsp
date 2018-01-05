@@ -252,7 +252,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 			</div>
 			<div id="allmap" class="content"></div>
 			<div id="autoShowList" class="expander fadeOut" @click="expander()"></div>
-			<div class="list-container">
+			<div class="list-container" id ="list-container-id">
 				<div class="overlay" style="display: none;"></div>
 				<div class="list-header">
 					<span class="total-count">共<em id='finditemlength'>0</em>条信息</span>
@@ -330,7 +330,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 			</div>
 		</div>
 </body>
-<script src="js/viewer-jquery.min.js"></script>
+<script src="js/viewer.min.js"></script>
 <script src="js/vue.min.js"></script>
 <script src="js/index.js"></script>
 <script src="plugins/earthmap/js/classie.js"></script>
