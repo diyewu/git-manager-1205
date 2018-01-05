@@ -19,6 +19,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 			var _editForm;
 			//var newWin;
 		</script>
+		<script src="../js/jquery.js"></script>
 		<script type="text/javascript" src="../ext3/adapter/ext/ext-base.js"></script>
 		<script type="text/javascript" src="../ext3/ext-all.js"></script>
 		<script type="text/javascript" src="../ext3/locale/ext-lang-zh_CN.js"></script>

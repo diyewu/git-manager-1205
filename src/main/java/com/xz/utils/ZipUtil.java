@@ -49,8 +49,7 @@ public class ZipUtil {
 				String outPath = (descDir + zipEntryName).replaceAll("\\*", "/");
 
 				// 获取当前file的父路径,这才是文件夹
-				File file = new File(outPath.substring(0,
-						outPath.lastIndexOf('/')));
+				File file = new File(outPath.substring(0,outPath.lastIndexOf('/')));
 
 				// 判断路径是否存在,不存在则创建文件路径
 				if (!file.exists()) {
@@ -69,8 +68,6 @@ public class ZipUtil {
 				while ((len = in.read(buf1)) > 0) {
 					out.write(buf1, 0, len);
 				}
-				in.close();
-				out.close();
 			} catch (Exception e) {
 				e.printStackTrace();
 			} finally {

@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.xz.common.Page;
+import com.xz.utils.CreateExcelUtil;
 import com.xz.utils.ExcelReadUtils;
 import com.xz.utils.SortableUUID;
 import com.xz.utils.ZipUtil;
@@ -120,8 +121,18 @@ public class ProjectServices {
 	public void addRelateImg(HttpSession session,String projectId,File zipFile,String desPath) throws IOException{
 		String msg = null;
 		String sql = " select * from project_attribute where project_id = ? and attribute_type = 4 ";
+		String projectSql = " select * from project_main where id = ? ";
+		String filepath = "";
+		String tPath = "";
 		try {
 			List<Map<String, Object>> attrList = jdbcTemplate.queryForList(sql, projectId);
+			List<Map<String, Object>> proList = jdbcTemplate.queryForList(projectSql, projectId);
+			String projectName = "";
+			projectName = proList.get(0).get("project_name")+"";
+			List<List<Object>> exList = new ArrayList<List<Object>>();
+			List<Object> dList = new ArrayList<Object>();
+			dList.add(projectName);
+			exList.add(dList);
 			if (attrList != null && attrList.size() > 0) {
 				Map<String, String> map = new HashMap<String, String>();
 				String desPathLocal = desPath.split("\\.")[0];
@@ -158,9 +169,16 @@ public class ProjectServices {
 							tmap = remainList.get(i);
 							if(StringUtils.isBlank(tmap.get("img_path")==null?"":tmap.get("img_path")+"")){
 								remainPic += tmap.get("imgname")+",";
+								dList = new ArrayList<Object>();
+								dList.add(tmap.get("imgname"));
+								exList.add(dList);
 							}
 						}
 						msg = "以下图片名称没有匹配到图片：" + remainPic;
+						if(exList.size()>1){
+							tPath = desPathLocal + File.separator+System.currentTimeMillis()+".xlsx";
+							CreateExcelUtil.createExcelFile(tPath, exList);
+						}
 					}
 				} else {
 					msg = "请确认zip压缩包有正确数据！";
@@ -172,7 +190,7 @@ public class ProjectServices {
 			e.printStackTrace();
 			msg = e.getMessage();
 		}
-		operateHistoryService.insertOH(session, "18", msg, msg==null?1:0);
+		operateHistoryService.insertOH(session, "18", msg, msg==null?1:0,tPath);
 	}
 	
 	/**

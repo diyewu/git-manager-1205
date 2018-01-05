@@ -89,7 +89,6 @@ public class ProjectMgrController extends BaseController {
     	String userId = session.getAttribute("userId")+"";
     	Map<String, String> map = new HashMap<String, String>();
     	mapper = new ObjectMapper();
-		long startTime = System.currentTimeMillis();
 		String webProjectId = request.getParameter("projrctId");
 		String title = request.getParameter("importTitle");
 		String comment = request.getParameter("importComment");
@@ -151,7 +150,6 @@ public class ProjectMgrController extends BaseController {
 					}
 				}
 			}
-			long endTime = System.currentTimeMillis();
 		}catch(Exception e){
 			e.printStackTrace();
 			msg = e.getMessage();

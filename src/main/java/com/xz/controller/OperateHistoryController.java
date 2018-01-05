@@ -1,8 +1,12 @@
 package com.xz.controller;
 
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -14,6 +18,7 @@ import org.codehaus.jackson.map.JsonMappingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.xz.service.OperateHistoryService;
 
@@ -98,6 +103,81 @@ public class OperateHistoryController extends BaseController{
 		}catch(Exception e){
 			e.printStackTrace();
 		}
+	}
+	
+	
+	@RequestMapping("downloadExcelByid")
+	@ResponseBody
+	public void downloadExcelByid(HttpServletRequest request,HttpServletResponse response){
+        response.setHeader("Pragma", "No-cache"); 
+        response.setHeader("Cache-Control", "no-cache"); 
+        response.setDateHeader("Expires", 0); 
+        response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+        response.addHeader("Content-Disposition","inline; attachment; filename=" + System.currentTimeMillis()+".xlsx");
+        String detailId = request.getParameter("id");
+        if(StringUtils.isBlank(detailId)){
+        	return;
+        }
+        List<Map<String, Object>> list = operateHistoryService.getFilePath(detailId);
+        File excelFile = null;
+        if(list != null && list.size()>0){
+        	String path = list.get(0).get("downfile_path")==null?"":list.get(0).get("downfile_path")+"";
+        	if(StringUtils.isNotBlank(path)){
+        		excelFile = new File(path);
+        	}
+        }
+        if(excelFile != null){
+            OutputStream os = null;
+            FileInputStream fos = null;
+			try {
+				os = response.getOutputStream();
+				byte[] buffer = new byte[2048];
+				fos = new FileInputStream(excelFile.getPath());
+				int count;
+				while ((count = fos.read(buffer)) > 0) {
+					os.write(buffer, 0, count);
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			} finally{
+				try {
+					if (os != null)
+						os.close();
+					if (fos != null)
+					fos.close();
+				} catch (IOException e) {
+				}
+			}
+        }
+	}
+	@RequestMapping("checkDownloadExcelByid")
+	@ResponseBody
+	public void checkDownloadExcelByid(HttpServletRequest request,HttpServletResponse response){
+		String detailId = request.getParameter("id");
+		if(StringUtils.isBlank(detailId)){
+			return;
+		}
+		String msg = null;
+		Map<String ,String > map = new HashMap<String, String>();
+		List<Map<String, Object>> list = operateHistoryService.getFilePath(detailId);
+		File excelFile = null;
+		if(list != null && list.size()>0){
+			String path = list.get(0).get("downfile_path")==null?"":list.get(0).get("downfile_path")+"";
+			if(StringUtils.isNotBlank(path)){
+				excelFile = new File(path);
+			}
+		}
+		if(!excelFile.exists()){
+			msg = "文件不存在或文件丢失。";
+		}
+		
+		if(msg == null){
+			map.put("i_type", "success");
+		}else{
+			map.put("i_type", "error");
+			map.put("i_msg", msg);
+		}
+		this.printData(response, map);
 	}
 
 }
