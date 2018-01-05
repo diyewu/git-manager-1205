@@ -477,7 +477,8 @@ var vm = new Vue({
     				//TODO 解析坐标点到地图上
     				var data = result.data;
 //    				initMap();
-    				generateCluster(data);
+//    				generateCluster(data);
+    				generateMarker(data,12);
     				layer.close(layindex); 
     			}else {
     			}
