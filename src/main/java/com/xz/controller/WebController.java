@@ -279,12 +279,11 @@ public class WebController extends BaseController{
 		String userRole = session.getAttribute(SessionConstant.WEB_USER_ROLE)+"";
 		String cacheKey = request.getParameter("cacheKey");
 		String key = request.getParameter("key");
-		String nextLevel = request.getParameter("nextLevel");
 		String currentLevel = request.getParameter("currentLevel");
 		String msg = null;
 		List<Map<String, Object>> info = new ArrayList<Map<String,Object>>();
 		if(StringUtils.isNotBlank(userRole)){
-			info = appService.generateCod(key,AppService.cacheMap.get(cacheKey), cacheKey,currentLevel,nextLevel);
+			info = appService.generateCod(key,AppService.cacheMap.get(cacheKey), cacheKey,currentLevel);
 		}else{
 			msg = "尚未登陆！";
 		}

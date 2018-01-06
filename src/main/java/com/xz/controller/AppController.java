@@ -215,7 +215,7 @@ public class AppController extends BaseController{
 						param.put(AttriId, conditionList);
 					}
 				}
-				list = appService.getMapInfo(projectId, param,null,"first_area","second_area");
+//				list = appService.getMapInfo(projectId, param,null,"first_area","second_area");
 				if (list != null && list.size() > 0) {
 					info.addAll(list);
 				}

@@ -163,43 +163,60 @@
 				}
 			}
 //    	   var marker = new BMap.Marker(pt);
-    	   var mouseoverTxt = array[i].key + " " + array[i].totalitem + "条问题点" ;
-    	   var myCompOverlay = new ComplexCustomOverlay(pt, array[i].key,mouseoverTxt);
+    	   var mouseoverTxt = array[i].text + " 共" + array[i].totalitem + "条问题点" ;
+    	   var myCompOverlay = new ComplexCustomOverlay(pt, array[i].text,mouseoverTxt);
     	   divIdIndex++;
     	   map.addOverlay(myCompOverlay);
     	   overlays.push(myCompOverlay);
 //    	   marker.tkey = array[i].key;
-    	   if(array[i].nextLevel){
-	    	   (function() {  
-	    		    var key = array[i].key;
-		       		var cacheKey = array[i].cacheKey;
-		       		var currentLevel = array[i].currentLevel;
-		       		var nextLevel = array[i].nextLevel;
-		       		var ids = array[i].ids;
-		       		myCompOverlay.addEventListener("click", function(){
-	            	   showNextLevel(level,key,cacheKey,currentLevel,nextLevel,ids);
-	            	   showInfo(ids);
-	               });
-	           })();  
-    	   }else{
-    		   (function() {  
-    			    var ids = array[i].ids;
-		       		myCompOverlay.addEventListener("click", function(){
-	            	   showInfo(ids);
-	               });
-	           })(); 
-    	   }
+    	   (function() {  
+   		    	var key = array[i].key;
+	       		var cacheKey = array[i].cacheKey;
+	       		var currentLevel = array[i].currentLevel;
+	       		var nextLevel = array[i].nextLevel;
+	       		var ids = array[i].ids;
+	       		myCompOverlay.addEventListener("click", function(){
+	       			if(currentLevel != '6'){
+	       				showNextLevel(level,key,cacheKey,currentLevel,nextLevel,ids);
+	       			}
+	           	    showInfo(ids);
+	       		});
+          })();  
+//    	   if(array[i].nextLevel){
+//	    	   (function() {  
+//	    		    var key = array[i].key;
+//		       		var cacheKey = array[i].cacheKey;
+//		       		var currentLevel = array[i].currentLevel;
+//		       		var nextLevel = array[i].nextLevel;
+//		       		var ids = array[i].ids;
+//		       		myCompOverlay.addEventListener("click", function(){
+//	            	   showNextLevel(level,key,cacheKey,currentLevel,nextLevel,ids);
+//	            	   showInfo(ids);
+//	               });
+//	           })();  
+//    	   }else{
+//    		   (function() {  
+//    			    var ids = array[i].ids;
+//		       		myCompOverlay.addEventListener("click", function(){
+//	            	   showInfo(ids);
+//	               });
+//	           })(); 
+//    	   }
     	   k++;
     	}
 	}
 	
 	function showNextLevel(level,key,cacheKey,currentLevel,nextLevel,ids){
-		_key = key;
-		_cacheKey = cacheKey;
-		_currentLevel = currentLevel;
-		_nextLevel = nextLevel;
-		_ids = ids;
-		
+		if(key)
+			_key = key;
+		if(cacheKey)
+			_cacheKey = cacheKey;
+		if(currentLevel)
+			_currentLevel = currentLevel;
+		if(nextLevel)
+			_nextLevel = nextLevel;
+		if(ids)
+			_ids = ids;
 		$.post(path+"/webctrl/getMapInfoByKey/", 
 		{
 			key:key,
@@ -210,7 +227,6 @@
 		function(result){
 			if(result.success == true){
 				var data = result.data;
-//				console.log(data);
 				generateMarker(data,level+2);
 			}else {
 				 
@@ -219,8 +235,6 @@
 	}
 	function showPreLevel(level,key,cacheKey,currentLevel){
 		_level = level-2;
-//		initMap();
-//		map.reset();
 		$.post(path+"/webctrl/getPreMapInfoByKey/", 
 		{
 			key:key,
@@ -228,13 +242,11 @@
 			currentLevel:currentLevel
 		},
 		function(result){
-//			console.log(result);
 			if(result.success == true){
 				var data = result.data;
 				if(data){
 					_key = data[0].preKey;
 					_currentLevel = data[0].preLevel;
-//					console.log(data);
 					generateMarker(data,level-2);
 					var ids ="";
 					for (var i in data) {
