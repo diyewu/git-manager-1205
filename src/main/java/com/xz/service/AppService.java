@@ -651,6 +651,23 @@ public class AppService {
 	
 	
 	public List<Map<String, Object>> getCoordinateInfo(String detailId){
+		String attrSql = " SELECT pa.id, patt.alias_name, pa.attribute_index, pa.attribute_name FROM project_attribute pa INNER JOIN project_attribute_type patt ON pa.attribute_info_type = patt.id AND patt.type = 1 WHERE project_id = ( SELECT project_id FROM project_detail WHERE id = ? ) ORDER BY alias_name ";
+		List<Map<String, Object>> list = jdbcTemplate.queryForList(attrSql, detailId);
+		if(list == null || list.size()==0){
+			return null;
+		}
+		Map<String, Object> attrMap = new HashMap<String, Object>();
+		StringBuilder sb = new StringBuilder();
+		sb.append(" select ");
+		for (int i = 0; i < list.size(); i++) {
+			attrMap = list.get(i);
+			sb.append(" ext"+attrMap.get("attribute_index")+" as "+attrMap.get("alias_name")+"_key,");
+			sb.append("'"+attrMap.get("attribute_name")+"' as "+attrMap.get("alias_name")+"_value,");
+		}
+		sb.append(" id from project_detail where id = ? ");
+		return jdbcTemplate.queryForList(sb.toString(), detailId);
+	}
+	public List<Map<String, Object>> getCoordinateInfo_bak20180107(String detailId){
 		String attrSql = " SELECT pat.alias_name, attribute_index FROM project_attribute_type pat LEFT JOIN ( SELECT * FROM project_attribute WHERE project_id = ( SELECT project_id FROM project_detail WHERE id = ? )) pa ON pa.attribute_type = pat.id WHERE pat.alias_name IS NOT NULL ";
 		List<Map<String, Object>> list = jdbcTemplate.queryForList(attrSql, detailId);
 		if(list == null || list.size()==0){
