@@ -442,7 +442,8 @@
 	    							}
 	    						},
 	    						failure : function(form, action) {
-	    							Ext.Msg.alert("Error",'上传失败！',function(){  
+	    							var data = Ext.decode(action.response.responseText);
+	    							Ext.Msg.alert("Error",data.msg,function(){  
 		    							newWin.close();
 		    							reloadData();
 	    							});
@@ -494,6 +495,9 @@
    				type : 'string'
    			}, {
    				name : 'type_name',
+   				type : 'string'
+   			}, {
+   				name : 'info_type_name',
    				type : 'string'
    			}, {
    				name : 'attribute_type',
@@ -617,7 +621,7 @@
 		//数据库动态取下拉框数据
 		var typeStore = new Ext.data.Store({
 			proxy: new Ext.data.HttpProxy({
-				url : path + "/projectmgr/getAttrType"
+				url : path + "/projectmgr/getAttrType?type=0"
 			}),
 			reader: new Ext.data.JsonReader({
 				root : 'data',
@@ -625,13 +629,25 @@
 			})
 		});
 		typeStore.load();
+		//数据库动态取下拉框数据
+		var infoTypeStore = new Ext.data.Store({
+			proxy: new Ext.data.HttpProxy({
+				url : path + "/projectmgr/getAttrType?type=1"
+			}),
+			reader: new Ext.data.JsonReader({
+				root : 'data',
+				fields:['value','text']
+			})
+		});
+		infoTypeStore.load();
+		
         var sacolumn=new Ext.grid.ColumnModel( 
             [ 
             	new Ext.grid.RowNumberer(),
             	sasm,
             	{header:"项目名称",align:'center',dataIndex:"project_name",sortable:true}, 
 	            {header:"属性名称",align:'center',dataIndex:"attribute_name",sortable:true},
-	            {header:"设置属性信息(双击)",align:'center',dataIndex:"type_name",
+	            {header:"设置必要属性信息(双击)",align:'center',dataIndex:"type_name",
 	            	editor : new Ext.form.ComboBox({//编辑的时候变成下拉框。
 	                    triggerAction : "all",
 	                    editable: false,
@@ -645,6 +661,21 @@
 	                    lazyRender : true,
 	                    width : 12
 	                   })
+	            },
+	            {header:"设置显示属性信息(双击)",align:'center',dataIndex:"info_type_name",
+	            	editor : new Ext.form.ComboBox({//编辑的时候变成下拉框。
+	            		triggerAction : "all",
+	            		editable: false,
+//	                    valueField:'value',
+	            		displayField:'text',
+//	                    store : ["无","经度","维度","详细地址","图片编号"],
+	            		store : infoTypeStore,
+	            		resizable : true,
+	            		mode : 'local',
+	            		selectOnFocus:true,//用户不能自己输入,只能选择列表中有的记录
+	            		lazyRender : true,
+	            		width : 12
+	            	})
 	            } 
             ] 
         ); 

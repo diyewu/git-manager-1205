@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -38,22 +39,32 @@ public class UserLoginController {
 	@RequestMapping("checkUser")
 	@ResponseBody
 	public JsonModel checkUser(HttpServletRequest request,HttpServletResponse response) {
+		String msg = null;
 		HttpSession session=request.getSession();
 		String name = request.getParameter("userName");
 		String pwd = request.getParameter("userPwd");
+		if(StringUtils.isBlank(name) || StringUtils.isBlank(pwd)){
+			msg = "用户名或密码参数有误！";
+		}
 		UserLogin user = new UserLogin();
-		user.setUserName(name);
-		user.setUserPassword(pwd);
-		UserLogin userLogin = userLoginService.checkUserExist(user);
-		session.setAttribute("isLogin", "0");
-		session.setAttribute("userName", userLogin.getUserName());
-		Map<String, String> condition = new HashMap<String, String>();
-		condition.put("userName", userLogin.getUserName());
-		condition.put("userPwd", userLogin.getUserPassword());
-		session.setAttribute("userRole", userLogin.getUserRole());
-		session.setAttribute("userRoleId", userLogin.getUserRole());
-		session.setAttribute("userId", userLogin.getId());
-		return new JsonModel(true, userLogin);
+		if(msg == null){
+			user.setUserName(name);
+			user.setUserPassword(pwd);
+			UserLogin userLogin = userLoginService.checkUserExist(user);
+			if(userLogin != null){
+				session.setAttribute("isLogin", "0");
+				session.setAttribute("userName", userLogin.getUserName());
+				Map<String, String> condition = new HashMap<String, String>();
+				condition.put("userName", userLogin.getUserName());
+				condition.put("userPwd", userLogin.getUserPassword());
+				session.setAttribute("userRole", userLogin.getUserRole());
+				session.setAttribute("userRoleId", userLogin.getUserRole());
+				session.setAttribute("userId", userLogin.getId());
+			}else{
+				msg = "用户名或密码错误！";
+			}
+		}
+		return new JsonModel(msg == null,msg);
 	}
 	
 	

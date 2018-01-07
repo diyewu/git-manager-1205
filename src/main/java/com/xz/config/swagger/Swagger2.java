@@ -32,8 +32,8 @@ public class Swagger2 {
 		return new ApiInfoBuilder()
 				.title("GIS APP APIs")
 				.description("描述")
-				.termsOfServiceUrl("https://www.zhaoshuxue.top")
-				.version("3.1.2")
+				.termsOfServiceUrl("")
+				.version("1.0")
 				.build();
 	}
 

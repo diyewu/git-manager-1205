@@ -4,7 +4,11 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -68,6 +72,27 @@ public class AppController extends BaseController{
 		if(code == 0){
 			if(list == null || list.size()==0){
 				code = ServerResult.RESULT_ERROE_USER_LOGIN;
+			}
+		}
+		//验证账户是否失效
+		if(code == 0){
+			String enableTime = list.get(0).get("enable_time")+"";
+			String disableTime = list.get(0).get("disable_time")+"";
+			if(StringUtils.isNotBlank(enableTime) && StringUtils.isNotBlank(disableTime)){
+				Date d = new Date();
+				DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+				try {
+					df.parse(enableTime);
+					df.parse(disableTime);
+					if(d.getTime() < df.parse(enableTime).getTime() || d.getTime() > df.parse(disableTime).getTime() ){
+//						msg = "您好，您的账户已经失效，如需继续使用，请联系管理员。";
+						code = ServerResult.RESULT_CHECK_USER_EXPIRY_DATE_ERROE;
+					}
+				} catch (ParseException e) {
+				}
+			}else{
+//				msg = "您好，您的账户已经失效，如需继续使用，请联系管理员。";
+				code = ServerResult.RESULT_CHECK_USER_EXPIRY_DATE_ERROE;
 			}
 		}
 		//验证phone是否允许登陆
@@ -147,6 +172,7 @@ public class AppController extends BaseController{
 	@RequestMapping("getMapInfo")
 	@ResponseBody
 	public AppJsonModel getMapInfoByMenu(HttpServletRequest request){
+		long start = System.currentTimeMillis();
 		String token = request.getHeader("token");
 		String phoneId = request.getHeader("phoneId");
 		String jsonIds = request.getParameter("jsonIds");
@@ -189,15 +215,44 @@ public class AppController extends BaseController{
 						param.put(AttriId, conditionList);
 					}
 				}
-				list = appService.getMapInfo(projectId, param);
+				list = appService.getMapInfo(projectId, param,null,"0");
 				if (list != null && list.size() > 0) {
 					info.addAll(list);
 				}
 			}
 		}
+		long end = System.currentTimeMillis();
+		System.out.println("getMapInfoByMenu="+(end - start));
 		return new AppJsonModel(code, ServerResult.getCodeMsg(code, msg), info);
 	}
 	
+	@RequestMapping("getNextMapInfoByKey")
+	@ResponseBody
+	public AppJsonModel getNextMapInfoByKey(HttpServletRequest request){
+		String token = request.getHeader("token");
+		String phoneId = request.getHeader("phoneId");
+		
+		String cacheKey = request.getParameter("cacheKey");
+		String key = request.getParameter("key");
+		String currentLevel = request.getParameter("currentLevel");
+		
+		String msg = "success";
+		int code = 0;
+		List<String> paramList = new ArrayList<String>();
+		paramList.add(token);
+		paramList.add(phoneId);
+		paramList.add(cacheKey);
+		paramList.add(key);
+		paramList.add(currentLevel);
+		AppLoginBean appLoginBean = new AppLoginBean();
+		code = globalCheck(paramList, token, phoneId,appLoginBean);
+		
+		List<Map<String, Object>> info = new ArrayList<Map<String,Object>>();
+		if(code == 0){
+			info = appService.generateCod(key,AppService.cacheMap.get(cacheKey), cacheKey,currentLevel);
+		}
+		return new AppJsonModel(code, ServerResult.getCodeMsg(code, msg), info);
+	}
 	
 	@RequestMapping("getCoordinateInfo")
 	@ResponseBody
@@ -258,18 +313,6 @@ public class AppController extends BaseController{
 	@RequestMapping("getImgBydetailId")
 	@ResponseBody
 	public void getImgBydetailId(HttpServletRequest request,HttpServletResponse response){
-//		String token = request.getHeader("token");
-//		String phoneId = request.getHeader("phoneId");
-//		String coordinateId = request.getParameter("coordinateId");
-//		String msg = "success";
-//		int code = 0;
-//		List<String> paramList = new ArrayList<String>();
-//		paramList.add(token);
-//		paramList.add(phoneId);
-//		paramList.add(coordinateId);
-//		AppLoginBean appLoginBean = new AppLoginBean();
-//		code = globalCheck(paramList, token, phoneId,appLoginBean);
-		
         response.setHeader("Pragma", "No-cache"); 
         response.setHeader("Cache-Control", "no-cache"); 
         response.setDateHeader("Expires", 0); 
@@ -301,15 +344,46 @@ public class AppController extends BaseController{
 				e.printStackTrace();
 			} finally{
 				try {
-					os.close();
+					if (os != null)
+						os.close();
+					if (fos != null)
 					fos.close();
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
 			}
         }
-        
-		
 	}
+	@RequestMapping("getPreMapInfoByKey")
+	@ResponseBody
+	public AppJsonModel getPreMapInfoByKey(HttpServletRequest request){
+		String token = request.getHeader("token");
+		String phoneId = request.getHeader("phoneId");
+		
+		String cacheKey = request.getParameter("cacheKey");
+		String key = request.getParameter("key");
+		String currentLevel = request.getParameter("currentLevel");
+		String msg = "success";
+		int code = 0;
+		List<String> paramList = new ArrayList<String>();
+		paramList.add(token);
+		paramList.add(phoneId);
+		paramList.add(cacheKey);
+		paramList.add(key);
+		paramList.add(currentLevel);
+		AppLoginBean appLoginBean = new AppLoginBean();
+		code = globalCheck(paramList, token, phoneId,appLoginBean);
+		
+		List<Map<String, Object>> info = new ArrayList<Map<String,Object>>();
+		if(code == 0){
+			info = appService.turnback(cacheKey, key, currentLevel);
+		}
+		
+		return new AppJsonModel(code, ServerResult.getCodeMsg(code, msg), info);
+	}
+	
+	
+	
+	
 	//TODO 增加心跳包接口
 }

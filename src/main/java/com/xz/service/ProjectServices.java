@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.xz.common.Page;
+import com.xz.utils.CreateExcelUtil;
 import com.xz.utils.ExcelReadUtils;
 import com.xz.utils.SortableUUID;
 import com.xz.utils.ZipUtil;
@@ -104,6 +105,7 @@ public class ProjectServices {
 				}
 			}
 		}
+		insertOperateHistory(session, type, msg);
 		return projectId;
 	}
 	public boolean checkSetImg(String projectId){
@@ -119,8 +121,18 @@ public class ProjectServices {
 	public void addRelateImg(HttpSession session,String projectId,File zipFile,String desPath) throws IOException{
 		String msg = null;
 		String sql = " select * from project_attribute where project_id = ? and attribute_type = 4 ";
+		String projectSql = " select * from project_main where id = ? ";
+		String filepath = "";
+		String tPath = "";
 		try {
 			List<Map<String, Object>> attrList = jdbcTemplate.queryForList(sql, projectId);
+			List<Map<String, Object>> proList = jdbcTemplate.queryForList(projectSql, projectId);
+			String projectName = "";
+			projectName = proList.get(0).get("project_name")+"";
+			List<List<Object>> exList = new ArrayList<List<Object>>();
+			List<Object> dList = new ArrayList<Object>();
+			dList.add(projectName);
+			exList.add(dList);
 			if (attrList != null && attrList.size() > 0) {
 				Map<String, String> map = new HashMap<String, String>();
 				String desPathLocal = desPath.split("\\.")[0];
@@ -157,9 +169,16 @@ public class ProjectServices {
 							tmap = remainList.get(i);
 							if(StringUtils.isBlank(tmap.get("img_path")==null?"":tmap.get("img_path")+"")){
 								remainPic += tmap.get("imgname")+",";
+								dList = new ArrayList<Object>();
+								dList.add(tmap.get("imgname"));
+								exList.add(dList);
 							}
 						}
 						msg = "以下图片名称没有匹配到图片：" + remainPic;
+						if(exList.size()>1){
+							tPath = desPathLocal + File.separator+System.currentTimeMillis()+".xlsx";
+							CreateExcelUtil.createExcelFile(tPath, exList);
+						}
 					}
 				} else {
 					msg = "请确认zip压缩包有正确数据！";
@@ -171,7 +190,7 @@ public class ProjectServices {
 			e.printStackTrace();
 			msg = e.getMessage();
 		}
-		operateHistoryService.insertOH(session, "18", msg, msg==null?1:0);
+		operateHistoryService.insertOH(session, "18", msg, msg==null?1:0,tPath);
 	}
 	
 	/**
@@ -215,6 +234,29 @@ public class ProjectServices {
 	 * 添加筛选条件
 	 * @param list
 	 */
+	public void addCondition_bak_bak(List<String> list,String projectId){
+		String sql = " select id, attribute_index,attribute_name from project_attribute where id = ? ";
+		String detailSql = "";
+		List<Map<String, Object>> attrList = new ArrayList<Map<String,Object>>();
+		String attributeIndex = "";
+		String attrSql = "insert into project_attribute_condition(attribute_condition,attribute_id,type)values(?,?,1)";
+		for (int i = 0; i < list.size(); i++) {
+			detailSql = " insert into project_attribute_condition(attribute_condition,attribute_id,type)"
+					+ "select DISTINCT(ext__index),?,0 from project_detail where project_id = ? ";
+			attrList = jdbcTemplate.queryForList(sql, list.get(i));
+			attributeIndex = attrList.get(0).get("attribute_index")+"";
+			detailSql=detailSql.replace("__index", attributeIndex);
+			jdbcTemplate.update(detailSql, list.get(i),projectId);
+			jdbcTemplate.update(attrSql, attrList.get(0).get("attribute_name"),projectId);
+		}
+		String mainSql = "insert into project_attribute_condition(attribute_condition,attribute_id,type)values((select project_name from project_main where id = ?),?,2)";
+		jdbcTemplate.update(mainSql,projectId,projectId);
+		
+	}
+	/**
+	 * 添加筛选条件
+	 * @param list
+	 */
 	public void addCondition(List<String> list,String projectId){
 		String sql = " select attribute_index from project_attribute where id = ? ";
 		String detailSql = "";
@@ -228,7 +270,8 @@ public class ProjectServices {
 			detailSql=detailSql.replace("__index", attributeIndex);
 			jdbcTemplate.update(detailSql, list.get(i),projectId);
 		}
-		
+		String mainSql = " update project_main set type = 1 where id = ? ";
+		jdbcTemplate.update(mainSql, projectId);
 	}
 	/**
 	 * 删除筛选条件
@@ -251,6 +294,8 @@ public class ProjectServices {
 		jdbcTemplate.update(authSql, projectId);
 		
 		String sql = " delete from project_attribute_condition  where attribute_id in (select id from project_attribute where project_id = ?) ";
+		jdbcTemplate.update(sql, projectId);
+		sql = " delete from project_attribute_condition  where attribute_id in (?) ";
 		jdbcTemplate.update(sql, projectId);
 		sql = " update project_attribute set attribute_active = 0 where project_id = ? ";
 		jdbcTemplate.update(sql, projectId);
@@ -310,9 +355,11 @@ public class ProjectServices {
 	public Page<Map<String, Object>> getProjectAttr(String projectId,int start,int limit){
 		Page<Map<String, Object>> page = new Page<Map<String, Object>>(start, limit, false);
 		List<Object> params = new ArrayList<Object>();
-		StringBuilder sql = new StringBuilder(" select pa.id,pa.project_id,pm.project_name,pa.attribute_name,pat.type_name,pa.attribute_type,pa.attribute_active  ");
+		StringBuilder sql = new StringBuilder(" select pa.id,pa.project_id,pm.project_name,pa.attribute_name,pat.type_name,patt.type_name as info_type_name,pa.attribute_type,pa.attribute_active  ");
 		sql.append(" from project_attribute pa left join project_main pm on pa.project_id = pm.id ");
-		sql.append(" left join project_attribute_type pat on pa.attribute_type = pat.id and pat.id <> 0 where 1=1 ");
+		sql.append(" left join project_attribute_type pat on pa.attribute_type = pat.id AND pat.id <> 0 and pat.type = 0  ");
+		sql.append(" LEFT JOIN project_attribute_type patt ON pa.attribute_info_type = patt.id AND patt.id <> 0 and patt.type = 1 ");
+		sql.append(" where 1=1 ");
 		if(StringUtils.isNotBlank(projectId)){
 			sql.append(" and pm.id = ? ");
 			params.add(projectId);
@@ -329,15 +376,18 @@ public class ProjectServices {
 	}
 	
 	
-	public void updateAttrType(String id,String typeName){
+	public void updateAttrType(String id,String typeName,String infoTypeName){
 		StringBuilder sb = new StringBuilder();
-		String sql = " update project_attribute set attribute_type = (select id from project_attribute_type where type_name = ? ) where project_attribute.id = ? ";
-		jdbcTemplate.update(sql,typeName,id);
+		String sql = " update project_attribute set "
+				+ "attribute_type = (select id from project_attribute_type where type_name = ? and type = 0 ) "
+				+ ",attribute_info_type = (select id from project_attribute_type where type_name = ? and type = 1 ) "
+				+ "where project_attribute.id = ? ";
+		jdbcTemplate.update(sql,typeName,infoTypeName,id);
 	}
-	public Page<Map<String, Object>> getAttrType(){
+	public Page<Map<String, Object>> getAttrType(int type){
 		Page<Map<String, Object>> page = new Page<Map<String, Object>>(0, 1010, false);
-		String sql = " select id as value,type_name as text from project_attribute_type ";
-		List<Map<String, Object>> list = jdbcTemplate.queryForList(sql);
+		String sql = " select id as value,type_name as text from project_attribute_type where type = ? ";
+		List<Map<String, Object>> list = jdbcTemplate.queryForList(sql,type);
 		page.setTotalCount(list.size());
 		page.setResult(list);
 		return page;

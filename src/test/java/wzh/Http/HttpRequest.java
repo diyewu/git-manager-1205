@@ -15,11 +15,12 @@ public class HttpRequest {
 //        String s=HttpRequest.sendGet("http://localhost:8080/gismgr/app/login/", "userName=admin&userPwd=admin");
 //        System.out.println(s);
         
-        //发送 POST 请求  	login	getMenu	getMapInfo	getCoordinateInfo
-        String sr=HttpRequest.sendPost("http://localhost:8095/gismgr/app/getCoordinateInfo/", 
+        //发送 POST 请求  	login	getMenu	getMapInfo	getCoordinateInfo  getNextMapInfoByKey 	getPreMapInfoByKey
+        String sr=HttpRequest.sendPost("http://localhost:8085/gismgr/app/getPreMapInfoByKey/", 
         		"userName=admin&userPwd=admin&"
-        		+ "jsonIds=[{\"attributes\":[{\"attribute_id\":\"00151324042912900011005056c00001\",\"conditions\":[{\"condition_id\":\"1957\"},{\"condition_id\":\"1956\"}]}],\"project_id\":\"00151323566661600000005056c00001\"}]"
-        		+ "&coordinateId=00151382364465001265005056c00001,00151382364465101266005056c00001,00151382364465101267005056c00001,00151382364465201268005056c00001");
+        		+ "jsonIds=[{\"attributes\": [{\"attribute_id\": \"00151520636359000004005056c00001\",\"conditions\": [{\"condition_id\": \"1655\"},{\"condition_id\": \"1656\"}]},{\"attribute_id\": \"00151520636359500012005056c00001\",\"conditions\": [{\"condition_id\": \"1647\"},{\"condition_id\": \"1648\"}]}],\"project_id\": \"00151520636358600000005056c00001\"}]"
+        		+ "&key=0709&cacheKey=1f460db1fc5f47e9afc6a332f7a6d230&currentLevel=2"
+        		+ "&coordinateId=00151382364465001265005056c00001,00151382364465101266005056c00001,00151382364465101267005056c00001,00151382364465301270005056c00001");
         System.out.println(sr);
     }
 	
@@ -100,8 +101,8 @@ public class HttpRequest {
             conn.setRequestProperty("accept", "*/*");
 //            conn.setRequestProperty("connection", "Keep-Alive");
 //            conn.setRequestProperty("user-agent", "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1;SV1)");
-            conn.setRequestProperty("phoneId", "asd1232");
-            conn.setRequestProperty("token", "90b31a48d01546c8a4b2a0f13ec25b1a");
+            conn.setRequestProperty("phoneId", "a4sd655555");
+            conn.setRequestProperty("token", "3740707cbb384b40a8305fcee79b12dc");
             // 发送POST请求必须设置如下两行
             conn.setDoOutput(true);
             conn.setDoInput(true);

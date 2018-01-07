@@ -14,9 +14,8 @@ import org.apache.commons.lang.StringUtils;
     20000：登陆名或密码错误
     20001：当前设备不允许登陆
     20002：当前设备没有登陆用户
+    20003:当前账户已经失效
     30000:参数校验失败
-    
-    
  * @author 吴迪叶
  *
  */
@@ -42,6 +41,9 @@ public class ServerResult {
 	public final static int RESULT_CHECK_PHONE_USER_ERROE = 20002;
 	public final static String RESULT_CHECK_PHONE_USER_ERROE_MSG = "当前设备没有登陆用户";
 	
+	public final static int RESULT_CHECK_USER_EXPIRY_DATE_ERROE = 20003;
+	public final static String RESULT_CHECK_USER_EXPIRY_DATE_ERROE_MSG = "当前账户已经失效";
+	
 	public final static int RESULT_ERROE_PARAM = 30000;
 	public final static String RESULT_ERROE_PARAM_MSG = "参数校验失败";
 	
@@ -56,6 +58,7 @@ public class ServerResult {
 		ServerResultMap.put(RESULT_CHECK_PHONE_ERROE, RESULT_CHECK_PHONE_ERROE_MSG);
 		ServerResultMap.put(RESULT_CHECK_PHONE_USER_ERROE, RESULT_CHECK_PHONE_USER_ERROE_MSG);
 		ServerResultMap.put(RESULT_ERROE_PARAM, RESULT_ERROE_PARAM_MSG);
+		ServerResultMap.put(RESULT_CHECK_USER_EXPIRY_DATE_ERROE, RESULT_CHECK_USER_EXPIRY_DATE_ERROE_MSG);
 	}
 	
 	

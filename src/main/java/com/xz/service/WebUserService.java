@@ -31,6 +31,13 @@ public class WebUserService {
 	
 	
 	
+	public List<CategoryTreeBeanCk> getTreeCKListAuthDo_bak(String roleId) {//赋予权限
+		List<CategoryTreeBeanCk> list = new ArrayList<CategoryTreeBeanCk>();
+		StringBuilder sb = new StringBuilder();
+		sb.append(" SELECT CASE WHEN pac.type = 0 THEN pac.id ELSE pac.attribute_id END id, pac.attribute_condition AS menu_name, CASE WHEN pac.type = 2 THEN NULL ELSE pac.attribute_id END AS parent_id, pac.leaf, pac.id AS is_check FROM project_attribute_condition pac LEFT JOIN ( SELECT * FROM project_condition_auth pca WHERE pca.web_user_role_id = ? ) b ON pac.id = b.condition_id ORDER BY pac.id ASC; ");
+		list = (List<CategoryTreeBeanCk>)jdbcTemplate.query(sb.toString(), new CategoryTreeBeanCKRowMapper(),roleId);
+		return list;
+	}
 	public List<CategoryTreeBeanCk> getTreeCKListAuthDo(String roleId) {//赋予权限
 		List<CategoryTreeBeanCk> list = new ArrayList();
 		StringBuilder sb = new StringBuilder();
@@ -39,7 +46,7 @@ public class WebUserService {
 		sb.append(" union  ");
 		sb.append(" SELECT id,	pa.attribute_name AS menu_name,		pa.project_id AS parent_id,		0 AS leaf,		pa.id AS is_check	FROM 		project_attribute pa	WHERE		pa.attribute_active = 1 ");
 		sb.append(" union  ");
-		sb.append(" SELECT id,	pm.project_name AS menu_name,	NULL AS parent_id,	0 AS leaf,	pm.id AS is_check	FROM	project_main pm	 ");
+		sb.append(" SELECT id,	pm.project_name AS menu_name,	NULL AS parent_id,	0 AS leaf,	pm.id AS is_check	FROM	project_main pm where pm.type = 1	 ");
 		sb.append(" )a left JOIN (  ");
 		sb.append(" select * from project_condition_auth pca 	where pca.web_user_role_id = ?  ");
 		sb.append(" ) b on a.id = b.condition_id ORDER BY a.id DESC  ");
@@ -91,7 +98,7 @@ public class WebUserService {
 		List<Object> params = new ArrayList<Object>();
 		List<Map<String, Object>> list = new ArrayList<Map<String,Object>>();
 		StringBuilder sbud = new StringBuilder("select a.id,a.user_name,a.user_password,a.is_delete,a.user_role as user_role_id,b.role_name as user_role,"
-				+ "real_name,CASE when c.use_size is null then 0 else c.use_size end as use_phone_size, a.allow_phone_size "
+				+ "real_name,CASE when c.use_size is null then 0 else c.use_size end as use_phone_size, a.allow_phone_size,a.enable_time,a.disable_time "
 				+ "from web_user_login a left join web_user_role b on a.user_role = b.id "
 				+ " left join (select count(wp.id) as use_size,wp.web_user_id from web_user_login_phone wp GROUP BY wp.web_user_id) c on c.web_user_id = a.id "
 				+ "where 1 = 1 and a.is_delete = 0 and b.is_delete = 0 ");
@@ -137,9 +144,12 @@ public class WebUserService {
 		return i>0;
 	}
 	
-	public void addUser(String userName,String userPwd,int role,String realName,int phoneSizeInt){
+	public void addUser(String userName,String userPwd,int role,
+			String realName,int phoneSizeInt,String beginTime ,String endTime){
 		String uuid = UUID.randomUUID().toString().replace("-", "");
-		jdbcTemplate.update("insert into web_user_login(id,user_name,user_password,user_role,real_name,allow_phone_size)values(?,?,?,?,?,?)",uuid,userName,userPwd,role,realName,phoneSizeInt);
+		jdbcTemplate.update("insert into web_user_login"
+				+ "(id,user_name,user_password,user_role,real_name,allow_phone_size,enable_time,disable_time)"
+				+ "values(?,?,?,?,?,?,?,?)",uuid,userName,userPwd,role,realName,phoneSizeInt,beginTime,endTime);
 	}
 	public void editUser(UserLogin user){
 		if(StringUtils.isNotBlank(user.getId())){
@@ -165,6 +175,14 @@ public class WebUserService {
 			if(StringUtils.isNotBlank(user.getAllowPhoneSize()+"")){
 				sb.append(",allow_phone_size = ?");
 				params.add(user.getAllowPhoneSize());
+			}
+			if(StringUtils.isNotBlank(user.getEnableTime())){
+				sb.append(",enable_time = ?");
+				params.add(user.getEnableTime());
+			}
+			if(StringUtils.isNotBlank(user.getDisableTime()+"")){
+				sb.append(",disable_time = ?");
+				params.add(user.getDisableTime());
 			}
 			sb.append(" where id = ?");
 			params.add(user.getId());

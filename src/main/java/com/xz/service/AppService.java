@@ -12,6 +12,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +26,8 @@ import com.alibaba.fastjson.JSONObject;
 import com.google.common.base.Joiner;
 import com.xz.common.ServerResult;
 import com.xz.entity.AppMenu;
+import com.xz.entity.AreaBean;
+import com.xz.model.json.JsonModel;
 
 @Service
 @Transactional
@@ -32,6 +35,38 @@ public class AppService {
 	
 	@Autowired  
 	private JdbcTemplate jdbcTemplate; 
+	
+	private static List<String> keyList = new ArrayList<String>();
+	private static Map<String,String> lvlMap = new HashMap<String, String>();
+	private static Map<String,String> preMap = new HashMap<String, String>();
+	private static Map<Integer,Integer> levelMap = new HashMap<Integer,Integer>();
+	static{
+		keyList.add("research_no");
+		keyList.add("question_type");
+		keyList.add("longitude");
+		keyList.add("latitude");
+		levelMap.put(1, 2);
+		levelMap.put(2, 4);
+		levelMap.put(3, 6);
+		levelMap.put(4, 9);
+		levelMap.put(5, 12);
+		
+		
+		
+		
+		
+		
+		
+		
+		lvlMap.put("first_area", "second_area");
+		lvlMap.put("second_area", "third_area");
+		lvlMap.put("third_area", "forth_area");
+		
+		preMap.put("second_area", "first_area");
+		preMap.put("third_area", "second_area");
+		preMap.put("forth_area", "third_area");
+	}
+	public static Map<String,List<Map<String, Object>>> cacheMap = new HashMap<String, List<Map<String,Object>>>();
 	
 	public List<Map<String, Object>> getUserInfoByNameandPwd(String name,String pwd){
 		String sql = "  select * from web_user_login where user_name = ? and user_password = ? and is_delete = 0 ";
@@ -140,7 +175,226 @@ public class AppService {
 		}
 	}
 	
-	public List<Map<String,Object>> getMapInfo(String projectId,Map<String,List<String>> param){
+	public List<Map<String,Object>> getMapInfo(String projectId,Map<String,
+			List<String>> param,String cacheKey,String currentLevel){
+		if(StringUtils.isBlank(cacheKey)){
+			String attriSql = " select attribute_index from project_attribute where id = ? ";
+			List<Map<String, Object>> list = new ArrayList<Map<String,Object>>();
+			List<Map<String, Object>> resultList = new ArrayList<Map<String,Object>>();
+			StringBuilder sb = new StringBuilder();
+			String attriAllSql = " select pa.attribute_name,pat.alias_name,pa.attribute_index"
+					+ " from project_attribute pa left join project_attribute_type pat"
+					+ " on pa.attribute_type = pat.id and pat.type = 0 where pa.project_id = ? ORDER BY pat.id ";
+			List<Map<String, Object>> attributeList = jdbcTemplate.queryForList(attriAllSql, projectId);
+			if(attributeList == null || attributeList.size() == 0){
+				return null;
+			}
+			List<String> conditionIdList = new ArrayList<String>();
+			if (param != null && param.size() > 0) {
+				String tempSql = "";
+				sb.append(" select ");
+				String aliasName = "";
+				for (int i = 0; i < attributeList.size(); i++) {
+					aliasName = (String)attributeList.get(i).get("alias_name");
+					if(StringUtils.isNotBlank(aliasName)){
+						/**
+						 * keyList={first_area,second_area,third_area,forth_area,latitude,longitude}
+						 */
+						if(keyList.contains(aliasName)){
+							sb.append(" pd.ext"+attributeList.get(i).get("attribute_index") +" as " + aliasName +",");
+						}
+					}
+				}
+				sb.append(" pd.id ");
+				sb.append(" from project_detail  pd ");
+				sb.append(" where project_id = ? ");
+				for (Map.Entry<String,List<String>> entry : param.entrySet()) {  
+					list = jdbcTemplate.queryForList(attriSql, entry.getKey());
+					tempSql = "and ext_index in(select attribute_condition from project_attribute_condition where id in (?) )";
+				    if(list != null && list.size()>0){
+				    	tempSql = tempSql.replace("_index", list.get(0).get("attribute_index")+"");
+				    	conditionIdList = entry.getValue();
+				    	if(conditionIdList != null && conditionIdList.size()>0){
+				    		tempSql = tempSql.replace("?", Joiner.on(",").join(conditionIdList));
+				    		sb.append(tempSql);
+	//			    		sqlParam.add(Joiner.on(",").join(conditionIdList));
+				    	}
+				    }
+				}
+				resultList = jdbcTemplate.queryForList(sb.toString(), projectId);
+				if(resultList != null && resultList.size()>0){
+					String tkey = UUID.randomUUID().toString().replaceAll("-", "");
+					cacheMap.put(tkey, resultList);
+					List<Map<String, Object>> cod = generateCod(null,resultList,tkey,currentLevel);
+					return cod;
+				}
+			}
+		}else{
+			List<Map<String, Object>> cod = generateCod(null,cacheMap.get(cacheKey),cacheKey,currentLevel);
+			return cod;
+		}
+		return null;
+	}
+	public List<Map<String,Object>> generateCod(String currentKey,List<Map<String, Object>> resultList,
+			String cacheKey,String currentLevel ){
+		Map<String,AreaBean> areaMap = new HashMap<String, AreaBean>();
+		int currentLevelInt = Integer.parseInt(currentLevel);
+		AreaBean areaBean = new AreaBean();
+		double longitudeF = 0;
+		double latitudeF = 0;
+		Map<String, Object> resultmap = new HashMap<String, Object>();
+		List<Map<String,Object>> sList = new ArrayList<Map<String,Object>>();
+		Map<String, Object> smap = new HashMap<String, Object>();
+		String researchNo = "";
+		String tempKey = "";
+		String nextLevelKey = "";
+		String id = "";
+		for (int i = 0; i < resultList.size(); i++) {
+			areaBean = new AreaBean();
+			resultmap = resultList.get(i);
+			if(resultmap.containsKey("research_no")){
+				researchNo = resultmap.get("research_no")+"";
+				if(StringUtils.isNotBlank(currentKey)){//从第二级开始
+					tempKey = StringUtils.substring(researchNo, 0, levelMap.get(currentLevelInt));
+					if(currentLevelInt != 5){//2.3.4
+						if(currentKey.equals(tempKey)){//匹配,找下一级
+							nextLevelKey = StringUtils.substring(researchNo, 0, levelMap.get(currentLevelInt+1));
+							id = resultmap.get("id")+"";
+							try {
+								longitudeF = resultmap.get("longitude")==null?0:Double.parseDouble(resultmap.get("longitude")+"");
+								latitudeF = resultmap.get("latitude")==null?0:Double.parseDouble(resultmap.get("latitude")+"");
+							} catch (Exception e) {}
+							if(longitudeF == 0 || latitudeF == 0){
+								continue;
+							}
+							if(areaMap.containsKey(nextLevelKey)){
+								areaBean = areaMap.get(nextLevelKey);
+								areaBean.setTotalLongitude(areaBean.getTotalLongitude()+longitudeF);
+								areaBean.setTotalLatitude(areaBean.getTotalLatitude()+latitudeF);
+								areaBean.setCount(areaBean.getCount()+1);
+								areaBean.setIds(areaBean.getIds()+","+id);
+							}else{
+								areaBean.setTotalLongitude(longitudeF);
+								areaBean.setTotalLatitude(latitudeF);
+								areaBean.setCount(1);
+								areaBean.setIds(id);
+							}
+							areaMap.put(nextLevelKey, areaBean);
+						}else{
+							continue;
+						}
+					}else{//第五级
+						if(currentKey.equals(tempKey)){//匹配,找下一级
+							try {
+								longitudeF = resultmap.get("longitude")==null?0:Double.parseDouble(resultmap.get("longitude")+"");
+								latitudeF = resultmap.get("latitude")==null?0:Double.parseDouble(resultmap.get("latitude")+"");
+							} catch (Exception e) {}
+							if(longitudeF == 0 || latitudeF == 0){
+								continue;
+							}
+							smap = new HashMap<String, Object>();
+							smap.put("key",resultmap.get("question_type") );
+							smap.put("currentLevel", currentLevelInt+1);
+							smap.put("nextLevel", "");
+							smap.put("preKey", currentKey);
+							smap.put("preLevel", currentLevelInt);
+							smap.put("cacheKey", cacheKey);
+							smap.put("text", "问题分类:"+resultmap.get("question_type"));
+							smap.put("longitude", longitudeF);
+							smap.put("latitude", latitudeF);
+							smap.put("ids", resultmap.get("id"));
+							smap.put("totalitem", 1);
+							sList.add(smap);
+						}
+					}
+				}else{//第一级
+					tempKey = StringUtils.substring(researchNo, 0, levelMap.get(currentLevelInt+1));
+					id = resultmap.get("id")+"";
+					try {
+						longitudeF = resultmap.get("longitude")==null?0:Double.parseDouble(resultmap.get("longitude")+"");
+						latitudeF = resultmap.get("latitude")==null?0:Double.parseDouble(resultmap.get("latitude")+"");
+					} catch (Exception e) {}
+					if(longitudeF == 0 || latitudeF == 0){
+						continue;
+					}
+					if(areaMap.containsKey(tempKey)){
+						areaBean = areaMap.get(tempKey);
+						areaBean.setTotalLongitude(areaBean.getTotalLongitude()+longitudeF);
+						areaBean.setTotalLatitude(areaBean.getTotalLatitude()+latitudeF);
+						areaBean.setCount(areaBean.getCount()+1);
+						areaBean.setIds(areaBean.getIds()+","+id);
+					}else{
+						areaBean.setTotalLongitude(longitudeF);
+						areaBean.setTotalLatitude(latitudeF);
+						areaBean.setCount(1);
+						areaBean.setIds(id);
+					}
+					areaMap.put(tempKey, areaBean);
+				}
+			}else{
+				break;
+			}
+		}
+		if(currentLevelInt != 5){
+			if(areaMap != null && !areaMap.isEmpty()){
+				Map<String,Object> sMap = new HashMap<String, Object>();
+				for (Map.Entry<String,AreaBean> entry : areaMap.entrySet()) {
+					areaBean = new AreaBean();
+					areaBean = entry.getValue();
+					sMap.put("key", entry.getKey());
+					if(StringUtils.isNotBlank(currentKey)){
+						sMap.put("currentLevel", currentLevelInt+1);
+						sMap.put("nextLevel", currentLevelInt+2);
+						sMap.put("preKey", StringUtils.substring(currentKey, 0,levelMap.get(currentLevelInt)));
+						sMap.put("preLevel", currentLevelInt);
+					}else{
+						sMap.put("currentLevel", 1);
+						sMap.put("nextLevel", 2);
+						sMap.put("preKey", "");
+						sMap.put("preLevel", 0);
+					}
+					sMap.put("cacheKey", cacheKey);
+					sMap.put("text", entry.getKey());
+					sMap.put("longitude", areaBean.getTotalLongitude()/areaBean.getCount());
+					sMap.put("latitude", areaBean.getTotalLatitude()/areaBean.getCount());
+					sMap.put("ids", areaBean.getIds());
+					sMap.put("totalitem", areaBean.getCount());
+					sList.add(sMap);
+					sMap = new HashMap<String, Object>();
+				}
+			}
+//			System.out.println(sList);
+		}
+		return sList;
+	}
+	public List<Map<String, Object>> turnback(String cacheKey,String key,String currentLevel){
+		List<Map<String, Object>> resultList = cacheMap.get(cacheKey);
+		Map<String, Object> map = new HashMap<String, Object>();
+		int currentLevelInt = Integer.parseInt(currentLevel);
+		String fatherKey = "";
+		int fatherLvl = currentLevelInt - 1;
+		String tempKey = "";
+		String researchNo = "";
+		for(int i=0;i<resultList.size();i++){
+			map = resultList.get(i);
+			researchNo = map.get("research_no")+"";
+			tempKey = StringUtils.substring(researchNo, 0, levelMap.get(currentLevelInt));
+			if(key.equals(tempKey)){
+				if(fatherLvl != 0){
+					fatherKey = StringUtils.substring(researchNo, 0, levelMap.get(fatherLvl));
+				}else{
+					fatherKey = "";
+				}
+				break;
+			}
+		}
+		List<Map<String, Object>> list = this.generateCod(fatherKey, resultList, cacheKey, fatherLvl+"");
+		return list;
+	}
+	
+	
+	
+	public List<Map<String,Object>> getMapInfo_bak20180102(String projectId,Map<String,List<String>> param){
 		String attriSql = " select attribute_index from project_attribute where id = ? ";
 		List<Map<String, Object>> list = new ArrayList<Map<String,Object>>();
 		List<Map<String, Object>> resultList = new ArrayList<Map<String,Object>>();
@@ -173,15 +427,15 @@ public class AppService {
 //			    System.out.println("Key = " + entry.getKey() + ", Value = " + entry.getValue());  
 				list = jdbcTemplate.queryForList(attriSql, entry.getKey());
 				tempSql = "and ext_index in(select attribute_condition from project_attribute_condition where id in (?) )";
-			    if(list != null && list.size()>0){
-			    	tempSql = tempSql.replace("_index", list.get(0).get("attribute_index")+"");
-			    	conditionIdList = entry.getValue();
-			    	if(conditionIdList != null && conditionIdList.size()>0){
-			    		tempSql = tempSql.replace("?", Joiner.on(",").join(conditionIdList));
-			    		sb.append(tempSql);
+				if(list != null && list.size()>0){
+					tempSql = tempSql.replace("_index", list.get(0).get("attribute_index")+"");
+					conditionIdList = entry.getValue();
+					if(conditionIdList != null && conditionIdList.size()>0){
+						tempSql = tempSql.replace("?", Joiner.on(",").join(conditionIdList));
+						sb.append(tempSql);
 //			    		sqlParam.add(Joiner.on(",").join(conditionIdList));
-			    	}
-			    }
+					}
+				}
 			}
 			resultList = jdbcTemplate.queryForList(sb.toString(), projectId);
 			if(resultList != null && resultList.size()>0){
@@ -202,7 +456,7 @@ public class AppService {
 						longitudeF = Double.parseDouble(longitude);
 						latitudeF = Double.parseDouble(latitude);
 					} catch (Exception e) {
-						e.printStackTrace();
+//						e.printStackTrace();
 						continue;
 					}
 					key = df.format(longitudeF) +","+ df.format(latitudeF);
@@ -218,7 +472,7 @@ public class AppService {
 						longitudeF = Double.parseDouble(longitude);
 						latitudeF = Double.parseDouble(latitude);
 					} catch (Exception e) {
-						e.printStackTrace();
+//						e.printStackTrace();
 						continue;
 					}
 					key = df.format(longitudeF) +","+ df.format(latitudeF);
@@ -315,7 +569,7 @@ public class AppService {
 					}
 				}
 				if (param != null && param.size() > 0) {
-					list = this.getMapInfo(projectId, param);
+					list = this.getMapInfo(projectId, param, null,"0");
 					if (list != null && list.size() > 0) {
 						info.addAll(list);
 					}

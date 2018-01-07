@@ -47,6 +47,26 @@ public class BaseController {
 			e.printStackTrace();
 		}
 	}
+	/**
+	 * 功能：公共方法用于响应前台请求
+	 * 
+	 * @param response
+	 * @param data
+	 */
+	protected void printData(HttpServletResponse response, Object data) {
+		ObjectMapper mapper = new ObjectMapper();
+		try {
+			// System.out.println(data);
+			response.setContentType("text/html;charset=utf-8");
+			response.setCharacterEncoding("UTF-8");
+			PrintWriter out = new PrintWriter(new OutputStreamWriter(response.getOutputStream(), "UTF-8"));
+			out.println(mapper.writeValueAsString(data));
+			out.close();
+			out.flush();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
 	
 	protected void resultSuccess(String message, Object data, long total,HttpServletResponse response) {
 		Result result = new Result();
@@ -70,7 +90,10 @@ public class BaseController {
 		if(code == 0){
 			String lastToken = "";
 			try {
-				appLoginBean = (AppLoginBean) AgingCache.getCacheInfo(phoneId).getValue();
+				AppLoginBean appLoginBeanTemp = (AppLoginBean) AgingCache.getCacheInfo(phoneId).getValue();
+				appLoginBean.setUserId(appLoginBeanTemp.getUserId());
+				appLoginBean.setToken(appLoginBeanTemp.getToken());
+				appLoginBean.setUserRoleId(appLoginBeanTemp.getUserRoleId());
 			} catch (Exception e) {
 				code = ServerResult.RESULT_TOKEN_OVERTIME;
 			}

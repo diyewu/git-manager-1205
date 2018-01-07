@@ -50,16 +50,23 @@
 	            {header:"操作详情",align:'center',dataIndex:"id",renderer: function (value, meta, record) {
 	            	var msg = 	(record.get('operateSummary')+'').replace(/\'/g,  '\\\'').replace(/\"/g,"“");
 	            	;
-//        			var formatStr = "<input id = 'bt_edit_" + record.get('id')
-//					+ "' onclick=\"Ext.Msg.alert('详情','" + 
-//					msg
-//					+ "');\" type='button' value='查看' width ='15px'/>&nbsp;&nbsp;"; 
+	            	var resultStr = "";
+	            	
         			var formatStr = "<input id = 'bt_edit_" + record.get('id')
 					+ "'onclick=\"showErrInfo('" + 
 					msg
 					+ "');\" type='button' value='查看' width ='15px'/>&nbsp;&nbsp;"; 
-								            			
-    				var resultStr = String.format(formatStr);
+        			
+        			if(record.get('opereteTypeId') == '导入项目图片数据'){
+	        			var downloadExcel = "<input id = 'bt_downloadexcel_" + record.get('id')
+	        			+ "'onclick=\"downloadExcel('" + 
+	        			record.get('id')
+	        			+ "');\" type='button' value='下载EXCEL' width ='15px'/>&nbsp;&nbsp;"; 
+									            			
+	    				resultStr = String.format(formatStr+downloadExcel);
+        			}else{
+        				resultStr = String.format(formatStr);
+        			}
     				return "<div>" + resultStr + "</div>";
 				  } .createDelegate(this)}
             ] 
@@ -229,4 +236,38 @@
     		items : [_importPanel]
     	});
 		newWin.show();
+   }
+
+   function downloadExcel(id){
+	   Ext.Ajax.request( {
+			  url : path + "/operate/"+"checkDownloadExcelByid/",
+			  method : 'post',
+			  params : {
+				  id:id
+			  },
+			  success : function(response, options) {
+				   var o = Ext.util.JSON.decode(response.responseText);
+				   if(o.i_type && "success"== o.i_type){
+					   var form=$("<form>");//定义一个form表单
+					   form.attr("style","display:none");
+					   form.attr("target","");
+					   form.attr("method","post");
+					   form.attr("action",path + "/operate/"+"downloadExcelByid?id="+id);
+					   var input1=$("<input>");
+					   input1.attr("type","hidden");
+					   input1.attr("name","exportData");
+					   input1.attr("value",(new Date()).getMilliseconds());
+					   $("body").append(form);//将表单放置在web中
+					   form.append(input1);
+					   form.submit();//表单提交 
+				   }else{
+				   	   Ext.Msg.alert('提示', o.i_msg); 
+				   }
+			  },
+			  failure : function() {
+				  console.log(2133333);
+			  }
+		});
+	   
+	   
    }

@@ -5,6 +5,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.charset.Charset;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
@@ -37,7 +38,7 @@ public class ZipUtil {
 		if (!pathFile.exists()) {
 			pathFile.mkdirs();
 		}
-		ZipFile zip = new ZipFile(zipFile);
+		ZipFile zip = new ZipFile(zipFile,Charset.forName("GBK"));
 		for (Enumeration entries = zip.entries(); entries.hasMoreElements();) {
 			InputStream in = null;
 			OutputStream out = null;
@@ -48,8 +49,7 @@ public class ZipUtil {
 				String outPath = (descDir + zipEntryName).replaceAll("\\*", "/");
 
 				// 获取当前file的父路径,这才是文件夹
-				File file = new File(outPath.substring(0,
-						outPath.lastIndexOf('/')));
+				File file = new File(outPath.substring(0,outPath.lastIndexOf('/')));
 
 				// 判断路径是否存在,不存在则创建文件路径
 				if (!file.exists()) {
@@ -68,8 +68,6 @@ public class ZipUtil {
 				while ((len = in.read(buf1)) > 0) {
 					out.write(buf1, 0, len);
 				}
-				in.close();
-				out.close();
 			} catch (Exception e) {
 				e.printStackTrace();
 			} finally {

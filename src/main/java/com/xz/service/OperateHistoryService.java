@@ -81,6 +81,29 @@ public class OperateHistoryService {
 			logger.error("operateUserId = "+operateUserId +",opereteTypeId="+opereteTypeId+",operateSummary ="+operateSummary+",ip="+ip+",mac="+mac+",serverIp="+serverIp+",出错信息："+e.getMessage());
 		}
 	}
+	public void insertOH(HttpSession session, String opereteTypeId, String operateSummary,int isSuccess,String filepath) {
+		String ip = "";
+		String mac = "";
+		String serverIp = "";
+		String operateUserId = session.getAttribute("userId")+"";
+		try {
+			ip = session.getAttribute("userIP")+"";
+			serverIp = session.getAttribute("userMAC")+"";
+		} catch (Exception e) {
+			e.printStackTrace();
+			logger.error(e.getMessage());
+		}
+		String operateUserCity = "";
+		String sql = "insert into operate_history (operate_user_id,operete_type_id,create_time,operate_user_ip,operate_user_mac,local_server,operate_user_city,operate_summary,is_success,downfile_path)" +
+				"values(?,?,sysdate(),?,?,?,?,?,?,?)";
+		try {
+			jdbcTemplate.update(sql, operateUserId, opereteTypeId, ip, mac,
+					serverIp, operateUserCity, operateSummary,isSuccess,filepath);
+		} catch (Exception e) {
+			e.printStackTrace();
+			logger.error("operateUserId = "+operateUserId +",opereteTypeId="+opereteTypeId+",operateSummary ="+operateSummary+",ip="+ip+",mac="+mac+",serverIp="+serverIp+",出错信息："+e.getMessage());
+		}
+	}
 	public void insertOH( String operateUserId,
 			String opereteTypeId, String operateSummary,int isSuccess) {
 		String ip = "";
@@ -319,6 +342,15 @@ public class OperateHistoryService {
 			rm.setOpereteTypeId(rs.getString("operete_type_id"));
 			return rm;
 		}
+	}
+	
+	public List<Map<String, Object>> getFilePath(String id){
+		String sql = " select * from operate_history where id = ? ";
+		List<Map<String, Object>> list = jdbcTemplate.queryForList(sql, id);
+		if(list != null && list.size() > 0){
+			return list;
+		}
+		return null;
 	}
 }
 

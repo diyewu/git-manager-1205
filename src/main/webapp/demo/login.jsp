@@ -1,4 +1,3 @@
-<%@page import="javax.websocket.Session"%>
 <%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
 <%
 	String path = request.getContextPath();
@@ -16,6 +15,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>登录</title>
+    <link rel="icon" href="img/title.png" type="img/x-ico" />
     <link rel="stylesheet" href="css/login.css">
     <link rel="stylesheet" href="css/animate.min.css">
     <script src="js/jquery-3.2.1.min.js"></script>
@@ -52,7 +52,7 @@
             <input type="text" class="form-control" id="userName" placeholder="请输入账号" aria-describedby="basic-addon1">
         </div>
         <div class="inputBox pwdBox">
-            <input type="text" class="form-control" id="userPwd" placeholder="请输入密码" aria-describedby="basic-addon1">
+            <input type="password" class="form-control" id="userPwd" placeholder="请输入密码" aria-describedby="basic-addon1">
             <!-- <a href="#" class="forgetPwd">忘记密码</a> -->
         </div>
         <div class="inputBox codeBox">

@@ -1,6 +1,14 @@
 	var markerClusterer;
+	var ComplexCustomOverlay;
+	var _level;
+	var _key;
+	var _cacheKey;
+	var _currentLevel;
+	var _nextLevel;
+	var _ids;
+	var divIdIndex = 0;
+	var viewer ;
 	$(document).ready(function() { 
-		
 		// 百度地图API功能
 		initMap();
     	//===================
@@ -8,7 +16,6 @@
 		
 //    	$('#myContainer').hide();
         $('body').addClass('loaded');
-        $('#loader-wrapper .load_title').remove();
         
 //    	$(".js-silder").silder({
 //			auto: true,//自动播放，传入任何可以转化为true的值都会自动轮播
@@ -21,17 +28,258 @@
 //		});
     	getObjectList();//加载项目数据
     	getObjectDetail();//加载项目筛选条件数据
-    	initCluster();
+//    	initCluster();//根据项目生成markercluster
+    	initProjectMarker();
+    	$('#loader-wrapper .load_title').remove();
     	
+//    	$('img').each(function() {
+//            if (!this.complete || typeof this.naturalWidth == "undefined" || this.naturalWidth == 0) {
+//                this.src = 'images/01.jpg';
+//            }
+//        });
+    	//自定义覆盖物*************************************
+        ComplexCustomOverlay = function(point, text, mouseoverText){
+          this._point = point;
+          this._text = text;
+          this._overText = mouseoverText;
+        }
+        ComplexCustomOverlay.prototype = new BMap.Overlay();
+        ComplexCustomOverlay.prototype.initialize = function(map){
+          this._map = map;
+          var div = this._div = document.createElement("div");
+          div.id = "_creatdivid"+divIdIndex;
+          div.style.borderRadius="4px";
+          div.style.boxShadow="1px 1px 2px 1px rgba(0, 0, 0, 0.24)";
+//          div.style.background="rgba(57, 172, 106, 0.98)";
+          
+          div.style.position = "absolute";
+          div.style.zIndex = BMap.Overlay.getZIndex(this._point.lat);
+          div.style.backgroundColor = "#EE5D5B";
+          div.style.border = "1px solid #BC3B3A";
+          div.style.color = "white";
+//          div.style.height = "18px";
+//          div.style.padding = "2px";
+          div.style.padding = "2px";
+          div.style.lineHeight = "25px";
+          div.style.whiteSpace = "nowrap";
+          div.style.MozUserSelect = "none";
+          div.style.fontSize = "15px"
+          var span = this._span = document.createElement("span");
+          div.appendChild(span);
+          span.appendChild(document.createTextNode(this._text));      
+          var that = this;
+
+          var arrow = this._arrow = document.createElement("div");
+          arrow.style.background = "url(./img/label.png) no-repeat";
+          arrow.style.position = "absolute";
+          arrow.style.width = "11px";
+          arrow.style.height = "10px";
+          arrow.style.top = "29px";
+          arrow.style.left = "10px";
+          arrow.style.overflow = "hidden";
+          div.appendChild(arrow);
+         
+          div.onmouseover = function(){
+        	  this.style.zIndex = 100;
+        	  this.style.cursor = "pointer";
+        	
+            this.style.backgroundColor = "#6BADCA";
+            this.style.borderColor = "#0000ff";
+            this.getElementsByTagName("span")[0].innerHTML = that._overText;
+            arrow.style.backgroundPosition = "0px -20px";
+          }
+
+          div.onmouseout = function(){
+        	this.style.zIndex = BMap.Overlay.getZIndex(that._point.lat);
+            this.style.backgroundColor = "#EE5D5B";
+            this.style.borderColor = "#BC3B3A";
+            this.getElementsByTagName("span")[0].innerHTML = that._text;
+            arrow.style.backgroundPosition = "0px 0px";
+          }
+
+          map.getPanes().labelPane.appendChild(div);
+          
+          return div;
+        }
+        ComplexCustomOverlay.prototype.draw = function(){
+          var map = this._map;
+          var pixel = map.pointToOverlayPixel(this._point);
+          this._div.style.left = pixel.x - parseInt(this._arrow.style.left) + "px";
+          this._div.style.top  = pixel.y - 30 + "px";
+        }
+        //添加监听事件  
+        ComplexCustomOverlay.prototype.addEventListener = function(event,fun){  
+            this._div['on'+event] = fun;  
+        }
+    	//自定义覆盖物*************************************
+    	
+        
     }); 
+	//图片查看插件**********************************************
+//	$(document).on('mousedown','.nullclass',function () {
+//		if($(this).attr('src')){
+//			$('.list-container').viewer(
+//					{
+//						'hidden': function (e) {
+//							console.log(e.type);
+//						},
+//					}
+//			);
+//		}
+//		else{
+//			return false;
+//		}
+//	});
+	//图片查看插件**********************************************
+	
+	function initProjectMarker(){
+		$.post(path+"/webctrl/getMapInfoByUserRole/", 
+		{
+		},
+		function(result){
+			if(result.success == true){//登陆成功
+				var data = result.data;
+//				generateCluster(data);
+				generateMarker(data,12);
+			}else {
+			}
+		},'json');
+	}
+	var overlays = new Array();
+	function generateMarker(array,level){
+		for(var k in overlays){
+			map.removeOverlay(overlays[k]);
+		}
+    	var pt = null;
+    	var k = 0;
+    	_level = level;
+    	for (var i in array) {
+    		pt = new BMap.Point(array[i].longitude , array[i].latitude);
+			if(k == 0){
+				if(array[i].nextLevel){
+					map.centerAndZoom(pt, level);
+				}else{
+					map.centerAndZoom(pt, 19);
+				}
+			}
+//    	   var marker = new BMap.Marker(pt);
+    	   var mouseoverTxt = array[i].text + " 共" + array[i].totalitem + "条问题点" ;
+    	   var myCompOverlay = new ComplexCustomOverlay(pt, array[i].text,mouseoverTxt);
+    	   divIdIndex++;
+    	   map.addOverlay(myCompOverlay);
+    	   overlays.push(myCompOverlay);
+//    	   marker.tkey = array[i].key;
+    	   (function() {  
+   		    	var key = array[i].key;
+	       		var cacheKey = array[i].cacheKey;
+	       		var currentLevel = array[i].currentLevel;
+	       		var nextLevel = array[i].nextLevel;
+	       		var ids = array[i].ids;
+	       		myCompOverlay.addEventListener("click", function(){
+	       			if(currentLevel != '6'){
+	       				showNextLevel(level,key,cacheKey,currentLevel,nextLevel,ids);
+	       			}
+	           	    showInfo(ids);
+	       		});
+          })();  
+//    	   if(array[i].nextLevel){
+//	    	   (function() {  
+//	    		    var key = array[i].key;
+//		       		var cacheKey = array[i].cacheKey;
+//		       		var currentLevel = array[i].currentLevel;
+//		       		var nextLevel = array[i].nextLevel;
+//		       		var ids = array[i].ids;
+//		       		myCompOverlay.addEventListener("click", function(){
+//	            	   showNextLevel(level,key,cacheKey,currentLevel,nextLevel,ids);
+//	            	   showInfo(ids);
+//	               });
+//	           })();  
+//    	   }else{
+//    		   (function() {  
+//    			    var ids = array[i].ids;
+//		       		myCompOverlay.addEventListener("click", function(){
+//	            	   showInfo(ids);
+//	               });
+//	           })(); 
+//    	   }
+    	   k++;
+    	}
+	}
+	
+	function showNextLevel(level,key,cacheKey,currentLevel,nextLevel,ids){
+		if(key)
+			_key = key;
+		if(cacheKey)
+			_cacheKey = cacheKey;
+		if(currentLevel)
+			_currentLevel = currentLevel;
+		if(nextLevel)
+			_nextLevel = nextLevel;
+		if(ids)
+			_ids = ids;
+		$.post(path+"/webctrl/getNextMapInfoByKey/", 
+		{
+			key:key,
+			cacheKey:cacheKey,
+			currentLevel:currentLevel,
+			nextLevel:nextLevel
+		},
+		function(result){
+			if(result.success == true){
+				var data = result.data;
+				generateMarker(data,level+2);
+			}else {
+				 
+			}
+		},'json');
+	}
+	function showPreLevel(level,key,cacheKey,currentLevel){
+		_level = level-2;
+		$.post(path+"/webctrl/getPreMapInfoByKey/", 
+		{
+			key:key,
+			cacheKey:cacheKey,
+			currentLevel:currentLevel
+		},
+		function(result){
+			if(result.success == true){
+				var data = result.data;
+				if(data){
+					_key = data[0].preKey;
+					_currentLevel = data[0].preLevel;
+					generateMarker(data,level-2);
+					var ids ="";
+					for (var i in data) {
+						ids = ids + data[i].ids+",";
+					}
+					showInfo(ids);
+				}else{
+					showNextLevel(10, "", _cacheKey, _currentLevel, _nextLevel, _ids);
+					if ($('.expander').hasClass("fadeOut")) {
+						$('#autoShowList').trigger("click");
+					}
+					$(".item-wrap").empty();
+					$('#finditemlength').html(0);
+					
+				}
+			}else {
+				
+			}
+		},'json');
+	}
     
 	function getObjectList(){
 		$.post(path+"/webctrl/getObjectListByUserRole/", 
 		{
 		},
 		function(result){
-			if(result.success == true){//登陆成功
+			if(result.success == true){
+				var kk = 0;
 				$.each(result.data, function (index, obj) {
+					if(kk == 0){
+						document.title = obj.menu_name;
+					}
+					kk++;
 	               var lis = "";
 	               trs = "<li id=\""+obj.id+"\"><span class=\"text\">"+obj.menu_name+"&nbsp;&nbsp;</span></li>";
 	               $(".first-info-list").append(trs);
@@ -148,27 +396,9 @@
     	map.setCurrentCity("上海");          // 设置地图显示的城市 此项是必须设置的
     	map.enableScrollWheelZoom(true);     //开启鼠标滚轮缩放
     	
-//    	var xy = [
-//    		{'x':121.48123,'y':31.23123},
-//    		{'x':121.4723,'y':31.25123},
-//    		{'x':121.48223,'y':31.33123},
-//    		{'x':121.46623,'y':31.35123},
-//    		{'x':121.23123,'y':31.36123},
-//    		{'x':121.25123,'y':31.22123},
-//    		{'x':121.36123,'y':31.28123},
-//    		{'x':121.45123,'y':31.12123},
-//    		{'x':121.5623,'y':31.8123},
-//    		{'x':121.45623,'y':31.73123},
-//    		{'x':121.38123,'y':31.63123}
-//    	];
+    	/* 
+    	 * 下面是markerclusterer逻辑
     	var markers = [];
-//    	var pt = null;
-//    	for (var i in xy) {
-//    	   pt = new BMap.Point(xy[i].x , xy[i].y);
-//    	   var marker = new BMap.Marker(pt);
-//    	   marker.addEventListener("click", showInfo)
-//    	   markers.push(marker);
-//    	}
     	//生成一个marker数组，然后调用markerClusterer类即可。
     	markerClusterer = new BMapLib.MarkerClusterer(map,
     		{
@@ -184,6 +414,7 @@
     		});
     	markerClusterer.setMaxZoom(13);
     	markerClusterer.setGridSize(100);
+    	*/
 	}
 
 
@@ -240,6 +471,10 @@ var vm = new Vue({
     	//三级菜单关联操作
     	cascadeClose :function(){//联动关闭
 //    		console.log(JSON.stringify(this.cascaderData));
+    		//loading层
+    		var layindex = layer.load(1, {
+    		  shade: [0.8,'#fff'] //0.1透明度的白色背景
+    		});
     		var jsonparam = JSON.stringify(this.cascaderData);
             this.cascaderStatus = false;
             this.firstIndex = '';
@@ -254,7 +489,9 @@ var vm = new Vue({
     				//TODO 解析坐标点到地图上
     				var data = result.data;
 //    				initMap();
-    				generateCluster(data);
+//    				generateCluster(data);
+    				generateMarker(data,12);
+    				layer.close(layindex); 
     			}else {
     			}
     		},'json');
@@ -475,17 +712,14 @@ function showDetail(title,subhead,imgSrc,detail1,detail2,detail3,detail4){
 }
 
 
-function showInfo(e){
-	
+function showInfo(ids){
 	if ($('.expander').hasClass("fadeIn")) {
 		$('#autoShowList').trigger("click");
 	}
-	
 	$(".item-wrap").empty();
-	
 	$.post(path+"/webctrl/getCoordinateInfo/", 
 	{
-    	ids:e.target.tid
+    	ids:ids
 	},
 	function(result){
 		if(result.success == true){//登陆成功
@@ -499,6 +733,9 @@ function showInfo(e){
 					   "检查时间："+obj.check_time,"照片编号："+obj.img_url);
                $(".item-wrap").append(htm);
 	        });
+			viewer = new Viewer(document.getElementById('list-container-id'), {
+				
+			});
 		}else {
 		}
 	},'json');
@@ -507,9 +744,9 @@ function showInfo(e){
 function generateRightItem(title,subhead,imgSrc,detail1,detail2,detail3){
 	var html = "";
 	html += "<div class=\"list-item\" >";
-	html += "	<img alt=\"\" onerror=\"this.src='"+imgSrc+"';this.onerror=null;\"	src=\""+imgSrc+"\">";
+	html += "	<img alt=\""+title+"\" class=\"nullclass\" onerror=\"this.src='./img/white1.png';this.onerror=null;\" data-original=\""+imgSrc+"\"	src=\""+imgSrc+"\">";
 	html += "	<div class=\"right-info\">";
-	html += "		<div style='cursor: pointer;' onClick=\"showDetail('"+title+"','"+subhead+"','"+imgSrc+"','"+detail1+"','"+detail2+"','"+detail3+"')\">";
+	html += "		<div style='cursor: pointer;'  onClick=\"showDetail('"+title+"','"+subhead+"','"+imgSrc+"','"+detail1+"','"+detail2+"','"+detail3+"')\">";
 	html += "			<span class=\"title\"> <a>"+title+"</a>";
 	html += "			</span> <span class=\"villa-name\" >"+subhead+"</span>";
 //	html += "			<span class=\"sale-status\" >正常</span>";
@@ -529,4 +766,19 @@ function generateRightItem(title,subhead,imgSrc,detail1,detail2,detail3){
 	html += "	<hr>";
 	html += "</div>";
 	return html;
+}
+
+
+function turnback(){
+//	generateMarker(_data, _level);
+//	console.log(_key);
+//	console.log(_cacheKey);
+//	console.log(_currentLevel);
+//	console.log(_nextLevel);
+//	console.log(_level);
+	if(!_key){
+		return null;
+	}else{
+		showPreLevel(_level, _key, _cacheKey, _currentLevel);
+	}
 }
