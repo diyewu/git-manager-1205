@@ -215,7 +215,7 @@ public class AppController extends BaseController{
 						param.put(AttriId, conditionList);
 					}
 				}
-//				list = appService.getMapInfo(projectId, param,null,"first_area","second_area");
+				list = appService.getMapInfo(projectId, param,null,"0");
 				if (list != null && list.size() > 0) {
 					info.addAll(list);
 				}
@@ -226,6 +226,33 @@ public class AppController extends BaseController{
 		return new AppJsonModel(code, ServerResult.getCodeMsg(code, msg), info);
 	}
 	
+	@RequestMapping("getNextMapInfoByKey")
+	@ResponseBody
+	public AppJsonModel getNextMapInfoByKey(HttpServletRequest request){
+		String token = request.getHeader("token");
+		String phoneId = request.getHeader("phoneId");
+		
+		String cacheKey = request.getParameter("cacheKey");
+		String key = request.getParameter("key");
+		String currentLevel = request.getParameter("currentLevel");
+		
+		String msg = "success";
+		int code = 0;
+		List<String> paramList = new ArrayList<String>();
+		paramList.add(token);
+		paramList.add(phoneId);
+		paramList.add(cacheKey);
+		paramList.add(key);
+		paramList.add(currentLevel);
+		AppLoginBean appLoginBean = new AppLoginBean();
+		code = globalCheck(paramList, token, phoneId,appLoginBean);
+		
+		List<Map<String, Object>> info = new ArrayList<Map<String,Object>>();
+		if(code == 0){
+			info = appService.generateCod(key,AppService.cacheMap.get(cacheKey), cacheKey,currentLevel);
+		}
+		return new AppJsonModel(code, ServerResult.getCodeMsg(code, msg), info);
+	}
 	
 	@RequestMapping("getCoordinateInfo")
 	@ResponseBody
@@ -326,8 +353,37 @@ public class AppController extends BaseController{
 				}
 			}
         }
-        
-		
 	}
+	@RequestMapping("getPreMapInfoByKey")
+	@ResponseBody
+	public AppJsonModel getPreMapInfoByKey(HttpServletRequest request){
+		String token = request.getHeader("token");
+		String phoneId = request.getHeader("phoneId");
+		
+		String cacheKey = request.getParameter("cacheKey");
+		String key = request.getParameter("key");
+		String currentLevel = request.getParameter("currentLevel");
+		String msg = "success";
+		int code = 0;
+		List<String> paramList = new ArrayList<String>();
+		paramList.add(token);
+		paramList.add(phoneId);
+		paramList.add(cacheKey);
+		paramList.add(key);
+		paramList.add(currentLevel);
+		AppLoginBean appLoginBean = new AppLoginBean();
+		code = globalCheck(paramList, token, phoneId,appLoginBean);
+		
+		List<Map<String, Object>> info = new ArrayList<Map<String,Object>>();
+		if(code == 0){
+			info = appService.turnback(cacheKey, key, currentLevel);
+		}
+		
+		return new AppJsonModel(code, ServerResult.getCodeMsg(code, msg), info);
+	}
+	
+	
+	
+	
 	//TODO 增加心跳包接口
 }

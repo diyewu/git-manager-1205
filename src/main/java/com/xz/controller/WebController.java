@@ -272,9 +272,9 @@ public class WebController extends BaseController{
 	 * @param request
 	 * @return
 	 */
-	@RequestMapping("getMapInfoByKey")
+	@RequestMapping("getNextMapInfoByKey")
 	@ResponseBody
-	public JsonModel getMapInfoByKey(HttpServletRequest request){
+	public JsonModel getNextMapInfoByKey(HttpServletRequest request){
 		HttpSession session = request.getSession(); 
 		String userRole = session.getAttribute(SessionConstant.WEB_USER_ROLE)+"";
 		String cacheKey = request.getParameter("cacheKey");

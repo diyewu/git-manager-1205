@@ -217,7 +217,7 @@
 			_nextLevel = nextLevel;
 		if(ids)
 			_ids = ids;
-		$.post(path+"/webctrl/getMapInfoByKey/", 
+		$.post(path+"/webctrl/getNextMapInfoByKey/", 
 		{
 			key:key,
 			cacheKey:cacheKey,
