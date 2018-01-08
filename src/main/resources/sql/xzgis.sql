@@ -10,7 +10,7 @@ Target Server Type    : MYSQL
 Target Server Version : 50629
 File Encoding         : 65001
 
-Date: 2018-01-06 14:37:17
+Date: 2018-01-08 18:00:09
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -424,6 +424,25 @@ CREATE TABLE `project_main` (
 INSERT INTO `project_main` VALUES ('00151520636358600000005056c00001', '2017年10月上海城管小区问题清单', '2018-01-06 10:39:23', null, '2bb49d9d514c48c5bebbf78beab3e179', 'F:\\tempfilepath\\20180106\\1515206361751管小区汇总2 - 测试.xlsx', '1');
 
 -- ----------------------------
+-- Table structure for project_searchno_dictionary
+-- ----------------------------
+DROP TABLE IF EXISTS `project_searchno_dictionary`;
+CREATE TABLE `project_searchno_dictionary` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `search_no` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `search_name` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `create_date` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `update_date` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ----------------------------
+-- Records of project_searchno_dictionary
+-- ----------------------------
+INSERT INTO `project_searchno_dictionary` VALUES ('1', '07', '上海', null, null);
+INSERT INTO `project_searchno_dictionary` VALUES ('2', '0705', '金山', null, null);
+
+-- ----------------------------
 -- Table structure for t_user
 -- ----------------------------
 DROP TABLE IF EXISTS `t_user`;
@@ -551,8 +570,8 @@ INSERT INTO `user_menu` VALUES ('115', '1', 'userAuth.jsp', '权限管理', '1',
 INSERT INTO `user_menu` VALUES ('120', '2', 'webUserPhoneMgr.jsp', '前端用户APP登陆管理', '1', '0', '1');
 INSERT INTO `user_menu` VALUES ('121', '2', 'webUserMgr.jsp', '前端用户管理', '1', '0', '1');
 INSERT INTO `user_menu` VALUES ('123', '2', 'webUserAuth.jsp', '前端筛选权限设置', '1', '0', '1');
-INSERT INTO `user_menu` VALUES ('131', '3', 'projectMgr.jsp', '项目数据管理', '1', '0', '1');
-INSERT INTO `user_menu` VALUES ('132', '3', 'welcome1.jsp', '预留菜单', '1', '0', '1');
+INSERT INTO `user_menu` VALUES ('131', '3', 'searchnoMgr.jsp', '调研编号字典管理', '1', '0', '1');
+INSERT INTO `user_menu` VALUES ('132', '3', 'projectMgr.jsp', '项目数据管理', '1', '0', '1');
 
 -- ----------------------------
 -- Table structure for user_role

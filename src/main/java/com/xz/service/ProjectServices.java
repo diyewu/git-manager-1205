@@ -453,5 +453,33 @@ public class ProjectServices {
 		jdbcTemplate.update(delprojectMain,projectId);
 	}
 	
+	public Page<Map<String, Object>> getSearchNoDictionary(Map<String, String> condition){
+		Page<Map<String, Object>> page = new Page<Map<String, Object>>(0, 1000, false);
+		List<Object> params = new ArrayList<Object>();
+		List<Map<String, Object>> list = new ArrayList<Map<String,Object>>();
+		StringBuilder sbud = new StringBuilder(" select * from project_searchno_dictionary where 1=1 ");
+		if (!condition.isEmpty()) { 
+			if (condition.containsKey("searchNo")) {
+				sbud.append(" and search_no like ? ");
+				params.add("%"+condition.get("searchNo")+"%");
+			}
+			if(condition.containsKey("searchName")){
+				sbud.append(" and search_name like ? ");
+				params.add("%"+condition.get("searchName")+"%");
+			}
+			List<Map<String, Object>> countList = jdbcTemplate.queryForList(sbud.toString(),params.toArray());
+			page.setTotalCount(countList.size());
+			if (condition.containsKey("start") && condition.containsKey("limit")) {
+				sbud.append(" LIMIT ?,? ");
+				int start = Integer.parseInt(condition.get("start"));
+				int limit = Integer.parseInt(condition.get("limit"));
+				params.add(start);
+				params.add(limit);
+			}
+			list = jdbcTemplate.queryForList(sbud.toString(),params.toArray());
+		}
+		page.setResult(list);
+		return page;
+	}
 	
 }

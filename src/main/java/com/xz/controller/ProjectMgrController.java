@@ -18,12 +18,14 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.StringUtils;
+import org.codehaus.jackson.JsonGenerationException;
 import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
@@ -381,4 +383,40 @@ public class ProjectMgrController extends BaseController {
     	}
     	writeJson(map, response);
     }
+    
+    
+    @RequestMapping("listSearchNo")
+	@ResponseBody
+	public void listSearchNo(HttpServletRequest request,HttpServletResponse response) throws JsonGenerationException, JsonMappingException, IOException{
+		Map<String,String> condition = new HashMap<String, String>();
+		String searchNo = request.getParameter("searchNo");
+		String searchName = request.getParameter("searchName");
+		String start = request.getParameter("start");
+		String limit = request.getParameter("limit");
+		
+		String msg = null;
+		if(StringUtils.isNotBlank(searchNo)){
+			condition.put("searchNo", searchNo);
+		}
+		if(StringUtils.isNotBlank(searchName)){
+			condition.put("searchName", searchName);
+		}
+		if (StringUtils.isNotBlank(start)) {
+			condition.put("start", start);
+		}
+		if (StringUtils.isNotBlank(limit)) {
+			condition.put("limit", limit);
+		}
+		Page<Map<String, Object>> page = new Page<Map<String,Object>>();
+		try {
+			page = projectServices.getSearchNoDictionary(condition);
+		} catch (Exception e) {
+			e.printStackTrace();
+			msg = e.getMessage();
+		}
+		resultSuccess("", page.getResult(), page.getTotalCount(),response);
+	}
+    
+    
+    
 }
