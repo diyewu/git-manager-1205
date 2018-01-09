@@ -482,4 +482,74 @@ public class ProjectServices {
 		return page;
 	}
 	
+	
+	public void updateResearchInfoById(String id,String no,String name){
+		if(StringUtils.isNotBlank(id)){
+			String sql = " update project_searchno_dictionary set search_no = ? ,search_name = ? ,update_date=NOW() where id = ? ";
+			jdbcTemplate.update(sql, no,name,id);
+		}
+	}
+	
+	public void addResearchInfo(String no,String name){
+		String sql = " INSERT into project_searchno_dictionary(search_no,search_name,create_date,update_date)VALUES(?,?,NOW(),NOW()) ";
+		jdbcTemplate.update(sql, no,name);
+	}
+	
+	public void deleteResearchInfoById(String id){
+		String sql = " delete from project_searchno_dictionary where id = ? ";
+		if(StringUtils.isNotBlank(id)){
+			jdbcTemplate.update(sql, id);
+		}
+	}
+	
+	public void importResearchInfo(File file,HttpSession session){
+		ArrayList<ArrayList<Object>> list = new ArrayList<ArrayList<Object>>();
+		String msg = null;
+		String type = "20";//导入调研编号
+		try {
+			try {
+				 list = ExcelReadUtils.readAllRows(file);
+			} catch (IOException e) {
+				e.printStackTrace();
+				msg = "文件解析出错："+e.getMessage();
+			}
+			ArrayList<Object> objList = new ArrayList<Object>(); 
+			if(msg != null){
+				insertOperateHistory(session, type, msg);
+				return;
+			}else{
+				if(list == null || list.size() <= 0){
+					msg = "文件内容有误，请确认文件内容不为空！";
+					insertOperateHistory(session, type, msg);
+					return;
+				}
+				String searchNo = "";
+				String searchName = "";
+				String sql = " INSERT into project_searchno_dictionary(search_no,search_name,create_date,update_date)VALUES(?,?,NOW(),NOW()) ";
+				String checkSql = " select * from project_searchno_dictionary where search_no = ? or search_name = ? ";
+				List<Map<String, Object>> checkList = new ArrayList<Map<String,Object>>();
+				for(int i=1;i<list.size();i++){
+					objList = list.get(i);
+					searchNo = objList.get(0)+"";
+					searchName = objList.get(1)+"";
+					checkList = jdbcTemplate.queryForList(checkSql, searchNo,searchName);
+					if (checkList == null || checkList.size() == 0) {
+						jdbcTemplate.update(sql, searchNo,searchName);
+					}else{
+						throw new RuntimeException("编号："+checkList.get(0).get("search_no")+"数据有重复");
+					}
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			msg = e.getMessage();
+			System.out.println("___________"+msg);
+			insertOperateHistory(session, type, msg);
+			throw new RuntimeException(e);
+		}
+	}
+	
+	
+	
+	
 }
