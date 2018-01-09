@@ -32,6 +32,7 @@ import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 
 import com.xz.common.Page;
 import com.xz.entity.CustomConfig;
+import com.xz.service.OperateHistoryService;
 import com.xz.service.ProjectServices;
 
 @RequestMapping("projectmgr")
@@ -42,6 +43,9 @@ public class ProjectMgrController extends BaseController {
 	
 	@Autowired
 	private ProjectServices projectServices;
+	
+	@Autowired
+	private OperateHistoryService operateHistoryService;
 	
 	
 	ExecutorService threadPool = Executors.newCachedThreadPool();
@@ -96,6 +100,8 @@ public class ProjectMgrController extends BaseController {
 				projectServices.importResearchInfo(xlsFile, session);
 			} catch (Exception e) {
 				e.printStackTrace();
+				System.out.println("_____111______"+e.getMessage());
+				operateHistoryService.insertOH(session, "20", e.getMessage(),0);
 			}
 			return resp;
 		}
