@@ -662,8 +662,8 @@ public class AppService {
 		for (int i = 0; i < list.size(); i++) {
 			attrMap = list.get(i);
 			if(attrMap.get("attribute_name") != null && StringUtils.isNotBlank(attrMap.get("attribute_name")+"")){
-				sb.append(" ext"+attrMap.get("attribute_index")+" as "+attrMap.get("alias_name")+"_key,");
-				sb.append("'"+attrMap.get("attribute_name")+"' as "+attrMap.get("alias_name")+"_value,");
+				sb.append(" ext"+attrMap.get("attribute_index")+" as "+attrMap.get("alias_name")+"_value,");
+				sb.append("'"+attrMap.get("attribute_name")+"' as "+attrMap.get("alias_name")+"_key,");
 			}else{
 				sb.append(" 'null' as "+attrMap.get("alias_name")+"_key,");
 				sb.append("'null' as "+attrMap.get("alias_name")+"_value,");

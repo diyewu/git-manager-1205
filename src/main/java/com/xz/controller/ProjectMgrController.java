@@ -18,12 +18,14 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.StringUtils;
+import org.codehaus.jackson.JsonGenerationException;
 import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
@@ -78,6 +80,25 @@ public class ProjectMgrController extends BaseController {
 			}
 	    	return resp;
 	    }
+	}
+	class ReadCallable implements Callable<Object>{
+		private HttpSession session;
+		private File xlsFile;
+		
+		ReadCallable(HttpSession session,File xlsFile) {
+			this.session =session;
+			this.xlsFile = xlsFile;
+		}
+		@Override
+		public Object call() throws Exception {
+			String resp = "";
+			try {
+				projectServices.importResearchInfo(xlsFile, session);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			return resp;
+		}
 	}
 	/*
 	 * 采用spring提供的上传文件的方法
@@ -381,4 +402,147 @@ public class ProjectMgrController extends BaseController {
     	}
     	writeJson(map, response);
     }
+    
+    
+    @RequestMapping("listSearchNo")
+	@ResponseBody
+	public void listSearchNo(HttpServletRequest request,HttpServletResponse response) throws JsonGenerationException, JsonMappingException, IOException{
+		Map<String,String> condition = new HashMap<String, String>();
+		String searchNo = request.getParameter("searchNo");
+		String searchName = request.getParameter("searchName");
+		String start = request.getParameter("start");
+		String limit = request.getParameter("limit");
+		
+		String msg = null;
+		if(StringUtils.isNotBlank(searchNo)){
+			condition.put("searchNo", searchNo);
+		}
+		if(StringUtils.isNotBlank(searchName)){
+			condition.put("searchName", searchName);
+		}
+		if (StringUtils.isNotBlank(start)) {
+			condition.put("start", start);
+		}
+		if (StringUtils.isNotBlank(limit)) {
+			condition.put("limit", limit);
+		}
+		Page<Map<String, Object>> page = new Page<Map<String,Object>>();
+		try {
+			page = projectServices.getSearchNoDictionary(condition);
+		} catch (Exception e) {
+			e.printStackTrace();
+			msg = e.getMessage();
+		}
+		resultSuccess("", page.getResult(), page.getTotalCount(),response);
+	}
+    @RequestMapping("editReachInfo")
+	@ResponseBody
+	public void editReachInfo(HttpServletRequest request,HttpServletResponse response){
+    	String id = request.getParameter("id");
+    	String no = request.getParameter("no");
+    	String name = request.getParameter("name");
+    	String msg = null;
+    	try {
+			if (StringUtils.isNotBlank(id)) {//编辑
+				projectServices.updateResearchInfoById(id, no, name);
+			} else {//新增
+				projectServices.addResearchInfo(no, name);
+			} 
+		} catch (Exception e) {
+			e.printStackTrace();
+			msg = e.getMessage();
+		}
+    	Map<String, String> map = new HashMap<String, String>();
+    	if (msg == null) {
+    		map.put("i_type", "success");
+    		map.put("i_msg", "");
+    	} else {
+    		map.put("i_type", "error");
+    		map.put("i_msg", "操作失败：" + msg);
+    	}
+    	writeJson(map, response);
+    }
+    
+    @RequestMapping("deleteResearchInfo")
+    @ResponseBody
+    public void deleteResearchInfo(HttpServletRequest request,HttpServletResponse response){
+    	String id = request.getParameter("id");
+    	String msg = null;
+    	try {
+    		if (StringUtils.isNotBlank(id)) {//编辑
+    			projectServices.deleteResearchInfoById(id);
+    		}else{
+    			msg = "参数异常";
+    		}
+    	} catch (Exception e) {
+    		e.printStackTrace();
+    		msg = e.getMessage();
+    	}
+    	Map<String, String> map = new HashMap<String, String>();
+    	if (msg == null) {
+    		map.put("i_type", "success");
+    		map.put("i_msg", "");
+    	} else {
+    		map.put("i_type", "error");
+    		map.put("i_msg", "操作失败：" + msg);
+    	}
+    	writeJson(map, response);
+    }
+    
+    /*
+	 * 采用spring提供的上传文件的方法
+	 */
+	@RequestMapping("uploadSearchNoInfoFile")
+	public void uploadSearchNoInfoFile(HttpServletRequest request,HttpServletResponse response) throws IllegalStateException, IOException {
+    	String msg = null;
+    	HttpSession session=request.getSession();
+    	Map<String, String> map = new HashMap<String, String>();
+    	mapper = new ObjectMapper();
+		try{
+			CommonsMultipartResolver multipartResolver = new CommonsMultipartResolver(request.getSession().getServletContext());
+			if (multipartResolver.isMultipart(request)) {
+				MultipartHttpServletRequest multiRequest = (MultipartHttpServletRequest) request;
+				Iterator iter = multiRequest.getFileNames();
+				File xlsFile = null;
+				while (iter.hasNext()) {
+					// 一次遍历所有文件
+					MultipartFile file = multiRequest.getFile(iter.next().toString());
+					if (file != null) {
+	//					String path = "E:/springUpload" + file.getOriginalFilename();
+						SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+						Date d = new Date();  
+				        String dateNowStr = sdf.format(d);
+				        String uploadPath = customConfig.getClientFileUpladPath()+File.separator+dateNowStr;
+				        File uploadPathFile =new File(uploadPath);
+						if(!uploadPathFile.exists() && !uploadPathFile.isDirectory() ){
+							uploadPathFile.mkdir();
+						}
+						//xls
+						String path=customConfig.getClientFileUpladPath()+File.separator+dateNowStr+File.separator+new Date().getTime()+file.getOriginalFilename();
+						// 上传
+						file.transferTo(new File(path));
+						if((file.getOriginalFilename()).contains(".xls")){//上传EXCEL文件
+							xlsFile = new File(path);
+							ReadCallable rc = new ReadCallable(session, xlsFile);
+							threadPool.submit(rc);
+						}
+					}
+	
+				}
+			}
+		}catch(Exception e){
+			e.printStackTrace();
+			msg = e.getMessage();
+		}
+		map.put("success", "true");
+		if (msg == null) {
+			map.put("i_type", "success");
+			map.put("i_msg", "");
+		} else {
+			map.put("i_type", "error");
+			map.put("i_msg", "操作失败：" + msg);
+		}
+		writeJson(map, response);
+	}
+    
 }
