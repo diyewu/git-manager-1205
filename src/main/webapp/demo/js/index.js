@@ -38,10 +38,12 @@
 //            }
 //        });
     	//自定义覆盖物*************************************
-        ComplexCustomOverlay = function(point, text, mouseoverText){
+        ComplexCustomOverlay = function(point, text, mouseoverText,showcolor,overcolor){
           this._point = point;
           this._text = text;
           this._overText = mouseoverText;
+          this._showcolor=showcolor;
+          this._overcolor=overcolor;
         }
         ComplexCustomOverlay.prototype = new BMap.Overlay();
         ComplexCustomOverlay.prototype.initialize = function(map){
@@ -50,15 +52,11 @@
           div.id = "_creatdivid"+divIdIndex;
           div.style.borderRadius="4px";
           div.style.boxShadow="1px 1px 2px 1px rgba(0, 0, 0, 0.24)";
-//          div.style.background="rgba(57, 172, 106, 0.98)";
+          div.style.background=this._showcolor;
           
           div.style.position = "absolute";
           div.style.zIndex = BMap.Overlay.getZIndex(this._point.lat);
-          div.style.backgroundColor = "#EE5D5B";
-          div.style.border = "1px solid #BC3B3A";
           div.style.color = "white";
-//          div.style.height = "18px";
-//          div.style.padding = "2px";
           div.style.padding = "2px";
           div.style.lineHeight = "25px";
           div.style.whiteSpace = "nowrap";
@@ -68,33 +66,32 @@
           div.appendChild(span);
           span.appendChild(document.createTextNode(this._text));      
           var that = this;
-
           var arrow = this._arrow = document.createElement("div");
-          arrow.style.background = "url(./img/label.png) no-repeat";
-          arrow.style.position = "absolute";
-          arrow.style.width = "11px";
-          arrow.style.height = "10px";
-          arrow.style.top = "29px";
-          arrow.style.left = "10px";
-          arrow.style.overflow = "hidden";
+          arrow.style.display="block";
+          arrow.style.borderWidth="5px";
+          arrow.style.position="absolute";
+          arrow.style.bottom= "-10px";
+          arrow.style.left= "10px";
+          arrow.style.borderStyle= "solid dashed dashed";
+          arrow.style.borderColor= this._showcolor+" transparent transparent";
+          arrow.style.fontSize= 0;
+          arrow.style.lineHeight= 0;
+          
           div.appendChild(arrow);
          
           div.onmouseover = function(){
-        	  this.style.zIndex = 100;
-        	  this.style.cursor = "pointer";
-        	
-            this.style.backgroundColor = "#6BADCA";
-            this.style.borderColor = "#0000ff";
+        	this.style.zIndex = 100;
+        	this.style.cursor = "pointer";
+            this.style.backgroundColor = that._overcolor;
+            arrow.style.borderColor= that._overcolor+" transparent transparent";
             this.getElementsByTagName("span")[0].innerHTML = that._overText;
-            arrow.style.backgroundPosition = "0px -20px";
           }
 
           div.onmouseout = function(){
         	this.style.zIndex = BMap.Overlay.getZIndex(that._point.lat);
-            this.style.backgroundColor = "#EE5D5B";
-            this.style.borderColor = "#BC3B3A";
+            this.style.background = that._showcolor;
             this.getElementsByTagName("span")[0].innerHTML = that._text;
-            arrow.style.backgroundPosition = "0px 0px";
+            arrow.style.borderColor= that._showcolor+" transparent transparent";
           }
 
           map.getPanes().labelPane.appendChild(div);
@@ -148,7 +145,8 @@
 			}
 //    	   var marker = new BMap.Marker(pt);
     	   var mouseoverTxt = array[i].text + " 共" + array[i].totalitem + "条问题点" ;
-    	   var myCompOverlay = new ComplexCustomOverlay(pt, array[i].text,mouseoverTxt);
+    	   var myCompOverlay = 
+    		   new ComplexCustomOverlay(pt, array[i].text,mouseoverTxt,"rgba(0,153,51, 0.9)","rgba(254,116,66, 0.8)");
     	   divIdIndex++;
     	   map.addOverlay(myCompOverlay);
     	   overlays.push(myCompOverlay);
@@ -228,6 +226,7 @@
 		function(result){
 			if(result.success == true){
 				var data = result.data;
+				console.log(data);
 				if(data){
 					_key = data[0].preKey;
 					_currentLevel = data[0].preLevel;
@@ -237,14 +236,13 @@
 						ids = ids + data[i].ids+",";
 					}
 					showInfo(ids);
-				}else{
-					showNextLevel(10, "", _cacheKey, _currentLevel, _nextLevel, _ids);
-					if ($('.expander').hasClass("fadeOut")) {
-						$('#autoShowList').trigger("click");
+					if(!_key){
+						if ($('.expander').hasClass("fadeOut")) {
+							$('#autoShowList').trigger("click");
+						}
+						$(".item-wrap").empty();
+						$('#finditemlength').html(0);
 					}
-					$(".item-wrap").empty();
-					$('#finditemlength').html(0);
-					
 				}
 			}else {
 				
@@ -713,22 +711,26 @@ function showInfo(ids){
 				$('#finditemlength').html(itemlength);
 			}
 			$.each(data, function (index, obj) {
-			   var htm = generateRightItem(obj.detail_address, '详情', basePath+'app/getImgBydetailId?id='+obj.id, "调研编号："+obj.research_number,
+			   var htm = generateRightItem(obj.detail_address, 
+					   '详情',
+					   	basePath+'app/getImgBydetailId?id='+obj.id,
+					   	basePath+'app/getImgBydetailId?id='+obj.id+"&type=thumb",
+					   "调研编号："+obj.research_number,
 					   "检查时间："+obj.check_time,"照片编号："+obj.img_url);
                $(".item-wrap").append(htm);
 	        });
 			viewer = new Viewer(document.getElementById('list-container-id'), {
-				
+				url: 'data-original'
 			});
 		}else {
 		}
 	},'json');
 }
 
-function generateRightItem(title,subhead,imgSrc,detail1,detail2,detail3){
+function generateRightItem(title,subhead,imgSrc,imgThumbSrc,detail1,detail2,detail3){
 	var html = "";
 	html += "<div class=\"list-item\" >";
-	html += "	<img alt=\""+title+"\" class=\"nullclass\" onerror=\"this.src='./img/white1.png';this.onerror=null;\" data-original=\""+imgSrc+"\"	src=\""+imgSrc+"\">";
+	html += "	<img alt=\""+title+"\" class=\"nullclass\" onerror=\"this.src='./img/white1.png';this.onerror=null;\" data-original=\""+imgSrc+"\"	src=\""+imgThumbSrc+"\">";
 	html += "	<div class=\"right-info\">";
 	html += "		<div style='cursor: pointer;'  onClick=\"showDetail('"+title+"','"+subhead+"','"+imgSrc+"','"+detail1+"','"+detail2+"','"+detail3+"')\">";
 	html += "			<span class=\"title\"> <a>"+title+"</a>";

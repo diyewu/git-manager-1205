@@ -20,8 +20,8 @@ public class MainTest {
 	}
 	
 	public static void splitTest(){
-		String s = "asdas.zip";
-		System.out.println(s.split("\\.")[0]);
+		String s = "F:\\tempfilepath\\20180110\\1515577741795201612\\201611\\照片 (3).jpg";
+		System.out.println(StringUtils.split(s, ".")[0]);
 	}
 	public static void listTest(){
 		List<String> list = new ArrayList<String>();

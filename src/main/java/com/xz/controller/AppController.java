@@ -318,6 +318,7 @@ public class AppController extends BaseController{
         response.setDateHeader("Expires", 0); 
         response.setContentType("image/jpeg"); 
         String detailId = request.getParameter("id");
+        String type = request.getParameter("type");
         if(StringUtils.isBlank(detailId)){
         	return;
         }
@@ -326,7 +327,12 @@ public class AppController extends BaseController{
         if(list != null && list.size()>0){
         	String path = list.get(0).get("img_path")==null?"":list.get(0).get("img_path")+"";
         	if(StringUtils.isNotBlank(path)){
-        		imgfile = new File(path);
+        		if("thumb".equals(type)){
+        			String[] imgs = StringUtils.split(path, ".");
+        			imgfile = new File(imgs[0]+"_thumb."+imgs[1]);
+        		}else{
+        			imgfile = new File(path);
+        		}
         	}
         }
         if(imgfile != null){

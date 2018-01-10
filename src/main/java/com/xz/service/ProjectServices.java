@@ -1,5 +1,6 @@
 package com.xz.service;
 
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -8,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
@@ -22,6 +24,10 @@ import com.xz.utils.CreateExcelUtil;
 import com.xz.utils.ExcelReadUtils;
 import com.xz.utils.SortableUUID;
 import com.xz.utils.ZipUtil;
+
+import net.coobird.thumbnailator.Thumbnails;
+import net.coobird.thumbnailator.Thumbnails.Builder;
+import net.coobird.thumbnailator.geometry.Positions;
 
 
 @Service
@@ -122,7 +128,6 @@ public class ProjectServices {
 		String msg = null;
 		String sql = " select * from project_attribute where project_id = ? and attribute_type = 4 ";
 		String projectSql = " select * from project_main where id = ? ";
-		String filepath = "";
 		String tPath = "";
 		try {
 			List<Map<String, Object>> attrList = jdbcTemplate.queryForList(sql, projectId);
@@ -142,6 +147,37 @@ public class ProjectServices {
 				String attrIndex = attrList.get(0).get("attribute_index") + "";
 				sql = "select id, ext" + attrIndex + " as imgname,img_path from project_detail where project_id = ?";
 				if (map != null && map.size() > 0) {
+					//生成缩略图
+					String newPath = "";
+					String imagePath = "";
+					String[] imgs = null; 
+					try{
+						for (Map.Entry<String, String> entry : map.entrySet()) {
+						    imagePath = entry.getValue();  
+						    imgs = StringUtils.split(imagePath, ".");
+						    
+						    newPath = imgs[0]+"_thumb."+imgs[1];
+						    
+						    BufferedImage image = ImageIO.read(new File(imagePath));  
+						    Builder<BufferedImage> builder = null;  
+						    int imageWidth = image.getWidth();  
+						    int imageHeitht = image.getHeight();  
+						    if ((float)120 / 90 != (float)imageWidth / imageHeitht) {  
+						        if (imageWidth > imageHeitht) {  
+						            image = Thumbnails.of(imagePath).height(90).asBufferedImage();  
+						        } else {  
+						            image = Thumbnails.of(imagePath).width(120).asBufferedImage();  
+						        }  
+						        builder = Thumbnails.of(image).sourceRegion(Positions.CENTER, 120, 90).size(120, 90);  
+						    } else {  
+						        builder = Thumbnails.of(image).size(120, 90);  
+						    }  
+						    builder.outputFormat("jpg").toFile(newPath);  
+						}
+					}catch (Exception e) {
+						e.printStackTrace();
+					}
+					//生成缩略图
 					List<Map<String, Object>> detailList = jdbcTemplate.queryForList(sql, projectId);
 					List<Map<String, Object>> remainList = new ArrayList<Map<String,Object>>();
 					if (detailList != null && detailList.size() > 0) {
