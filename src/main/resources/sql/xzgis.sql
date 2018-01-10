@@ -10,7 +10,7 @@ Target Server Type    : MYSQL
 Target Server Version : 50629
 File Encoding         : 65001
 
-Date: 2018-01-08 18:00:09
+Date: 2018-01-10 18:25:14
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -73,7 +73,7 @@ CREATE TABLE `operate_history` (
   `downfile_path` varchar(255) DEFAULT NULL,
   `downfile_type` varchar(100) DEFAULT NULL,
   UNIQUE KEY `IDX_RS_operate_history_ID` (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8 COMMENT='is_success : 0 false(失败)，1 true (成功)';
+) ENGINE=InnoDB AUTO_INCREMENT=19 DEFAULT CHARSET=utf8 COMMENT='is_success : 0 false(失败)，1 true (成功)';
 
 -- ----------------------------
 -- Records of operate_history
@@ -87,6 +87,12 @@ INSERT INTO `operate_history` VALUES ('6', '2bb49d9d514c48c5bebbf78beab3e179', '
 INSERT INTO `operate_history` VALUES ('7', '2bb49d9d514c48c5bebbf78beab3e179', '18', '2018-01-05 17:06:16', 'null', '', 'null', '', '以下图片名称没有匹配到图片：1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,', '0', 'F:\\tempfilepath/\\20180105\\1515143175312201612\\1515143175390.xlsx', null);
 INSERT INTO `operate_history` VALUES ('8', '2bb49d9d514c48c5bebbf78beab3e179', '5', '2018-01-06 10:39:23', 'null', '', 'null', '', null, '1', null, null);
 INSERT INTO `operate_history` VALUES ('9', '2bb49d9d514c48c5bebbf78beab3e179', '16', '2018-01-06 10:42:52', '0:0:0:0:0:0:0:1', '', '0:0:0:0:0:0:0:1', '', null, '1', null, null);
+INSERT INTO `operate_history` VALUES ('13', '2bb49d9d514c48c5bebbf78beab3e179', '18', '2018-01-10 17:46:39', 'null', '', 'null', '', '以下图片名称没有匹配到图片：照片 (4),照片 (5),照片 (6),照片 (7),照片 (8),照片 (9),照片 (10),照片 (11),照片 (12),照片 (13),照片 (14),照片 (15),照片 (16),照片 (17),照片 (18),照片 (19),照片 (20),照片 (21),照片 (22),照片 (23),照片 (24),照片 (25),照片 (26),照片 (27),照片 (28),照片 (29),照片 (30),照片 (31),照片 (32),照片 (33),照片 (34),照片 (35),照片 (36),照片 (37),照片 (38),照片 (39),照片 (40),照片 (41),照片 (42),照片 (43),照片 (44),照片 (45),照片 (46),照片 (47),照片 (48),', '0', 'F:\\tempfilepath/\\20180110\\1515577597154201612\\1515577598482.xlsx', null);
+INSERT INTO `operate_history` VALUES ('14', '2bb49d9d514c48c5bebbf78beab3e179', '18', '2018-01-10 17:47:22', 'null', '', 'null', '', '以下图片名称没有匹配到图片：照片 (4),照片 (5),照片 (6),照片 (7),照片 (8),照片 (9),照片 (10),照片 (11),照片 (12),照片 (13),照片 (14),照片 (15),照片 (16),照片 (17),照片 (18),照片 (19),照片 (20),照片 (21),照片 (22),照片 (23),照片 (24),照片 (25),照片 (26),照片 (27),照片 (28),照片 (29),照片 (30),照片 (31),照片 (32),照片 (33),照片 (34),照片 (35),照片 (36),照片 (37),照片 (38),照片 (39),照片 (40),照片 (41),照片 (42),照片 (43),照片 (44),照片 (45),照片 (46),照片 (47),照片 (48),', '0', 'F:\\tempfilepath/\\20180110\\1515577641875201612\\1515577642543.xlsx', null);
+INSERT INTO `operate_history` VALUES ('15', '2bb49d9d514c48c5bebbf78beab3e179', '18', '2018-01-10 17:49:52', 'null', '', 'null', '', '以下图片名称没有匹配到图片：照片 (4),照片 (5),照片 (6),照片 (7),照片 (8),照片 (9),照片 (10),照片 (11),照片 (12),照片 (13),照片 (14),照片 (15),照片 (16),照片 (17),照片 (18),照片 (19),照片 (20),照片 (21),照片 (22),照片 (23),照片 (24),照片 (25),照片 (26),照片 (27),照片 (28),照片 (29),照片 (30),照片 (31),照片 (32),照片 (33),照片 (34),照片 (35),照片 (36),照片 (37),照片 (38),照片 (39),照片 (40),照片 (41),照片 (42),照片 (43),照片 (44),照片 (45),照片 (46),照片 (47),照片 (48),', '0', 'F:\\tempfilepath/\\20180110\\1515577741795201612\\1515577792732.xlsx', null);
+INSERT INTO `operate_history` VALUES ('16', '2bb49d9d514c48c5bebbf78beab3e179', '18', '2018-01-10 17:54:43', 'null', '', 'null', '', '以下图片名称没有匹配到图片：照片 (4),照片 (5),照片 (6),照片 (7),照片 (8),照片 (9),照片 (10),照片 (11),照片 (12),照片 (13),照片 (14),照片 (15),照片 (16),照片 (17),照片 (18),照片 (19),照片 (20),照片 (21),照片 (22),照片 (23),照片 (24),照片 (25),照片 (26),照片 (27),照片 (28),照片 (29),照片 (30),照片 (31),照片 (32),照片 (33),照片 (34),照片 (35),照片 (36),照片 (37),照片 (38),照片 (39),照片 (40),照片 (41),照片 (42),照片 (43),照片 (44),照片 (45),照片 (46),照片 (47),照片 (48),', '0', 'F:\\tempfilepath/\\20180110\\1515578082251201612\\1515578083144.xlsx', null);
+INSERT INTO `operate_history` VALUES ('17', '2bb49d9d514c48c5bebbf78beab3e179', '18', '2018-01-10 17:56:38', 'null', '', 'null', '', '以下图片名称没有匹配到图片：照片 (4),照片 (5),照片 (6),照片 (7),照片 (8),照片 (9),照片 (10),照片 (11),照片 (12),照片 (13),照片 (14),照片 (15),照片 (16),照片 (17),照片 (18),照片 (19),照片 (20),照片 (21),照片 (22),照片 (23),照片 (24),照片 (25),照片 (26),照片 (27),照片 (28),照片 (29),照片 (30),照片 (31),照片 (32),照片 (33),照片 (34),照片 (35),照片 (36),照片 (37),照片 (38),照片 (39),照片 (40),照片 (41),照片 (42),照片 (43),照片 (44),照片 (45),照片 (46),照片 (47),照片 (48),', '0', 'F:\\tempfilepath/\\20180110\\1515578198107201612\\1515578198711.xlsx', null);
+INSERT INTO `operate_history` VALUES ('18', '2bb49d9d514c48c5bebbf78beab3e179', '18', '2018-01-10 17:57:48', 'null', '', 'null', '', '以下图片名称没有匹配到图片：照片 (4),照片 (5),照片 (6),照片 (7),照片 (8),照片 (9),照片 (10),照片 (11),照片 (12),照片 (13),照片 (14),照片 (15),照片 (16),照片 (17),照片 (18),照片 (19),照片 (20),照片 (21),照片 (22),照片 (23),照片 (24),照片 (25),照片 (26),照片 (27),照片 (28),照片 (29),照片 (30),照片 (31),照片 (32),照片 (33),照片 (34),照片 (35),照片 (36),照片 (37),照片 (38),照片 (39),照片 (40),照片 (41),照片 (42),照片 (43),照片 (44),照片 (45),照片 (46),照片 (47),照片 (48),', '0', 'F:\\tempfilepath/\\20180110\\1515578267352201612\\1515578267970.xlsx', null);
 
 -- ----------------------------
 -- Table structure for operate_type
@@ -120,6 +126,7 @@ INSERT INTO `operate_type` VALUES ('16', '权限设置');
 INSERT INTO `operate_type` VALUES ('17', '前台用户登陆');
 INSERT INTO `operate_type` VALUES ('18', '导入项目图片数据');
 INSERT INTO `operate_type` VALUES ('19', '删除手机标识码');
+INSERT INTO `operate_type` VALUES ('20', '导入调研编号');
 
 -- ----------------------------
 -- Table structure for project_attribute
@@ -354,9 +361,9 @@ CREATE TABLE `project_detail` (
 -- ----------------------------
 -- Records of project_detail
 -- ----------------------------
-INSERT INTO `project_detail` VALUES ('00151520636359700015005056c00001', '00151520636358600000005056c00001', '1', '070501461181PP', '上海', '金山区', '漕泾镇', '绿地漕泾新苑二期', '富漕路461弄', '2', '16号', '照片 (1)', '2017-11-18 00:00:00', '赵苏鸣', '121.411', '30.803', null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
-INSERT INTO `project_detail` VALUES ('00151520636359900016005056c00001', '00151520636358600000005056c00001', '2', '070501461181PP', '上海', '金山区', '漕泾镇', '绿地漕泾新苑二期', '富漕路461弄', '2', '42号', '照片 (2)', '2017-11-18 00:00:00', '赵苏鸣', '121.411', '30.803', null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
-INSERT INTO `project_detail` VALUES ('00151520636360000017005056c00001', '00151520636358600000005056c00001', '3', '070501461181PP', '上海', '金山区', '漕泾镇', '绿地漕泾新苑二期', '富漕路461弄', '2', '34号', '照片 (3)', '2017-11-18 00:00:00', '赵苏鸣', '121.409', '30.804', null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
+INSERT INTO `project_detail` VALUES ('00151520636359700015005056c00001', '00151520636358600000005056c00001', '1', '070501461181PP', '上海', '金山区', '漕泾镇', '绿地漕泾新苑二期', '富漕路461弄', '2', '16号', '照片 (1)', '2017-11-18 00:00:00', '赵苏鸣', '121.411', '30.803', null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 'F:\\tempfilepath\\20180110\\1515578267352201612\\201611\\照片 (1).jpg', null, null);
+INSERT INTO `project_detail` VALUES ('00151520636359900016005056c00001', '00151520636358600000005056c00001', '2', '070501461181PP', '上海', '金山区', '漕泾镇', '绿地漕泾新苑二期', '富漕路461弄', '2', '42号', '照片 (2)', '2017-11-18 00:00:00', '赵苏鸣', '121.411', '30.803', null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 'F:\\tempfilepath\\20180110\\1515578267352201612\\201611\\照片 (2).jpg', null, null);
+INSERT INTO `project_detail` VALUES ('00151520636360000017005056c00001', '00151520636358600000005056c00001', '3', '070501461181PP', '上海', '金山区', '漕泾镇', '绿地漕泾新苑二期', '富漕路461弄', '2', '34号', '照片 (3)', '2017-11-18 00:00:00', '赵苏鸣', '121.409', '30.804', null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 'F:\\tempfilepath\\20180110\\1515578267352201612\\201611\\照片 (3).jpg', null, null);
 INSERT INTO `project_detail` VALUES ('00151520636360100018005056c00001', '00151520636358600000005056c00001', '4', '070501461181PP', '上海', '金山区', '漕泾镇', '绿地漕泾新苑二期', '富漕路461弄', '4', '42号', '照片 (4)', '2017-11-18 00:00:00', '赵苏鸣', '121.41', '30.805', null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
 INSERT INTO `project_detail` VALUES ('00151520636360100019005056c00001', '00151520636358600000005056c00001', '5', '070401001001PP', '上海', '松江区', '岳阳街道', '南龙谭苑小区', '岳阳街道中山二路125弄', '2', '77号', '照片 (5)', '2017-11-18 00:00:00', '赵苏鸣', '121.239', '31.015', null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
 INSERT INTO `project_detail` VALUES ('00151520636360200020005056c00001', '00151520636358600000005056c00001', '6', '070401001001PP', '上海', '松江区', '岳阳街道', '南龙谭苑小区', '岳阳街道中山二路125弄', '2', '56号', '照片 (6)', '2017-11-18 00:00:00', '赵苏鸣', '121.24', '31.015', null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
@@ -434,13 +441,16 @@ CREATE TABLE `project_searchno_dictionary` (
   `create_date` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `update_date` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ----------------------------
 -- Records of project_searchno_dictionary
 -- ----------------------------
 INSERT INTO `project_searchno_dictionary` VALUES ('1', '07', '上海', null, null);
 INSERT INTO `project_searchno_dictionary` VALUES ('2', '0705', '金山', null, null);
+INSERT INTO `project_searchno_dictionary` VALUES ('3', '0701', '长宁', '2018-01-09 16:42:18', '2018-01-09 16:42:18');
+INSERT INTO `project_searchno_dictionary` VALUES ('4', '0706', '宝山', '2018-01-09 17:57:39', '2018-01-09 17:57:39');
+INSERT INTO `project_searchno_dictionary` VALUES ('5', '0707', '嘉定', '2018-01-09 17:57:39', '2018-01-09 17:57:39');
 
 -- ----------------------------
 -- Table structure for t_user
