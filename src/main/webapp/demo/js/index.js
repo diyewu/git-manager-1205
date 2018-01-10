@@ -115,22 +115,6 @@
     	
         
     }); 
-	//图片查看插件**********************************************
-//	$(document).on('mousedown','.nullclass',function () {
-//		if($(this).attr('src')){
-//			$('.list-container').viewer(
-//					{
-//						'hidden': function (e) {
-//							console.log(e.type);
-//						},
-//					}
-//			);
-//		}
-//		else{
-//			return false;
-//		}
-//	});
-	//图片查看插件**********************************************
 	
 	function initProjectMarker(){
 		$.post(path+"/webctrl/getMapInfoByUserRole/", 

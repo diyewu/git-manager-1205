@@ -536,16 +536,15 @@ public class ProjectServices {
 					if (checkList == null || checkList.size() == 0) {
 						jdbcTemplate.update(sql, searchNo,searchName);
 					}else{
-						throw new RuntimeException("编号："+checkList.get(0).get("search_no")+"数据有重复");
+						throw new RuntimeException("编号："+checkList.get(0).get("search_no")+" 数据有重复");
 					}
 				}
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 			msg = e.getMessage();
-			System.out.println("___________"+msg);
-			insertOperateHistory(session, type, msg);
-			throw new RuntimeException(e);
+//			insertOperateHistory(session, type, msg);
+			throw new RuntimeException(msg);
 		}
 	}
 	
