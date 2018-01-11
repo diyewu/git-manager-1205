@@ -14,22 +14,11 @@
     	//===================
 		$('#autoShowList').trigger("click");
 		
-//    	$('#myContainer').hide();
         $('body').addClass('loaded');
         
-//    	$(".js-silder").silder({
-//			auto: true,//自动播放，传入任何可以转化为true的值都会自动轮播
-//			speed: 20,//轮播图运动速度
-//			sideCtrl: true,//是否需要侧边控制按钮
-//			bottomCtrl: true,//是否需要底部控制按钮
-//			defaultView: 0,//默认显示的索引
-//			interval: 3000,//自动轮播的时间，以毫秒为单位，默认3000毫秒
-//			activeClass: "active",//小的控制按钮激活的样式，不包括作用两边，默认active
-//		});
     	getObjectList();//加载项目数据
     	getObjectDetail();//加载项目筛选条件数据
-//    	initCluster();//根据项目生成markercluster
-    	initProjectMarker();
+    	initProjectMarker();//初始加载地图数据
     	$('#loader-wrapper .load_title').remove();
     	
 //    	$('img').each(function() {
@@ -113,6 +102,34 @@
         
     }); 
 	
+	function projectClk(projectId){
+		vm.subFlag = 0;
+		vm.expand = 0;
+		
+		if(projectId){
+			getMapInfoByProjectId(projectId);
+		}else{
+			initProjectMarker();
+		}
+	}
+	
+	/**
+	 * 根据项目ID获取地图信息
+	 */
+	function getMapInfoByProjectId(projectId){
+		$.post(path+"/webctrl/getMapInfoByUserRoleAndProjectId/", 
+		{
+			projectId:projectId
+		},
+		function(result){
+			if(result.success == true){//登陆成功
+				var data = result.data;
+				generateMarker(data,12);
+			}else {
+			}
+		},'json');
+	}
+	
 	function initProjectMarker(){
 		$.post(path+"/webctrl/getMapInfoByUserRole/", 
 		{
@@ -164,26 +181,6 @@
 	           	    showInfo(ids);
 	       		});
           })();  
-//    	   if(array[i].nextLevel){
-//	    	   (function() {  
-//	    		    var key = array[i].key;
-//		       		var cacheKey = array[i].cacheKey;
-//		       		var currentLevel = array[i].currentLevel;
-//		       		var nextLevel = array[i].nextLevel;
-//		       		var ids = array[i].ids;
-//		       		myCompOverlay.addEventListener("click", function(){
-//	            	   showNextLevel(level,key,cacheKey,currentLevel,nextLevel,ids);
-//	            	   showInfo(ids);
-//	               });
-//	           })();  
-//    	   }else{
-//    		   (function() {  
-//    			    var ids = array[i].ids;
-//		       		myCompOverlay.addEventListener("click", function(){
-//	            	   showInfo(ids);
-//	               });
-//	           })(); 
-//    	   }
     	   k++;
     	}
 	}
@@ -263,7 +260,7 @@
 					}
 					kk++;
 	               var lis = "";
-	               trs = "<li id=\""+obj.id+"\"><span class=\"text\">"+obj.menu_name+"&nbsp;&nbsp;</span></li>";
+	               trs = "<li id=\""+obj.id+"\" onclick=\"projectClk(this.id)\"><span class=\"text\">"+obj.menu_name+"&nbsp;&nbsp;</span></li>";
 	               $(".first-info-list").append(trs);
 	           });
 			}else {
@@ -620,6 +617,7 @@ var vm = new Vue({
             this.subFlag = current;
         },
         subOut: function (current) {
+        	console.log(this);
             this.subFlag = 0;
             this.expand = 0;
         },

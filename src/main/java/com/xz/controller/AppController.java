@@ -249,7 +249,8 @@ public class AppController extends BaseController{
 		
 		List<Map<String, Object>> info = new ArrayList<Map<String,Object>>();
 		if(code == 0){
-			info = appService.generateCod(key,AppService.cacheMap.get(cacheKey), cacheKey,currentLevel);
+			List<Map<String, Object>> tlist = (List<Map<String, Object>>)AgingCache.getCacheInfo(cacheKey).getValue();
+			info = appService.generateCod(key,tlist, cacheKey,currentLevel);
 		}
 		return new AppJsonModel(code, ServerResult.getCodeMsg(code, msg), info);
 	}

@@ -27,7 +27,7 @@ import com.google.common.base.Joiner;
 import com.xz.common.ServerResult;
 import com.xz.entity.AppMenu;
 import com.xz.entity.AreaBean;
-import com.xz.model.json.JsonModel;
+import com.xz.utils.AgingCache;
 
 @Service
 @Transactional
@@ -50,13 +50,6 @@ public class AppService {
 		levelMap.put(3, 6);
 		levelMap.put(4, 9);
 		levelMap.put(5, 12);
-		
-		
-		
-		
-		
-		
-		
 		
 		lvlMap.put("first_area", "second_area");
 		lvlMap.put("second_area", "third_area");
@@ -144,6 +137,47 @@ public class AppService {
 		}
 		return newList;
 	}
+	public List<AppMenu> getMenulistByProjectId(String roleId,String projectId){
+		List<AppMenu> newList = new ArrayList<AppMenu>();
+		List<AppMenu>  l = new ArrayList<AppMenu>();
+		l = this.getMenuByProjectId(roleId,projectId);
+		Map<String,AppMenu> map = new LinkedHashMap<String,AppMenu>(); 
+		Map<String,AppMenu> map1 = new LinkedHashMap<String,AppMenu>(); 
+		for(AppMenu t:l){//list转换成map
+			map.put(t.getId(), t);
+			map1.put(t.getId(), t);
+		}
+		AppMenu c1 = null;
+		AppMenu c2 = null;
+		Iterator it = map.keySet().iterator();//遍历map
+		while (it.hasNext()) {
+			c1 = new AppMenu();
+			c1 = map.get(it.next());
+			if(c1.getId() == null ||"null".equals(c1.getId())){//第一级节点
+				
+			}else{
+				if(map1.containsKey(c1.getParent_id())){//
+					c2 = new AppMenu();
+					c2 = map1.get(c1.getParent_id());
+					if(c2.getChildren() != null){
+						c2.getChildren().add(c1);
+					}else{
+						List<AppMenu> childrens = new ArrayList<AppMenu>();
+						childrens.add(c1);
+						c2.setChildren(childrens);
+					}
+					map1.remove(c1.getId());
+				}
+			}
+		}
+		
+		Iterator i = map1.keySet().iterator();
+		while (i.hasNext()) {
+			newList.add((AppMenu)map.get(i.next()));
+		}
+		return newList;
+	}
+	
 	
 	
 	public List<AppMenu> getMenu(String roleId){
@@ -159,6 +193,21 @@ public class AppService {
 		sb.append(" ) b on a.id = b.condition_id where a.is_check is not null ORDER BY a.id DESC  ");
 //		List<Map<String, Object>> list = jdbcTemplate.queryForList(sb.toString(),roleId);
 		List<AppMenu> list = (List<AppMenu>)jdbcTemplate.query(sb.toString(), new AppMenuRowMapper(),roleId);
+		return list;
+	}
+	public List<AppMenu> getMenuByProjectId(String roleId,String projectId){
+		StringBuilder sb = new StringBuilder();
+		sb.append(" select a.id,	a.menu_name,	a.parent_id,	a.leaf	,b.web_user_role_id as is_check from ");
+		sb.append(" (SELECT pac.id, pac.attribute_condition AS menu_name, pac.attribute_id AS parent_id, pac.leaf, pac.id AS is_check, ppa.project_id FROM project_attribute_condition pac LEFT JOIN project_attribute ppa ON pac.attribute_id = ppa.id  ");
+		sb.append(" union  ");
+		sb.append(" SELECT id,	pa.attribute_name AS menu_name,		pa.project_id AS parent_id,		0 AS leaf,		pa.id AS is_check,pa.project_id	FROM 		project_attribute pa	WHERE		pa.attribute_active = 1 ");
+		sb.append(" union  ");
+		sb.append(" SELECT id,	pm.project_name AS menu_name,	NULL AS parent_id,	0 AS leaf,	pm.id AS is_check,pm.id as projet_id	FROM	project_main pm	 ");
+		sb.append(" )a inner JOIN (  ");
+		sb.append(" select * from project_condition_auth pca 	where pca.web_user_role_id = ?  ");
+		sb.append(" ) b on a.id = b.condition_id where a.is_check is not null and a.project_id = ? ORDER BY a.id DESC  ");
+//		List<Map<String, Object>> list = jdbcTemplate.queryForList(sb.toString(),roleId);
+		List<AppMenu> list = (List<AppMenu>)jdbcTemplate.query(sb.toString(), new AppMenuRowMapper(),roleId,projectId);
 		return list;
 	}
 	
@@ -224,14 +273,20 @@ public class AppService {
 				resultList = jdbcTemplate.queryForList(sb.toString(), projectId);
 				if(resultList != null && resultList.size()>0){
 					String tkey = UUID.randomUUID().toString().replaceAll("-", "");
-					cacheMap.put(tkey, resultList);
+//					cacheMap.put(tkey, resultList);
+					AgingCache.putCacheInfo(tkey, resultList,60);
 					List<Map<String, Object>> cod = generateCod(null,resultList,tkey,currentLevel);
 					return cod;
 				}
 			}
 		}else{
-			List<Map<String, Object>> cod = generateCod(null,cacheMap.get(cacheKey),cacheKey,currentLevel);
-			return cod;
+//			List<Map<String, Object>> cod = generateCod(null,cacheMap.get(cacheKey),cacheKey,currentLevel);
+			List<Map<String, Object>> tlist = (List<Map<String, Object>>)AgingCache.getCacheInfo(cacheKey).getValue();
+			if (tlist != null && tlist.size() > 0) {
+				AgingCache.updateCacheTimeOut(cacheKey);
+				List<Map<String, Object>> cod = generateCod(null,tlist,cacheKey,currentLevel);
+				return cod;
+			}
 		}
 		return null;
 	}
@@ -368,7 +423,8 @@ public class AppService {
 		return sList;
 	}
 	public List<Map<String, Object>> turnback(String cacheKey,String key,String currentLevel){
-		List<Map<String, Object>> resultList = cacheMap.get(cacheKey);
+//		List<Map<String, Object>> resultList = cacheMap.get(cacheKey);
+		List<Map<String, Object>> resultList = (List<Map<String, Object>>)AgingCache.getCacheInfo(cacheKey).getValue();
 		Map<String, Object> map = new HashMap<String, Object>();
 		int currentLevelInt = Integer.parseInt(currentLevel);
 		String fatherKey = "";

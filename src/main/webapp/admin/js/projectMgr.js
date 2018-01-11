@@ -454,6 +454,7 @@
     		},{
     			id : "btn_import_wordclass_down",
     			text : "下载示例文件",
+    			hidden:imisHid,
     			handler : function() {
     				window.location= path+"/example/proje_date_example.xlsx"; 
     			}

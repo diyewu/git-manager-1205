@@ -86,13 +86,13 @@
 				handler : function() {
 					showEditUser();
 				}
-			},{
+			}/*,{
 				text : '导入Excel',
 				iconCls : 'Add',
 				handler : function() {
 					showUploadExcel();
 				}
-			}]
+			}*/]
 
         });  
         grid = new Ext.grid.EditorGridPanel({ 
