@@ -162,8 +162,12 @@
 			}
 //    	   var marker = new BMap.Marker(pt);
     	   var mouseoverTxt = array[i].text + " 共" + array[i].totalitem + "条问题点" ;
+    	   var tcolor = "rgba(0,153,51, 0.9)";
+    	   if(array[i].color){
+    		   tcolor = array[i].color;
+    	   }
     	   var myCompOverlay = 
-    		   new ComplexCustomOverlay(pt, array[i].text,mouseoverTxt,"rgba(0,153,51, 0.9)","rgba(254,116,66, 0.8)");
+    		   new ComplexCustomOverlay(pt, array[i].text,mouseoverTxt,tcolor,"rgba(254,116,66, 0.8)");
     	   divIdIndex++;
     	   map.addOverlay(myCompOverlay);
     	   overlays.push(myCompOverlay);

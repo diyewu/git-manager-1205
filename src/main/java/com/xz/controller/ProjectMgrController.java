@@ -32,6 +32,7 @@ import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 
 import com.xz.common.Page;
 import com.xz.entity.CustomConfig;
+import com.xz.entity.ModuleStoreBean;
 import com.xz.service.OperateHistoryService;
 import com.xz.service.ProjectServices;
 
@@ -550,5 +551,123 @@ public class ProjectMgrController extends BaseController {
 		}
 		writeJson(map, response);
 	}
-    
+   
+	@RequestMapping("listQuestionTypeColor")
+	@ResponseBody
+	public void listQuestionTypeColor(HttpServletRequest request,HttpServletResponse response) throws JsonGenerationException, JsonMappingException, IOException{
+		Map<String,String> condition = new HashMap<String, String>();
+		String questionType = request.getParameter("questionType");
+		String start = request.getParameter("start");
+		String limit = request.getParameter("limit");
+		
+		String msg = null;
+		if(StringUtils.isNotBlank(questionType)){
+			condition.put("questionType", questionType);
+		}
+		if (StringUtils.isNotBlank(start)) {
+			condition.put("start", start);
+		}
+		if (StringUtils.isNotBlank(limit)) {
+			condition.put("limit", limit);
+		}
+		Page<Map<String, Object>> page = new Page<Map<String,Object>>();
+		try {
+			page = projectServices.getQuestionType(condition);
+		} catch (Exception e) {
+			e.printStackTrace();
+			msg = e.getMessage();
+		}
+		resultSuccess("", page.getResult(), page.getTotalCount(),response);
+	}
+	
+	
+	@RequestMapping("getColor")
+	@ResponseBody
+	public void getColor(HttpServletRequest request,HttpServletResponse response) throws JsonGenerationException, JsonMappingException, IOException{
+		String msg = null;
+		String isAll = request.getParameter("all");
+		ObjectMapper mapper = new ObjectMapper();
+		List<ModuleStoreBean> list = new ArrayList<ModuleStoreBean>();
+		list = projectServices.getColor();
+		StringBuffer sb = new StringBuffer("");
+		ModuleStoreBean dv = new ModuleStoreBean();
+		dv.setText("全部");
+		dv.setValue("0");
+		sb.append("{'totalCount':'" + list.size()+ "','products':[");
+		if ("1".equals(isAll)) {
+			sb.append(mapper.writeValueAsString(dv));
+		}
+		if(list != null){
+			if ("1".equals(isAll)) {
+				sb.append(",");
+			}
+			for(int i=0;i<list.size();i++){
+				sb.append(mapper.writeValueAsString(list.get(i)));
+				if((i+1) == list.size()){
+				}else{
+					sb.append(",");
+				}
+			}
+		}
+		sb.append("]}");
+		printData(response, sb.toString());
+	}
+	
+	@RequestMapping("editQuestionColor")
+	@ResponseBody
+	public void editQuestionColor(HttpServletRequest request,HttpServletResponse response){
+    	String id = request.getParameter("id");
+    	String question = request.getParameter("question");
+    	String color = request.getParameter("color");
+    	String msg = null;
+    	try {
+			if (StringUtils.isNotBlank(id)) {//编辑
+				projectServices.updateQuestionColorById(id, question, color);
+			} else {//新增
+				projectServices.addQuestionColorById(question, color);
+			} 
+		} catch (Exception e) {
+			e.printStackTrace();
+			msg = e.getMessage();
+		}
+    	Map<String, String> map = new HashMap<String, String>();
+    	if (msg == null) {
+    		map.put("i_type", "success");
+    		map.put("i_msg", "");
+    	} else {
+    		map.put("i_type", "error");
+    		map.put("i_msg", "操作失败：" + msg);
+    	}
+    	writeJson(map, response);
+    }
+	
+	 @RequestMapping("deleteQuestionTypeById")
+	    @ResponseBody
+	    public void deleteQuestionTypeById(HttpServletRequest request,HttpServletResponse response){
+	    	String id = request.getParameter("id");
+	    	String msg = null;
+	    	try {
+	    		if (StringUtils.isNotBlank(id)) {//编辑
+	    			projectServices.deleteQuestionTypeById(id);
+	    		}else{
+	    			msg = "参数异常";
+	    		}
+	    	} catch (Exception e) {
+	    		e.printStackTrace();
+	    		msg = e.getMessage();
+	    	}
+	    	Map<String, String> map = new HashMap<String, String>();
+	    	if (msg == null) {
+	    		map.put("i_type", "success");
+	    		map.put("i_msg", "");
+	    	} else {
+	    		map.put("i_type", "error");
+	    		map.put("i_msg", "操作失败：" + msg);
+	    	}
+	    	writeJson(map, response);
+	    }
+	
+	
+	
+	
 }
