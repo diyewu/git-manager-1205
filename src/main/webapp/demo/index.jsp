@@ -2,6 +2,9 @@
 <%
 String path = request.getContextPath();
 String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+path+"/";
+String realName = session.getAttribute("webUserRealName")==null?null:session.getAttribute("webUserRealName")+"";
+String loginName = session.getAttribute("webUserName")==null?"welcome":session.getAttribute("webUserName")+"";
+String showName = realName == null?loginName:realName;
 %>
 <!DOCTYPE html>
 <html lang="en">
@@ -47,6 +50,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
     var map ;
     var path = "<%=path%>";
     var basePath = "<%=basePath%>";
+    var showName = "<%=showName%>";
 	</script>
 </head>
 <jsp:include page="permission.jsp">
@@ -148,7 +152,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 				v-show="subFlag == 'region'" @mouseenter="subOver('region')"
 				@mouseleave="subOut('region')">
 				<ul class="first-info-list">
-					<li>所有</li>
+					<li onclick="projectClk();">全部</li>
 				</ul>
 			</div>
 
@@ -239,7 +243,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 					<i class="fa fa-user" aria-hidden="true"></i>
 					<div class="typeUserInfo">
 						<div class="no-login">
-							<a class="login login-user-btn btn-login ">周润发</a> <a href=""
+							<a class="login login-user-btn btn-login "><%=showName%></a> <a href=""
 								target="_blank" class="register"></a>
 						</div>
 						<div class="logged" style="display: none;">
@@ -332,8 +336,8 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 </body>
 <script src="js/viewer.min.js"></script>
 <script src="js/vue.min.js"></script>
-<script src="js/index.js"></script>
 <script src="plugins/earthmap/js/classie.js"></script>
 <script src="plugins/slider/wySilder.min.js" type="text/javascript"></script>
+<script src="js/index.js"></script>
 
 </html>

@@ -25,6 +25,7 @@ import com.xz.entity.AppMenu;
 import com.xz.model.json.JsonModel;
 import com.xz.service.AppService;
 import com.xz.service.WebService;
+import com.xz.utils.AgingCache;
 
 @RequestMapping("webctrl")
 @Controller
@@ -266,6 +267,47 @@ public class WebController extends BaseController{
 		
 		return new JsonModel(msg == null,msg,info);
 	}
+	/**
+	 * 根据用户角色和项目编号获取全部地图点信息,地图初始化时加载
+	 * @param request
+	 * @return
+	 */
+	@RequestMapping("getMapInfoByUserRoleAndProjectId")
+	@ResponseBody
+	public JsonModel getMapInfoByUserRoleAndProjectId(HttpServletRequest request){
+		HttpSession session = request.getSession(); 
+		String userRole = session.getAttribute(SessionConstant.WEB_USER_ROLE)+"";
+		String projectId = request.getParameter("projectId");
+		String msg = null;
+		List<AppMenu> list = new ArrayList<AppMenu>();
+		if(StringUtils.isBlank(projectId)){
+			msg = "参数错误！";
+		}
+		if(msg == null){
+			if(StringUtils.isNotBlank(userRole) ){
+				list = appService.getMenulistByProjectId(userRole,projectId);
+			}else{
+				msg = "尚未登陆！";
+			}
+		}
+		List<Map<String, Object>> info = new ArrayList<Map<String,Object>>();
+		if(list != null && list.size()>0){
+			ObjectMapper mapper = new ObjectMapper();
+			try {
+				String jsonIds = mapper.writeValueAsString(list);
+				System.out.println(jsonIds);
+				if(StringUtils.isNotBlank(jsonIds)){
+					JSONArray projectArray = JSONArray.parseArray(jsonIds);
+					info = appService.analyzeJson(projectArray, "is_check");
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+				msg = e.getMessage();
+			}
+		}
+		
+		return new JsonModel(msg == null,msg,info);
+	}
 	
 	/**
 	 * 根据用户选择的坐标点，获取该坐标点的下一级坐标
@@ -283,7 +325,8 @@ public class WebController extends BaseController{
 		String msg = null;
 		List<Map<String, Object>> info = new ArrayList<Map<String,Object>>();
 		if(StringUtils.isNotBlank(userRole)){
-			info = appService.generateCod(key,AppService.cacheMap.get(cacheKey), cacheKey,currentLevel);
+			List<Map<String, Object>> tlist = (List<Map<String, Object>>)AgingCache.getCacheInfo(cacheKey).getValue();
+			info = appService.generateCod(key,tlist, cacheKey,currentLevel);
 		}else{
 			msg = "尚未登陆！";
 		}

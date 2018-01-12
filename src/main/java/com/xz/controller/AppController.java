@@ -249,7 +249,8 @@ public class AppController extends BaseController{
 		
 		List<Map<String, Object>> info = new ArrayList<Map<String,Object>>();
 		if(code == 0){
-			info = appService.generateCod(key,AppService.cacheMap.get(cacheKey), cacheKey,currentLevel);
+			List<Map<String, Object>> tlist = (List<Map<String, Object>>)AgingCache.getCacheInfo(cacheKey).getValue();
+			info = appService.generateCod(key,tlist, cacheKey,currentLevel);
 		}
 		return new AppJsonModel(code, ServerResult.getCodeMsg(code, msg), info);
 	}
@@ -318,6 +319,7 @@ public class AppController extends BaseController{
         response.setDateHeader("Expires", 0); 
         response.setContentType("image/jpeg"); 
         String detailId = request.getParameter("id");
+        String type = request.getParameter("type");
         if(StringUtils.isBlank(detailId)){
         	return;
         }
@@ -326,7 +328,12 @@ public class AppController extends BaseController{
         if(list != null && list.size()>0){
         	String path = list.get(0).get("img_path")==null?"":list.get(0).get("img_path")+"";
         	if(StringUtils.isNotBlank(path)){
-        		imgfile = new File(path);
+        		if("thumb".equals(type)){
+        			String[] imgs = StringUtils.split(path, ".");
+        			imgfile = new File(imgs[0]+"_thumb."+imgs[1]);
+        		}else{
+        			imgfile = new File(path);
+        		}
         	}
         }
         if(imgfile != null){
