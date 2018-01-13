@@ -33,6 +33,7 @@ import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 import com.xz.common.Page;
 import com.xz.entity.CustomConfig;
 import com.xz.entity.ModuleStoreBean;
+import com.xz.service.AppService;
 import com.xz.service.OperateHistoryService;
 import com.xz.service.ProjectServices;
 
@@ -48,6 +49,8 @@ public class ProjectMgrController extends BaseController {
 	@Autowired
 	private OperateHistoryService operateHistoryService;
 	
+	@Autowired
+	private AppService appService;
 	
 	ExecutorService threadPool = Executors.newCachedThreadPool();
 
@@ -99,6 +102,7 @@ public class ProjectMgrController extends BaseController {
 			String resp = "";
 			try {
 				projectServices.importResearchInfo(xlsFile, session);
+				appService.initResearchNo();
 			} catch (Exception e) {
 				e.printStackTrace();
 				System.out.println("_____111______"+e.getMessage());
@@ -455,6 +459,7 @@ public class ProjectMgrController extends BaseController {
 			} else {//新增
 				projectServices.addResearchInfo(no, name);
 			} 
+			appService.initResearchNo();
 		} catch (Exception e) {
 			e.printStackTrace();
 			msg = e.getMessage();
@@ -478,6 +483,7 @@ public class ProjectMgrController extends BaseController {
     	try {
     		if (StringUtils.isNotBlank(id)) {//编辑
     			projectServices.deleteResearchInfoById(id);
+    			appService.initResearchNo();
     		}else{
     			msg = "参数异常";
     		}
@@ -534,7 +540,6 @@ public class ProjectMgrController extends BaseController {
 							threadPool.submit(rc);
 						}
 					}
-	
 				}
 			}
 		}catch(Exception e){
@@ -666,8 +671,4 @@ public class ProjectMgrController extends BaseController {
 	    	}
 	    	writeJson(map, response);
 	    }
-	
-	
-	
-	
 }

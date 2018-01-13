@@ -15,6 +15,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -31,7 +32,7 @@ import com.xz.utils.AgingCache;
 
 @Service
 @Transactional
-public class AppService {
+public class AppService implements InitializingBean{
 	
 	@Autowired  
 	private JdbcTemplate jdbcTemplate; 
@@ -40,6 +41,7 @@ public class AppService {
 	private static Map<String,String> lvlMap = new HashMap<String, String>();
 	private static Map<String,String> preMap = new HashMap<String, String>();
 	private static Map<Integer,Integer> levelMap = new HashMap<Integer,Integer>();
+	public static Map<String,String> researchNoMap = new HashMap<String, String>();
 	static{
 		keyList.add("research_no");
 		keyList.add("question_type");
@@ -60,6 +62,20 @@ public class AppService {
 		preMap.put("forth_area", "third_area");
 	}
 	public static Map<String,List<Map<String, Object>>> cacheMap = new HashMap<String, List<Map<String,Object>>>();
+	
+	public void initResearchNo(){
+		String sql = " select search_no,search_name from project_searchno_dictionary ";
+		List<Map<String, Object>> list = jdbcTemplate.queryForList(sql);
+		if(list != null && list.size()>0){
+			Map<String, Object> map = new HashMap<String, Object>();
+			if(list != null){
+				for(int i=0;i<list.size();i++){
+					map = list.get(i);
+					researchNoMap.put(map.get("search_no")+"", map.get("search_name")+"");
+				}
+			}
+		}
+	}
 	
 	public List<Map<String, Object>> getUserInfoByNameandPwd(String name,String pwd){
 		String sql = "  select * from web_user_login where user_name = ? and user_password = ? and is_delete = 0 ";
@@ -369,7 +385,7 @@ public class AppService {
 							smap.put("preKey", currentKey);
 							smap.put("preLevel", currentLevelInt);
 							smap.put("cacheKey", cacheKey);
-							smap.put("text", "问题分类:"+resultmap.get("question_type"));
+							smap.put("text", "问题分类:"+(StringUtils.isBlank(researchNoMap.get(resultmap.get("question_type")))?resultmap.get("question_type"):researchNoMap.get(resultmap.get("question_type"))));
 							smap.put("longitude", longitudeF);
 							smap.put("latitude", latitudeF);
 							smap.put("ids", resultmap.get("id"));
@@ -424,7 +440,7 @@ public class AppService {
 						sMap.put("preLevel", 0);
 					}
 					sMap.put("cacheKey", cacheKey);
-					sMap.put("text", entry.getKey());
+					sMap.put("text", (StringUtils.isBlank(researchNoMap.get(entry.getKey()))?entry.getKey():researchNoMap.get(entry.getKey())));
 					sMap.put("longitude", areaBean.getTotalLongitude()/areaBean.getCount());
 					sMap.put("latitude", areaBean.getTotalLatitude()/areaBean.getCount());
 					sMap.put("ids", areaBean.getIds());
@@ -770,6 +786,14 @@ public class AppService {
 		String sql = " select img_path from project_detail where id = ? ";
 		List<Map<String, Object>> list = jdbcTemplate.queryForList(sql, id);
 		return list;
+	}
+	private int tempi = 0;
+	@Override
+	public void afterPropertiesSet() throws Exception {
+		if(tempi == 0){
+			initResearchNo();
+		}
+		tempi++;
 	}
 	
 	
