@@ -10,10 +10,28 @@ Target Server Type    : MYSQL
 Target Server Version : 50629
 File Encoding         : 65001
 
-Date: 2018-01-11 17:56:42
+Date: 2018-01-12 18:00:27
 */
 
 SET FOREIGN_KEY_CHECKS=0;
+
+-- ----------------------------
+-- Table structure for color_dictionary
+-- ----------------------------
+DROP TABLE IF EXISTS `color_dictionary`;
+CREATE TABLE `color_dictionary` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `color` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `color_name` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ----------------------------
+-- Records of color_dictionary
+-- ----------------------------
+INSERT INTO `color_dictionary` VALUES ('1', '#336699', '浅蓝');
+INSERT INTO `color_dictionary` VALUES ('2', '#FFFF66', '橙黄');
+INSERT INTO `color_dictionary` VALUES ('3', '#666666', '浅灰');
 
 -- ----------------------------
 -- Table structure for gis_main
@@ -432,21 +450,6 @@ CREATE TABLE `project_main` (
 INSERT INTO `project_main` VALUES ('00151520636358600000005056c00001', '2017年10月上海城管小区问题清单', '2018-01-06 10:39:23', null, '2bb49d9d514c48c5bebbf78beab3e179', 'F:\\tempfilepath\\20180106\\1515206361751管小区汇总2 - 测试.xlsx', '1');
 
 -- ----------------------------
--- Table structure for project_questiontype_color
--- ----------------------------
-DROP TABLE IF EXISTS `project_questiontype_color`;
-CREATE TABLE `project_questiontype_color` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `question_type` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `color` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- ----------------------------
--- Records of project_questiontype_color
--- ----------------------------
-
--- ----------------------------
 -- Table structure for project_searchno_dictionary
 -- ----------------------------
 DROP TABLE IF EXISTS `project_searchno_dictionary`;
@@ -467,6 +470,28 @@ INSERT INTO `project_searchno_dictionary` VALUES ('2', '0705', '金山', null, n
 INSERT INTO `project_searchno_dictionary` VALUES ('3', '0701', '长宁', '2018-01-09 16:42:18', '2018-01-09 16:42:18');
 INSERT INTO `project_searchno_dictionary` VALUES ('4', '0706', '宝山', '2018-01-09 17:57:39', '2018-01-09 17:57:39');
 INSERT INTO `project_searchno_dictionary` VALUES ('5', '0707', '嘉定', '2018-01-09 17:57:39', '2018-01-09 17:57:39');
+
+-- ----------------------------
+-- Table structure for question_color
+-- ----------------------------
+DROP TABLE IF EXISTS `question_color`;
+CREATE TABLE `question_color` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `question_type` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `color_id` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `create_date` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `update_date` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ----------------------------
+-- Records of question_color
+-- ----------------------------
+INSERT INTO `question_color` VALUES ('1', '1', '1', null, '2018-01-12 16:45:57');
+INSERT INTO `question_color` VALUES ('2', '2', '2', null, null);
+INSERT INTO `question_color` VALUES ('3', '3', '1', '2018-01-12 16:46:08', '2018-01-12 16:46:08');
+INSERT INTO `question_color` VALUES ('4', '4', '1', '2018-01-12 16:46:20', '2018-01-12 17:59:12');
+INSERT INTO `question_color` VALUES ('5', '5', '2', '2018-01-12 16:57:05', '2018-01-12 16:57:05');
 
 -- ----------------------------
 -- Table structure for t_user
@@ -680,7 +705,7 @@ CREATE TABLE `web_user_login_phone` (
   `phone_id` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `create_date` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=19 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=20 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ----------------------------
 -- Records of web_user_login_phone
@@ -703,6 +728,7 @@ INSERT INTO `web_user_login_phone` VALUES ('15', '2bb49d9d514c48c5bebbf78beab3e1
 INSERT INTO `web_user_login_phone` VALUES ('16', '2bb49d9d514c48c5bebbf78beab3e179', '4695ee0f36f6ae9b305f82f883f5fcac', '2017-12-29 17:04:01');
 INSERT INTO `web_user_login_phone` VALUES ('17', '2bb49d9d514c48c5bebbf78beab3e179', '4695ee0f36f6ae9b305f82f883f5fcac', '2017-12-30 08:55:36');
 INSERT INTO `web_user_login_phone` VALUES ('18', '2bb49d9d514c48c5bebbf78beab3e179', '4695ee0f36f6ae9b305f82f883f5fcac', '2017-12-31 11:08:08');
+INSERT INTO `web_user_login_phone` VALUES ('19', '2bb49d9d514c48c5bebbf78beab3e179', '4695ee0f36f6ae9b305f82f883f5fcac', '2018-01-12 15:01:56');
 
 -- ----------------------------
 -- Table structure for web_user_role

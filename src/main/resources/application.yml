@@ -70,8 +70,8 @@ logging:
 
 #custom settings
 custom:
-    clientFileUpladPath: F:\tempfilepath/
-#    clientFileUpladPath: E:\gistools\img/
+#    clientFileUpladPath: F:\tempfilepath/
+    clientFileUpladPath: E:\gistools\img/
 #    clientFileUpladPath: /Users/calvin/Work/Tomcat/temp/
 
 

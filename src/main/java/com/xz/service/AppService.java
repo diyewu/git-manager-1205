@@ -243,6 +243,7 @@ public class AppService {
 				String tempSql = "";
 				sb.append(" select ");
 				String aliasName = "";
+				String questionAttr = "";
 				for (int i = 0; i < attributeList.size(); i++) {
 					aliasName = (String)attributeList.get(i).get("alias_name");
 					if(StringUtils.isNotBlank(aliasName)){
@@ -251,11 +252,24 @@ public class AppService {
 						 */
 						if(keyList.contains(aliasName)){
 							sb.append(" pd.ext"+attributeList.get(i).get("attribute_index") +" as " + aliasName +",");
+							if("question_type".equals(aliasName)){
+								questionAttr = "pd.ext"+attributeList.get(i).get("attribute_index");
+							}
 						}
 					}
 				}
+				
+				if(StringUtils.isNotBlank(questionAttr)){
+					sb.append(" cd.color, ");
+				}
 				sb.append(" pd.id ");
 				sb.append(" from project_detail  pd ");
+				if(StringUtils.isNotBlank(questionAttr)){
+					sb.append(" LEFT JOIN question_color qc on "+questionAttr+" = qc.question_type ");
+					sb.append(" LEFT JOIN color_dictionary cd on qc.color_id = cd.id ");
+				}
+				
+				
 				sb.append(" where project_id = ? ");
 				for (Map.Entry<String,List<String>> entry : param.entrySet()) {  
 					list = jdbcTemplate.queryForList(attriSql, entry.getKey());
@@ -349,6 +363,7 @@ public class AppService {
 							}
 							smap = new HashMap<String, Object>();
 							smap.put("key",resultmap.get("question_type") );
+							smap.put("color",resultmap.get("color") );
 							smap.put("currentLevel", currentLevelInt+1);
 							smap.put("nextLevel", "");
 							smap.put("preKey", currentKey);
@@ -414,6 +429,7 @@ public class AppService {
 					sMap.put("latitude", areaBean.getTotalLatitude()/areaBean.getCount());
 					sMap.put("ids", areaBean.getIds());
 					sMap.put("totalitem", areaBean.getCount());
+					sMap.put("color","" );
 					sList.add(sMap);
 					sMap = new HashMap<String, Object>();
 				}

@@ -71,37 +71,14 @@ $(document).ready(function () {
         }
     })
     $("#loginBtn_").click(function(){
-    	var userName = $("#userName").val();
-    	var userPwd = $("#userPwd").val();
-    	var imgCode = $("#userImgCode").val();
-    	if($.trim(userName)==""){
-    		showTip("请填写用户名！",'#userName');
-    		return;
+    	weblogin();
+    });
+    
+    $(".container").keypress(function(e) {
+    	var keyCode = e.keyCode ? e.keyCode : e.which ? e.which : e.charCode;
+    	if (keyCode == 13) {
+    		weblogin();
     	}
-    	if($.trim(userPwd)==""){
-    		showTip("请填写用户密码！",'#userPwd');
-    		return;
-    	}
-    	if($.trim(imgCode)==""){
-    		showTip("请填写验证码！",'#img');
-    		return;
-    	}
-    	$.post(path+"/webctrl/login/", 
-		{
-    		userName:userName,
-    		userPwd:userPwd,
-    		imgCode:imgCode
-		},
-		function(result){
-			if(result.success == true){//登陆成功
-				window.location.href="index.jsp"; 
-			}else {
-				layer.tips('登陆失败：'+result.msg, '#loginBtn_', {
-					tips: [2, '#CC0033']
-				});
-				changeImg()
-			}
-		},'json');
     });
     
     /**
@@ -127,6 +104,40 @@ $(document).ready(function () {
     	}
     });
 });
+
+function weblogin(){
+	var userName = $("#userName").val();
+	var userPwd = $("#userPwd").val();
+	var imgCode = $("#userImgCode").val();
+	if($.trim(userName)==""){
+		showTip("请填写用户名！",'#userName');
+		return;
+	}
+	if($.trim(userPwd)==""){
+		showTip("请填写用户密码！",'#userPwd');
+		return;
+	}
+	if($.trim(imgCode)==""){
+		showTip("请填写验证码！",'#img');
+		return;
+	}
+	$.post(path+"/webctrl/login/", 
+	{
+		userName:userName,
+		userPwd:userPwd,
+		imgCode:imgCode
+	},
+	function(result){
+		if(result.success == true){//登陆成功
+			window.location.href="index.jsp"; 
+		}else {
+			layer.tips('登陆失败：'+result.msg, '#loginBtn_', {
+				tips: [2, '#CC0033']
+			});
+			changeImg()
+		}
+	},'json');
+}
 
 function showTip(msg,id){
 	layer.tips(msg, id, {

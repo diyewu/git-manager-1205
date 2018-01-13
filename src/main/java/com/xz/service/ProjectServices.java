@@ -3,11 +3,12 @@ package com.xz.service;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletRequest;
@@ -16,10 +17,12 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.xz.common.Page;
+import com.xz.entity.ModuleStoreBean;
 import com.xz.utils.CreateExcelUtil;
 import com.xz.utils.ExcelReadUtils;
 import com.xz.utils.SortableUUID;
@@ -517,6 +520,31 @@ public class ProjectServices {
 		page.setResult(list);
 		return page;
 	}
+	public Page<Map<String, Object>> getQuestionType(Map<String, String> condition){
+		Page<Map<String, Object>> page = new Page<Map<String, Object>>(0, 1000, false);
+		List<Object> params = new ArrayList<Object>();
+		List<Map<String, Object>> list = new ArrayList<Map<String,Object>>();
+		StringBuilder sbud = new StringBuilder(" select qc.id ,qc.question_type,cd.color_name from question_color qc left JOIN color_dictionary cd on qc.color_id = cd.id where 1=1 ");
+		if (!condition.isEmpty()) { 
+			if (condition.containsKey("questionType")) {
+				sbud.append(" and  qc.question_type like ? ");
+				params.add("%"+condition.get("questionType")+"%");
+			}
+			List<Map<String, Object>> countList = jdbcTemplate.queryForList(sbud.toString(),params.toArray());
+			page.setTotalCount(countList.size());
+			sbud.append(" ORDER BY qc.id ");
+			if (condition.containsKey("start") && condition.containsKey("limit")) {
+				sbud.append(" LIMIT ?,? ");
+				int start = Integer.parseInt(condition.get("start"));
+				int limit = Integer.parseInt(condition.get("limit"));
+				params.add(start);
+				params.add(limit);
+			}
+			list = jdbcTemplate.queryForList(sbud.toString(),params.toArray());
+		}
+		page.setResult(list);
+		return page;
+	}
 	
 	
 	public void updateResearchInfoById(String id,String no,String name){
@@ -584,7 +612,36 @@ public class ProjectServices {
 		}
 	}
 	
+	public List<ModuleStoreBean> getColor(){
+		return jdbcTemplate.query(" select id,color_name from color_dictionary ",new ModuleStoreBeanRowMapper());
+	}
+	public static class ModuleStoreBeanRowMapper implements RowMapper<ModuleStoreBean> {
+		@Override
+		public ModuleStoreBean mapRow(ResultSet rs, int rowNum) throws SQLException {
+			ModuleStoreBean rm = new ModuleStoreBean();
+			rm.setValue(rs.getString("id"));
+			rm.setText(rs.getString("color_name"));
+			return rm;
+		}
+	}
 	
 	
+	public void addQuestionColorById(String question,String color){
+		String sql = " INSERT into question_color(question_type  ,color_id, update_date ,create_date )VALUES(?,?,NOW(),NOW()) ";
+		jdbcTemplate.update(sql, question,color);
+	}
+	public void updateQuestionColorById(String id,String question,String color){
+		if(StringUtils.isNotBlank(id)){
+			String sql = " update question_color set question_type = ? ,color_id = ?, update_date = NOW() where id = ? ";
+			jdbcTemplate.update(sql, question,color,id);
+		}
+	}
+	
+	public void deleteQuestionTypeById(String id){
+		String sql = " delete from question_color where id = ? ";
+		if(StringUtils.isNotBlank(id)){
+			jdbcTemplate.update(sql, id);
+		}
+	}
 	
 }
