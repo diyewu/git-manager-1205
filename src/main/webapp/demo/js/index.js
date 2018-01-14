@@ -662,19 +662,33 @@ var vm = new Vue({
     }
 })
 
-function showDetail(title,subhead,imgSrc,detail1,detail2,detail3,detail4){
+function showDetail(title,subhead,imgSrc,detail1,detail2,detail3,detail4,detail5,detail6){
 	$("#detailimg").attr("src",imgSrc);
 	$("#detailtitle").html(title);
 	$("#detailsubhead").html(subhead);
-	$("#detailitem1").html(detail1);
-	$("#detailitem2").html(detail2);
-	$("#detailitem3").html(detail3);
-	$("#detailitem4").html(detail4);
+	if("null：null" != detail1){
+		$("#detailitem1").html(detail1);
+	}
+	if("null：null" != detail2){
+		$("#detailitem2").html(detail2);
+	}
+	if("null：null" != detail3){
+		$("#detailitem3").html(detail3);
+	}
+	if("null：null" != detail4){
+		$("#detailitem4").html(detail4);
+	}
+	if("null：null" != detail5){
+		$("#detailitem5").html(detail5);
+	}
+	if("null：null" != detail6){
+		$("#detailitem6").html(detail6);
+	}
     layer.open({
         type: 1,
         title: false,
         closeBtn: 0,
-        area: ['40rem', '30rem'],
+        area: ['40rem', '32rem'],
         shadeClose: true,
         scrollbar: false, 
         content: $('.detail')
@@ -713,12 +727,17 @@ function showInfo(ids){
 				$('#finditemlength').html(itemlength);
 			}
 			$.each(data, function (index, obj) {
-			   var htm = generateRightItem(obj.detail_address, 
+			   var htm = generateRightItem(obj.detail_1_value, 
 					   '详情',
 					   	basePath+'app/getImgBydetailId?id='+obj.id,
 					   	basePath+'app/getImgBydetailId?id='+obj.id+"&type=thumb",
-					   "调研编号："+obj.research_number,
-					   "检查时间："+obj.check_time,"照片编号："+obj.img_url);
+					   	obj.detail_2_key+"："+obj.detail_2_value,
+					   	obj.detail_3_key+"："+obj.detail_3_value,
+					   	obj.detail_4_key+"："+obj.detail_4_value,
+					   	obj.detail_5_key+"："+obj.detail_5_value,
+					   	obj.detail_6_key+"："+obj.detail_6_value,
+					   	obj.detail_7_key+"："+obj.detail_7_value
+					   	);
                $(".item-wrap").append(htm);
 	        });
 			viewer = new Viewer(document.getElementById('list-container-id'), {
@@ -729,12 +748,13 @@ function showInfo(ids){
 	},'json');
 }
 
-function generateRightItem(title,subhead,imgSrc,imgThumbSrc,detail1,detail2,detail3){
+function generateRightItem(title,subhead,imgSrc,imgThumbSrc,detail1,detail2,detail3,detail4,detail5,detail6){
 	var html = "";
 	html += "<div class=\"list-item\" >";
 	html += "	<img alt=\""+title+"\" class=\"nullclass\" onerror=\"this.src='./img/white1.png';this.onerror=null;\" data-original=\""+imgSrc+"\"	src=\""+imgThumbSrc+"\">";
 	html += "	<div class=\"right-info\">";
-	html += "		<div style='cursor: pointer;'  onClick=\"showDetail('"+title+"','"+subhead+"','"+imgSrc+"','"+detail1+"','"+detail2+"','"+detail3+"')\">";
+	html += "		<div style='cursor: pointer;'  onClick=\"showDetail('"+title+"','"+subhead+"','"+imgSrc
+	+"','"+detail1+"','"+detail2+"','"+detail3+"','"+detail4+"','"+detail5+"','"+detail6+"')\">";
 	html += "			<span class=\"title\"> <a>"+title+"</a>";
 	html += "			</span> <span class=\"villa-name\" >"+subhead+"</span>";
 //	html += "			<span class=\"sale-status\" >正常</span>";

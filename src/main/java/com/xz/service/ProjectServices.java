@@ -397,7 +397,7 @@ public class ProjectServices {
 		StringBuilder sql = new StringBuilder(" select pa.id,pa.project_id,pm.project_name,pa.attribute_name,pat.type_name,patt.type_name as info_type_name,pa.attribute_type,pa.attribute_active  ");
 		sql.append(" from project_attribute pa left join project_main pm on pa.project_id = pm.id ");
 		sql.append(" left join project_attribute_type pat on pa.attribute_type = pat.id AND pat.id <> 0 and pat.type = 0  ");
-		sql.append(" LEFT JOIN project_attribute_type patt ON pa.attribute_info_type = patt.id AND patt.id <> 0 and patt.type = 1 ");
+		sql.append(" LEFT JOIN project_attribute_type patt ON pa.attribute_info_type = patt.id AND patt.id <> 16 and patt.type = 1 ");
 		sql.append(" where 1=1 ");
 		if(StringUtils.isNotBlank(projectId)){
 			sql.append(" and pm.id = ? ");
