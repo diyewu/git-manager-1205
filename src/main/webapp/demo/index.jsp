@@ -243,7 +243,7 @@ String showName = realName == null?loginName:realName;
 					<i class="fa fa-user" aria-hidden="true"></i>
 					<div class="typeUserInfo">
 						<div class="no-login">
-							<a class="login login-user-btn btn-login "><%=showName%></a> <a href=""
+							<a class="login login-user-btn btn-login " onClick="layreset();"><%=showName%></a> <a href=""
 								target="_blank" class="register"></a>
 						</div>
 						<div class="logged" style="display: none;">

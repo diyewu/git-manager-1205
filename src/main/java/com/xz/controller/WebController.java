@@ -8,6 +8,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -26,6 +27,9 @@ import com.xz.model.json.JsonModel;
 import com.xz.service.AppService;
 import com.xz.service.WebService;
 import com.xz.utils.AgingCache;
+import com.xz.utils.Mail;
+import com.xz.utils.MailSam;
+import com.xz.utils.RandomText;
 
 @RequestMapping("webctrl")
 @Controller
@@ -35,6 +39,16 @@ public class WebController extends BaseController{
 	
 	@Autowired
 	private AppService appService;
+	
+	
+	private static String smtp = "smtp.qq.com";  
+	private static String port = "587";  
+	private static String user = "194973883@qq.com"; 
+	private static String pwd="uwyuantqcphvcaeg";  
+//	private static String smtp = "smtp.qq.com";  
+//	private static String from = "194973883@qq.com"; 
+//	private static String username="194973883@qq.com";  
+//	private static String password="WudiYe6586309*";  
 	
 	/**
 	 * 登陆
@@ -77,6 +91,7 @@ public class WebController extends BaseController{
 				
 				String enableTime = userInfo.get(0).get("enable_time")+"";
 				String disableTime = userInfo.get(0).get("disable_time")+"";
+				String email = (String)userInfo.get(0).get("email");
 				if(StringUtils.isNotBlank(enableTime) && StringUtils.isNotBlank(disableTime)){
 					Date d = new Date();
 					DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
@@ -96,6 +111,7 @@ public class WebController extends BaseController{
 					session.setAttribute(SessionConstant.WEB_USER_NAME, userName);
 					session.setAttribute(SessionConstant.WEB_USER_ROLE, userRole);
 					session.setAttribute(SessionConstant.WEB_USER_REAL_NAME, userRealName);
+					session.setAttribute(SessionConstant.WEB_USER_EMAIL, email);
 				}
 			}else{
 				msg = "用户名或密码错误！";
@@ -359,4 +375,120 @@ public class WebController extends BaseController{
 		
 		return new JsonModel(msg == null,msg,info);
 	}
+	/**
+	 * 忘记密码填写用户名
+	 * @param request
+	 * @return
+	 */
+	@RequestMapping("forgetPwdCheckNameAndCode")
+	@ResponseBody
+	public JsonModel forgetPwdCheckNameAndCode(HttpServletRequest request){
+		HttpSession session = request.getSession(); 
+		String sessionUserName = (String)session.getAttribute(SessionConstant.WEB_USER_NAME);
+		
+		String webUserName = request.getParameter("userName");
+		String code = request.getParameter("code");
+		String sessionIMgCode = session.getAttribute(SessionConstant.WEB_IMG_CODE)+"";
+		String msg = null;
+		if(StringUtils.isBlank(sessionUserName)){
+			msg = "登陆超时，请重新登陆";
+		}
+		if(msg == null){
+			if(!sessionUserName.equals(webUserName)){
+				msg = "用户名填写错误！";
+			}
+		}
+		if(msg == null){
+			if(!sessionIMgCode.equals(code)){
+				msg = "验证码填写错误！";
+			}
+		}
+		return new JsonModel(msg == null,msg);
+	}
+	/**
+	 * 发送验证码
+	 * @param request
+	 * @return
+	 */
+	@RequestMapping("forgetPwdMailCode")
+	@ResponseBody
+	public JsonModel forgetPwdMailCode(HttpServletRequest request){
+		HttpSession session = request.getSession(); 
+		String sessionUserName = (String)session.getAttribute(SessionConstant.WEB_USER_NAME);
+		String email = request.getParameter("email");
+		
+		String msg = null;
+		if(StringUtils.isBlank(sessionUserName)){
+			msg = "登陆超时，请重新登陆";
+		}
+		if(StringUtils.isBlank(email)){
+			msg = "请填写邮箱地址";
+		}
+		if(msg == null){
+			String randomCode = RandomText.getRandomString(8);
+			session.removeAttribute(SessionConstant.WEB_USER_RANDOM_CODE);
+			session.setAttribute(SessionConstant.WEB_USER_RANDOM_CODE, randomCode);
+			String content="尊敬的用户：<br/>您的验证码为："+randomCode+"（60分钟内有效，区分大小写），为了保证您的账户安全，请勿向任何人提供此验证码。";
+			try {
+				MailSam.send(smtp, port, user, pwd, email, "旭中咨询", content);
+			} catch (MessagingException e) {
+				e.printStackTrace();
+			}
+		}
+		return new JsonModel(msg == null,msg);
+	}
+	/**
+	 * 验证 邮箱验证码
+	 * @param request
+	 * @return
+	 */
+	@RequestMapping("forgetPwdCheckMailCode")
+	@ResponseBody
+	public JsonModel forgetPwdCheckMailCode(HttpServletRequest request){
+		HttpSession session = request.getSession(); 
+		String sessionUserName = (String)session.getAttribute(SessionConstant.WEB_USER_NAME);
+		String code = request.getParameter("code");
+		String sessionCode = (String)session.getAttribute(SessionConstant.WEB_USER_RANDOM_CODE);
+		String msg = null;
+		if(StringUtils.isBlank(sessionUserName)){
+			msg = "登陆超时，请重新登陆";
+		}
+		if(StringUtils.isBlank(code)){
+			msg = "请填写验证码";
+		}
+		if(msg == null){
+			if(!code.equals(sessionCode)){
+				msg = "验证码填写错误";
+			}
+		}
+		return new JsonModel(msg == null,msg);
+	}
+	/**
+	 * 更新密码
+	 * @param request
+	 * @return
+	 */
+	@RequestMapping("forgetPwdUpdatePwd")
+	@ResponseBody
+	public JsonModel forgetPwdUpdatePwd(HttpServletRequest request){
+		HttpSession session = request.getSession(); 
+		String sessionUserName = (String)session.getAttribute(SessionConstant.WEB_USER_NAME);
+		String webUserId =  (String)session.getAttribute(SessionConstant.WEB_USER_ID);
+		String pwd = request.getParameter("pwd");
+		String msg = null;
+		if(StringUtils.isBlank(sessionUserName)){
+			msg = "登陆超时，请重新登陆";
+		}
+		if(StringUtils.isBlank(pwd)){
+			msg = "密码不能为空！";
+		}
+		if(msg == null){
+			
+		}
+		return new JsonModel(msg == null,msg);
+	}
+	
+	
+	
+	
 }

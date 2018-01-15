@@ -772,5 +772,8 @@ public class AppService {
 		return list;
 	}
 	
+	public void updateWebUserPwd(String pwd,String userId){
+		String sql = "";
+	}
 	
 }

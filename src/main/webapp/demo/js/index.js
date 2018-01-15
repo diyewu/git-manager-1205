@@ -758,15 +758,59 @@ function generateRightItem(title,subhead,imgSrc,imgThumbSrc,detail1,detail2,deta
 
 
 function turnback(){
-//	generateMarker(_data, _level);
-//	console.log(_key);
-//	console.log(_cacheKey);
-//	console.log(_currentLevel);
-//	console.log(_nextLevel);
-//	console.log(_level);
 	if(!_key){
 		return null;
 	}else{
 		showPreLevel(_level, _key, _cacheKey, _currentLevel);
 	}
+}
+
+function layreset(){
+	  layer.open({
+		  type: 1,
+//		  area: ['500', '300']
+		  area: ['800px', '500px']
+		  ,shade: 0.8 //遮罩透明度
+		  ,skin: 'laystyle123'//样式类名
+		  ,title: '修改密码'
+		  ,maxmin: true //允许全屏最小化
+		  ,anim: 1 //0-6的动画形式，-1不开启
+		  ,offset: ['center']
+		  ,content: '<div class="layui-form-item" style="padding-top:30px"><label class="layui-form-label">输入旧密码</label><div class="layui-input-inline"><input type="password" name="oldpassword" id ="oldpassword" required lay-verify="required" placeholder="请输入旧密码" autocomplete="off" class="layui-input"></div><div class="layui-form-mid layui-word-aux"></div></div><div class="layui-form-item" style="padding-top:30px"><label class="layui-form-label">输入新密码</label><div class="layui-input-inline"><input type="password" name="newpassword" id="newpassword" required lay-verify="required" placeholder="请输入新密码" autocomplete="off" class="layui-input"></div><div class="layui-form-mid layui-word-aux"></div></div><div class="layui-form-item" style="padding-top:30px"><label class="layui-form-label">确认新密码</label><div class="layui-input-inline"><input type="password" name="confirmpassword" id="confirmpassword" required lay-verify="required" placeholder="请输入新密码" autocomplete="off" class="layui-input"></div><div class="layui-form-mid layui-word-aux"></div></div><div class="layui-form-item"><div class="layui-input-block"><button class="layui-btn" onclick="submitPwd();" >立即提交</button><button type="reset" class="layui-btn layui-btn-primary">重置</button></div></div>' //这里content是一个DOM
+	  });
+}
+function submitPwd(){
+	var oldpwd = $("#oldpassword").val();
+	var newpwd = $("#newpassword").val();
+	var confirmpwd = $("#confirmpassword").val();
+	if("" == oldpwd){
+		showErrorMsg('旧密码不能为空');
+		return false;
+	}
+	if("" == newpwd){
+		showErrorMsg('新密码不能为空');
+		return false;
+	}
+	if("" == confirmpwd){
+		showErrorMsg('确认密码不能为空');
+		return false;
+	}
+	if(newpwd != confirmpwd){
+		showErrorMsg('新密码两次输入不一致，请确认。');
+		return false;
+	}
+	$.post("base!reSetPwd.action", 
+			{
+				oldpwd:oldpwd,
+				newpwd:newpwd,
+				confirmpwd:confirmpwd
+			},
+			function(result){
+				if("error" == result.i_type){
+					showErrorMsg(result.i_msg);
+				}else{
+					window.location.href="login.jsp"; 
+				}
+			},'json');
+	
 }
