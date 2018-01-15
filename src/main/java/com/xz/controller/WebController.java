@@ -27,7 +27,6 @@ import com.xz.model.json.JsonModel;
 import com.xz.service.AppService;
 import com.xz.service.WebService;
 import com.xz.utils.AgingCache;
-import com.xz.utils.Mail;
 import com.xz.utils.MailSam;
 import com.xz.utils.RandomText;
 
@@ -39,17 +38,10 @@ public class WebController extends BaseController{
 	
 	@Autowired
 	private AppService appService;
-	
-	
 	private static String smtp = "smtp.qq.com";  
 	private static String port = "587";  
 	private static String user = "194973883@qq.com"; 
 	private static String pwd="uwyuantqcphvcaeg";  
-//	private static String smtp = "smtp.qq.com";  
-//	private static String from = "194973883@qq.com"; 
-//	private static String username="194973883@qq.com";  
-//	private static String password="WudiYe6586309*";  
-	
 	/**
 	 * 登陆
 	 * @param request
@@ -91,7 +83,6 @@ public class WebController extends BaseController{
 				
 				String enableTime = userInfo.get(0).get("enable_time")+"";
 				String disableTime = userInfo.get(0).get("disable_time")+"";
-				String email = (String)userInfo.get(0).get("email");
 				if(StringUtils.isNotBlank(enableTime) && StringUtils.isNotBlank(disableTime)){
 					Date d = new Date();
 					DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
@@ -111,7 +102,6 @@ public class WebController extends BaseController{
 					session.setAttribute(SessionConstant.WEB_USER_NAME, userName);
 					session.setAttribute(SessionConstant.WEB_USER_ROLE, userRole);
 					session.setAttribute(SessionConstant.WEB_USER_REAL_NAME, userRealName);
-					session.setAttribute(SessionConstant.WEB_USER_EMAIL, email);
 				}
 			}else{
 				msg = "用户名或密码错误！";
@@ -375,6 +365,7 @@ public class WebController extends BaseController{
 		
 		return new JsonModel(msg == null,msg,info);
 	}
+	
 	/**
 	 * 忘记密码填写用户名
 	 * @param request
@@ -483,12 +474,14 @@ public class WebController extends BaseController{
 			msg = "密码不能为空！";
 		}
 		if(msg == null){
-			
+			try {
+				appService.updateWebUserPwdById(pwd, webUserId);
+			} catch (Exception e) {
+				e.printStackTrace();
+				msg = e.getMessage();
+			}
 		}
 		return new JsonModel(msg == null,msg);
 	}
-	
-	
-	
 	
 }

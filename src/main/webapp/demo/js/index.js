@@ -662,19 +662,33 @@ var vm = new Vue({
     }
 })
 
-function showDetail(title,subhead,imgSrc,detail1,detail2,detail3,detail4){
+function showDetail(title,subhead,imgSrc,detail1,detail2,detail3,detail4,detail5,detail6){
 	$("#detailimg").attr("src",imgSrc);
 	$("#detailtitle").html(title);
 	$("#detailsubhead").html(subhead);
-	$("#detailitem1").html(detail1);
-	$("#detailitem2").html(detail2);
-	$("#detailitem3").html(detail3);
-	$("#detailitem4").html(detail4);
+	if("null：null" != detail1){
+		$("#detailitem1").html(detail1);
+	}
+	if("null：null" != detail2){
+		$("#detailitem2").html(detail2);
+	}
+	if("null：null" != detail3){
+		$("#detailitem3").html(detail3);
+	}
+	if("null：null" != detail4){
+		$("#detailitem4").html(detail4);
+	}
+	if("null：null" != detail5){
+		$("#detailitem5").html(detail5);
+	}
+	if("null：null" != detail6){
+		$("#detailitem6").html(detail6);
+	}
     layer.open({
         type: 1,
         title: false,
         closeBtn: 0,
-        area: ['40rem', '30rem'],
+        area: ['40rem', '32rem'],
         shadeClose: true,
         scrollbar: false, 
         content: $('.detail')
@@ -713,12 +727,17 @@ function showInfo(ids){
 				$('#finditemlength').html(itemlength);
 			}
 			$.each(data, function (index, obj) {
-			   var htm = generateRightItem(obj.detail_address, 
+			   var htm = generateRightItem(obj.detail_1_value, 
 					   '详情',
 					   	basePath+'app/getImgBydetailId?id='+obj.id,
 					   	basePath+'app/getImgBydetailId?id='+obj.id+"&type=thumb",
-					   "调研编号："+obj.research_number,
-					   "检查时间："+obj.check_time,"照片编号："+obj.img_url);
+					   	obj.detail_2_key+"："+obj.detail_2_value,
+					   	obj.detail_3_key+"："+obj.detail_3_value,
+					   	obj.detail_4_key+"："+obj.detail_4_value,
+					   	obj.detail_5_key+"："+obj.detail_5_value,
+					   	obj.detail_6_key+"："+obj.detail_6_value,
+					   	obj.detail_7_key+"："+obj.detail_7_value
+					   	);
                $(".item-wrap").append(htm);
 	        });
 			viewer = new Viewer(document.getElementById('list-container-id'), {
@@ -729,12 +748,13 @@ function showInfo(ids){
 	},'json');
 }
 
-function generateRightItem(title,subhead,imgSrc,imgThumbSrc,detail1,detail2,detail3){
+function generateRightItem(title,subhead,imgSrc,imgThumbSrc,detail1,detail2,detail3,detail4,detail5,detail6){
 	var html = "";
 	html += "<div class=\"list-item\" >";
 	html += "	<img alt=\""+title+"\" class=\"nullclass\" onerror=\"this.src='./img/white1.png';this.onerror=null;\" data-original=\""+imgSrc+"\"	src=\""+imgThumbSrc+"\">";
 	html += "	<div class=\"right-info\">";
-	html += "		<div style='cursor: pointer;'  onClick=\"showDetail('"+title+"','"+subhead+"','"+imgSrc+"','"+detail1+"','"+detail2+"','"+detail3+"')\">";
+	html += "		<div style='cursor: pointer;'  onClick=\"showDetail('"+title+"','"+subhead+"','"+imgSrc
+	+"','"+detail1+"','"+detail2+"','"+detail3+"','"+detail4+"','"+detail5+"','"+detail6+"')\">";
 	html += "			<span class=\"title\"> <a>"+title+"</a>";
 	html += "			</span> <span class=\"villa-name\" >"+subhead+"</span>";
 //	html += "			<span class=\"sale-status\" >正常</span>";
@@ -758,59 +778,15 @@ function generateRightItem(title,subhead,imgSrc,imgThumbSrc,detail1,detail2,deta
 
 
 function turnback(){
+//	generateMarker(_data, _level);
+//	console.log(_key);
+//	console.log(_cacheKey);
+//	console.log(_currentLevel);
+//	console.log(_nextLevel);
+//	console.log(_level);
 	if(!_key){
 		return null;
 	}else{
 		showPreLevel(_level, _key, _cacheKey, _currentLevel);
 	}
-}
-
-function layreset(){
-	  layer.open({
-		  type: 1,
-//		  area: ['500', '300']
-		  area: ['800px', '500px']
-		  ,shade: 0.8 //遮罩透明度
-		  ,skin: 'laystyle123'//样式类名
-		  ,title: '修改密码'
-		  ,maxmin: true //允许全屏最小化
-		  ,anim: 1 //0-6的动画形式，-1不开启
-		  ,offset: ['center']
-		  ,content: '<div class="layui-form-item" style="padding-top:30px"><label class="layui-form-label">输入旧密码</label><div class="layui-input-inline"><input type="password" name="oldpassword" id ="oldpassword" required lay-verify="required" placeholder="请输入旧密码" autocomplete="off" class="layui-input"></div><div class="layui-form-mid layui-word-aux"></div></div><div class="layui-form-item" style="padding-top:30px"><label class="layui-form-label">输入新密码</label><div class="layui-input-inline"><input type="password" name="newpassword" id="newpassword" required lay-verify="required" placeholder="请输入新密码" autocomplete="off" class="layui-input"></div><div class="layui-form-mid layui-word-aux"></div></div><div class="layui-form-item" style="padding-top:30px"><label class="layui-form-label">确认新密码</label><div class="layui-input-inline"><input type="password" name="confirmpassword" id="confirmpassword" required lay-verify="required" placeholder="请输入新密码" autocomplete="off" class="layui-input"></div><div class="layui-form-mid layui-word-aux"></div></div><div class="layui-form-item"><div class="layui-input-block"><button class="layui-btn" onclick="submitPwd();" >立即提交</button><button type="reset" class="layui-btn layui-btn-primary">重置</button></div></div>' //这里content是一个DOM
-	  });
-}
-function submitPwd(){
-	var oldpwd = $("#oldpassword").val();
-	var newpwd = $("#newpassword").val();
-	var confirmpwd = $("#confirmpassword").val();
-	if("" == oldpwd){
-		showErrorMsg('旧密码不能为空');
-		return false;
-	}
-	if("" == newpwd){
-		showErrorMsg('新密码不能为空');
-		return false;
-	}
-	if("" == confirmpwd){
-		showErrorMsg('确认密码不能为空');
-		return false;
-	}
-	if(newpwd != confirmpwd){
-		showErrorMsg('新密码两次输入不一致，请确认。');
-		return false;
-	}
-	$.post("base!reSetPwd.action", 
-			{
-				oldpwd:oldpwd,
-				newpwd:newpwd,
-				confirmpwd:confirmpwd
-			},
-			function(result){
-				if("error" == result.i_type){
-					showErrorMsg(result.i_msg);
-				}else{
-					window.location.href="login.jsp"; 
-				}
-			},'json');
-	
 }

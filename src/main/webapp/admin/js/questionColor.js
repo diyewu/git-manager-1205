@@ -146,7 +146,7 @@
 				  url : path + "/projectmgr/deleteQuestionTypeById",
 				  method : 'post',
 				  params : {
-					  userId:id
+					  id:id
 				  },
 				  success : function(response, options) {
 				   var o = Ext.util.JSON.decode(response.responseText);

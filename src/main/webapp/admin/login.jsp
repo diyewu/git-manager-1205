@@ -88,7 +88,7 @@ String pathName = request.getParameter("pathName")==null?"index":request.getPara
 				console.log(data);
 				if(true == data.success){
 					//跳转
-					console.log(pathName+".jsp");
+					//console.log(pathName+".jsp");
 					window.location.href = pathName+".jsp";
 				}else{
 					jAlert(data.msg, '提示');

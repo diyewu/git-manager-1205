@@ -243,7 +243,7 @@ String showName = realName == null?loginName:realName;
 					<i class="fa fa-user" aria-hidden="true"></i>
 					<div class="typeUserInfo">
 						<div class="no-login">
-							<a class="login login-user-btn btn-login " onClick="layreset();"><%=showName%></a> <a href=""
+							<a class="login login-user-btn btn-login "><%=showName%></a> <a href=""
 								target="_blank" class="register"></a>
 						</div>
 						<div class="logged" style="display: none;">
@@ -319,7 +319,7 @@ String showName = realName == null?loginName:realName;
 				</div>
 				<div class="houseInfo" style="margin: 0.3rem 0.85rem;">
 					<span class="title" style="font-weight:bolder;font-size:0.9rem;">
-						<a target="_blank" href="" id='detailtitle'></a>
+						<a id='detailtitle'></a>
 					</span> <span class="villa-name" id = 'detailsubhead'></span>
 					<i class="iconfont favor-icon" style="display: none;"></i>
 					<div class="inlineText">
@@ -330,6 +330,12 @@ String showName = realName == null?loginName:realName;
 						<span><span class="tag" id = 'detailitem3'></span></span><span
 							class="afterSpan"><span class="tag" id = 'detailitem4'></span></span>
 					</div>
+                    <div class="inlineText"><span>
+                    <span class="tag" id = 'detailitem5'></span>
+                    </span>
+                    <span class="afterSpan">
+                    <span class="tag" id = 'detailitem6'></span></span>
+                	</div>
 				</div>
 			</div>
 		</div>
