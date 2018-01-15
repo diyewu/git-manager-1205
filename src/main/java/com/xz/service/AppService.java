@@ -796,5 +796,14 @@ public class AppService implements InitializingBean{
 		tempi++;
 	}
 	
+	public void updateWebUserPwdById(String pwd,String userId){
+		String sql = " update web_user_login set user_password = ? where id = ?  ";
+		jdbcTemplate.update(sql, pwd,userId);
+	}
+	
+	public void updateWebUserEmail(String email,String userId){
+		String sql = " update web_user_login set email = ? where id = ?  ";
+		jdbcTemplate.update(sql, email,userId);
+	}
 	
 }
