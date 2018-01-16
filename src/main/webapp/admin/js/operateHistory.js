@@ -98,9 +98,30 @@
     	endTimeField.on('change', function(o, v) {
     	});
         
+    	
+    	var comstore = new Ext.data.SimpleStore({
+    	    fields : ['value', 'text'],
+    	    data : [['3', '全部'],['1', '前端'], ['2', 'APP'],['0', '后台']]
+    	});
+    	_cob = new Ext.form.ComboBox({
+			id:'shUserRole',
+			width:150,
+			forceSelection: true,
+			store:comstore,
+			mode : 'local',
+			valueField:'value',
+			displayField:'text',
+			typeAhead: true,
+			triggerAction: 'all',
+			selectOnFocus:true,//用户不能自己输入,只能选择列表中有的记录
+			allowBlank:false,
+			editable:false
+		});
+		_cob.setValue("全部");
+    	
         var tbar = new Ext.Toolbar({  
             renderTo : Ext.grid.GridPanel.tbar,// 其中grid是上边创建的grid容器  
-            items :['操作用户名：', {
+            items :['类型：',_cob,'操作用户名：', {
 		  		  id : 'operateUser',
 		  		  xtype : 'textfield',
 		  		  width : 115
@@ -171,6 +192,7 @@
    function reloadData(){
 	    var beginTime = this.beginTimeField.getValue();
 		var endTime = this.endTimeField.getValue();
+		var type = _cob.getValue();
 		if (!beginTime && !endTime) {
 			var _bt = new Date();
 			_bt.setDate(1);
@@ -189,6 +211,7 @@
 		store.baseParams['operateUser'] = userName;
 		store.baseParams['createDateStart'] = beginTime;
 		store.baseParams['createDateEnd'] = endTime;
+		store.baseParams['type'] = type;
 		store.reload({
 			params: {start:0,limit:100},
 			callback: function(records, options, success){

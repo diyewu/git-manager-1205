@@ -20,13 +20,13 @@ public class MailSam {
         // 表示SMTP发送邮件，必须进行身份验证
         props.put("mail.smtp.auth", "true");
         //此处填写SMTP服务器
-        props.put("mail.smtp.host", "smtp.qq.com");
+        props.put("mail.smtp.host", "smtp.ym.163.com");
         //端口号，QQ邮箱给出了两个端口，但是另一个我一直使用不了，所以就给出这一个587
-        props.put("mail.smtp.port", "587");
+        props.put("mail.smtp.port", "25");
         // 此处填写你的账号
-        props.put("mail.user", "194973883@qq.com");
+        props.put("mail.user", "xuzhongwxgzh@xxinxi.com");
         // 此处的密码就是前面说的16位STMP口令
-        props.put("mail.password", "uwyuantqcphvcaeg");
+        props.put("mail.password", "xuzhongwxgzh");
 
         // 构建授权信息，用于进行SMTP进行身份验证
         Authenticator authenticator = new Authenticator() {

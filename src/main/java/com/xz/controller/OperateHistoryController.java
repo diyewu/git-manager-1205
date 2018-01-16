@@ -39,6 +39,7 @@ public class OperateHistoryController extends BaseController{
 			String operateUser = request.getParameter("operateUser");
 			String createDateStart = request.getParameter("createDateStart");
 			String createDateEnd = request.getParameter("createDateEnd");
+			String type = request.getParameter("type");
 			String start = request.getParameter("start");
 			String limit = request.getParameter("limit");;
 			if (StringUtils.isNotBlank(operateUser)) {
@@ -55,6 +56,9 @@ public class OperateHistoryController extends BaseController{
 			}
 			if (limit != null && !"".equals(limit.trim())) {
 				condition.put("limit", limit);
+			}
+			if(!"3".equals(type) && StringUtils.isNotBlank(type)){
+				condition.put("type", type);
 			}
 			try {
 				outPut = operateHistoryService.getOperateList(condition);

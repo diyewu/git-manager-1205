@@ -15,6 +15,7 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.StringUtils;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,8 +24,10 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.alibaba.fastjson.JSONArray;
 import com.xz.common.SessionConstant;
 import com.xz.entity.AppMenu;
+import com.xz.entity.CustomConfig;
 import com.xz.model.json.JsonModel;
 import com.xz.service.AppService;
+import com.xz.service.OperateHistoryService;
 import com.xz.service.WebService;
 import com.xz.utils.AgingCache;
 import com.xz.utils.MailSam;
@@ -32,16 +35,19 @@ import com.xz.utils.RandomText;
 
 @RequestMapping("webctrl")
 @Controller
-public class WebController extends BaseController{
+public class WebController extends BaseController {
 	@Autowired
 	private WebService webService;
 	
 	@Autowired
 	private AppService appService;
-	private static String smtp = "smtp.qq.com";  
-	private static String port = "587";  
-	private static String user = "194973883@qq.com"; 
-	private static String pwd="uwyuantqcphvcaeg";  
+	
+	@Autowired  
+    private CustomConfig customConfig; 
+	
+	@Autowired
+	private OperateHistoryService operateHistoryService;
+	
 	/**
 	 * 登陆
 	 * @param request
@@ -80,6 +86,7 @@ public class WebController extends BaseController{
 				String userId = userInfo.get(0).get("id")+"";
 				String userRole = userInfo.get(0).get("user_role")+"";
 				String userRealName = userInfo.get(0).get("real_name")+"";
+				String email = userInfo.get(0).get("email")+"";
 				
 				String enableTime = userInfo.get(0).get("enable_time")+"";
 				String disableTime = userInfo.get(0).get("disable_time")+"";
@@ -102,11 +109,13 @@ public class WebController extends BaseController{
 					session.setAttribute(SessionConstant.WEB_USER_NAME, userName);
 					session.setAttribute(SessionConstant.WEB_USER_ROLE, userRole);
 					session.setAttribute(SessionConstant.WEB_USER_REAL_NAME, userRealName);
+					session.setAttribute(SessionConstant.WEB_USER_EMAIL, email);
 				}
 			}else{
 				msg = "用户名或密码错误！";
 			}
 		}
+		operateHistoryService.insertOH(request, "1", msg, msg==null?1:0, 1);
 		
 		return new JsonModel(msg == null, msg);
 	}
@@ -128,6 +137,7 @@ public class WebController extends BaseController{
 		}else{
 			msg = "尚未登陆！";
 		}
+		operateHistoryService.insertOH(request, "2", msg, msg==null?1:0, 1);
 		return new JsonModel(msg == null,msg,list);
 	}
 	
@@ -140,7 +150,6 @@ public class WebController extends BaseController{
 	@RequestMapping("getObjectDetail")
 	@ResponseBody
 	public JsonModel getObjectDetail(HttpServletRequest request,HttpServletResponse response){
-		long start = System.currentTimeMillis();	
 		HttpSession session = request.getSession(); 
 		String userRole = session.getAttribute(SessionConstant.WEB_USER_ROLE)+"";
 		String msg = null;
@@ -150,8 +159,9 @@ public class WebController extends BaseController{
 		}else{
 			msg = "尚未登陆！";
 		}
-		long end = System.currentTimeMillis();
-		System.out.println("getObjectDetail="+(end - start));
+		
+		operateHistoryService.insertOH(request, "3", msg, msg==null?1:0, 1);
+		
 		return new JsonModel(msg == null,msg,list);
 	}
 	
@@ -163,7 +173,6 @@ public class WebController extends BaseController{
 	@RequestMapping("getMapInfo")
 	@ResponseBody
 	public JsonModel getMapInfoByMenu(HttpServletRequest request){
-		long start = System.currentTimeMillis();
 		String msg = null;
 		String jsonIds = request.getParameter("jsonIds");
 		List<Map<String, Object>> info = new ArrayList<Map<String,Object>>();
@@ -173,8 +182,7 @@ public class WebController extends BaseController{
 		}else{
 			msg = "参数有误！";
 		}
-		long end = System.currentTimeMillis();
-		System.out.println("getMapInfoByMenu="+(end - start));
+		operateHistoryService.insertOH(request, "4", msg, msg==null?1:0, 1);
 		return new JsonModel(msg == null,msg,info);
 	}
 	
@@ -199,6 +207,7 @@ public class WebController extends BaseController{
 		}else{
 			msg = "参数有误！";
 		}
+		operateHistoryService.insertOH(request, "7", msg, msg==null?1:0, 1);
 		return new JsonModel(msg == null,msg,resplist);
 	}
 	
@@ -270,6 +279,7 @@ public class WebController extends BaseController{
 				msg = e.getMessage();
 			}
 		}
+		operateHistoryService.insertOH(request, "8", msg, msg==null?1:0, 1);
 		
 		return new JsonModel(msg == null,msg,info);
 	}
@@ -301,7 +311,6 @@ public class WebController extends BaseController{
 			ObjectMapper mapper = new ObjectMapper();
 			try {
 				String jsonIds = mapper.writeValueAsString(list);
-				System.out.println(jsonIds);
 				if(StringUtils.isNotBlank(jsonIds)){
 					JSONArray projectArray = JSONArray.parseArray(jsonIds);
 					info = appService.analyzeJson(projectArray, "is_check");
@@ -311,7 +320,7 @@ public class WebController extends BaseController{
 				msg = e.getMessage();
 			}
 		}
-		
+		operateHistoryService.insertOH(request, "21", msg, msg==null?1:0, 1);
 		return new JsonModel(msg == null,msg,info);
 	}
 	
@@ -336,7 +345,7 @@ public class WebController extends BaseController{
 		}else{
 			msg = "尚未登陆！";
 		}
-		
+		operateHistoryService.insertOH(request, "22", msg, msg==null?1:0, 1);
 		return new JsonModel(msg == null,msg,info);
 	}
 	
@@ -362,7 +371,7 @@ public class WebController extends BaseController{
 		}else{
 			msg = "尚未登陆！";
 		}
-		
+		operateHistoryService.insertOH(request, "23", msg, msg==null?1:0, 1);
 		return new JsonModel(msg == null,msg,info);
 	}
 	
@@ -394,10 +403,11 @@ public class WebController extends BaseController{
 				msg = "验证码填写错误！";
 			}
 		}
+		operateHistoryService.insertOH(request, "24", msg, msg==null?1:0, 1);
 		return new JsonModel(msg == null,msg);
 	}
 	/**
-	 * 发送验证码
+	 * 发送邮箱验证码
 	 * @param request
 	 * @return
 	 */
@@ -431,11 +441,12 @@ public class WebController extends BaseController{
 			session.setAttribute(SessionConstant.WEB_USER_RANDOM_CODE, randomCode);
 			String content="尊敬的用户：<br/>您的验证码为："+randomCode+"（60分钟内有效，区分大小写），为了保证您的账户安全，请勿向任何人提供此验证码。";
 			try {
-				MailSam.send(smtp, port, user, pwd, email, "旭中咨询", content);
+				MailSam.send(customConfig.getSmtp(), customConfig.getPort(), customConfig.getUser(), customConfig.getPwd(), email, "旭中咨询", content);
 			} catch (MessagingException e) {
 				e.printStackTrace();
 			}
 		}
+		operateHistoryService.insertOH(request, "25", msg, msg==null?1:0, 1);
 		return new JsonModel(msg == null,msg);
 	}
 	/**
@@ -462,6 +473,7 @@ public class WebController extends BaseController{
 				msg = "验证码填写错误";
 			}
 		}
+		operateHistoryService.insertOH(request, "26", msg, msg==null?1:0, 1);
 		return new JsonModel(msg == null,msg);
 	}
 	/**
@@ -491,6 +503,7 @@ public class WebController extends BaseController{
 				msg = e.getMessage();
 			}
 		}
+		operateHistoryService.insertOH(request, "27", msg, msg==null?1:0, 1);
 		return new JsonModel(msg == null,msg);
 	}
 	

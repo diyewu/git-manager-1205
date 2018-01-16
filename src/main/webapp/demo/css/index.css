@@ -1,10 +1,10 @@
 .myContainer .logo {
     width: 7.55rem;
-    height: 1.45rem;
+    height: 2.5rem;
     display: inline-block;
-    background: url('../img/logo.png') left top no-repeat;
+    background: url('../img/logo.gif') left top no-repeat;
     background-size: contain;
-    margin: 1rem 0 0 0.8rem;
+    margin: 0.5rem 0 0 0.8rem;
     float: left;
 }
 

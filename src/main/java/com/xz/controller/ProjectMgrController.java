@@ -105,7 +105,6 @@ public class ProjectMgrController extends BaseController {
 				appService.initResearchNo();
 			} catch (Exception e) {
 				e.printStackTrace();
-				System.out.println("_____111______"+e.getMessage());
 				operateHistoryService.insertOH(session, "20", e.getMessage(),0);
 			}
 			return resp;
