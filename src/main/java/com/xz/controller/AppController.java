@@ -30,6 +30,7 @@ import com.xz.entity.AppLoginBean;
 import com.xz.entity.AppMenu;
 import com.xz.model.json.AppJsonModel;
 import com.xz.service.AppService;
+import com.xz.service.OperateHistoryService;
 import com.xz.utils.AgingCache;
 
 
@@ -44,6 +45,14 @@ public class AppController extends BaseController{
 	@Autowired
 	private AppService appService;
 	
+	@Autowired
+	private OperateHistoryService operateHistoryService;
+	
+	/**
+	 * APP 用户登陆
+	 * @param request
+	 * @return
+	 */
 	@RequestMapping("login")
 	@ResponseBody
 	public AppJsonModel login(HttpServletRequest request){
@@ -121,9 +130,15 @@ public class AppController extends BaseController{
 			appLoginBean.setUserRoleId(roleId);
 			AgingCache.putCacheInfo(phoneId, appLoginBean,30);
 		}
+		operateHistoryService.insertOH(request, "28", ServerResult.getCodeMsg(code, msg), "success".equals(msg)?1:0, 2);
 		return new AppJsonModel(code, ServerResult.getCodeMsg(code, msg), resultMap);
 	}
 	
+	/**
+	 * APP 根据登陆用户获取菜单
+	 * @param request
+	 * @return
+	 */
 	@RequestMapping("getMenu")
 	@ResponseBody
 	public AppJsonModel getMenu(HttpServletRequest request){
@@ -140,6 +155,7 @@ public class AppController extends BaseController{
 		if(code == 0){
 			newList = appService.getMenulist(appLoginBean.getUserRoleId());
 		}
+		operateHistoryService.insertOH(request, "29", ServerResult.getCodeMsg(code, msg), "success".equals(msg)?1:0, 2);
 		return new AppJsonModel(code, ServerResult.getCodeMsg(code, msg), newList);
 	}
 //	@RequestMapping("getMenu")
@@ -169,10 +185,14 @@ public class AppController extends BaseController{
 	}
 	
 	
+	/**
+	 * APP 根据用不选择菜单获取地图点信息
+	 * @param request
+	 * @return
+	 */
 	@RequestMapping("getMapInfo")
 	@ResponseBody
 	public AppJsonModel getMapInfoByMenu(HttpServletRequest request){
-		long start = System.currentTimeMillis();
 		String token = request.getHeader("token");
 		String phoneId = request.getHeader("phoneId");
 		String jsonIds = request.getParameter("jsonIds");
@@ -182,7 +202,6 @@ public class AppController extends BaseController{
 		paramList.add(token);
 		paramList.add(phoneId);
 		paramList.add(jsonIds);
-		System.out.println("jsonIds="+jsonIds);
 		AppLoginBean appLoginBean = new AppLoginBean();
 		code = globalCheck(paramList, token, phoneId,appLoginBean);
 		
@@ -221,11 +240,15 @@ public class AppController extends BaseController{
 				}
 			}
 		}
-		long end = System.currentTimeMillis();
-		System.out.println("getMapInfoByMenu="+(end - start));
+		operateHistoryService.insertOH(request, "30", ServerResult.getCodeMsg(code, msg), "success".equals(msg)?1:0, 2);
 		return new AppJsonModel(code, ServerResult.getCodeMsg(code, msg), info);
 	}
 	
+	/**
+	 * APP 根据当前点击坐标点获取下一级坐标
+	 * @param request
+	 * @return
+	 */
 	@RequestMapping("getNextMapInfoByKey")
 	@ResponseBody
 	public AppJsonModel getNextMapInfoByKey(HttpServletRequest request){
@@ -252,9 +275,15 @@ public class AppController extends BaseController{
 			List<Map<String, Object>> tlist = (List<Map<String, Object>>)AgingCache.getCacheInfo(cacheKey).getValue();
 			info = appService.generateCod(key,tlist, cacheKey,currentLevel);
 		}
+		operateHistoryService.insertOH(request, "31", ServerResult.getCodeMsg(code, msg), "success".equals(msg)?1:0, 2);
 		return new AppJsonModel(code, ServerResult.getCodeMsg(code, msg), info);
 	}
 	
+	/**
+	 * APP 根据用户点击坐标获取坐标点详细信息
+	 * @param request
+	 * @return
+	 */
 	@RequestMapping("getCoordinateInfo")
 	@ResponseBody
 	public AppJsonModel getCoordinateInfo(HttpServletRequest request){
@@ -279,6 +308,7 @@ public class AppController extends BaseController{
 				code = ServerResult.RESULT_SERVER_ERROR;
 			}
 		}
+		operateHistoryService.insertOH(request, "32", ServerResult.getCodeMsg(code, msg), "success".equals(msg)?1:0, 2);
 		return new AppJsonModel(code, ServerResult.getCodeMsg(code, msg), resplist);
 	}
 	
@@ -311,6 +341,12 @@ public class AppController extends BaseController{
 		}
 		return new AppJsonModel(code, ServerResult.getCodeMsg(code, msg), list);
 	}
+	
+	/**
+	 * APP 根据详细信息ID获取图片信息
+	 * @param request
+	 * @param response
+	 */
 	@RequestMapping("getImgBydetailId")
 	@ResponseBody
 	public void getImgBydetailId(HttpServletRequest request,HttpServletResponse response){
@@ -360,7 +396,14 @@ public class AppController extends BaseController{
 				}
 			}
         }
+//        operateHistoryService.insertOH(request, "32", ServerResult.getCodeMsg(code, msg), "success".equals(msg)?1:0, 2);
 	}
+	
+	/**
+	 * APP 根据当前级别获取上一级信息
+	 * @param request
+	 * @return
+	 */
 	@RequestMapping("getPreMapInfoByKey")
 	@ResponseBody
 	public AppJsonModel getPreMapInfoByKey(HttpServletRequest request){
@@ -385,7 +428,7 @@ public class AppController extends BaseController{
 		if(code == 0){
 			info = appService.turnback(cacheKey, key, currentLevel);
 		}
-		
+		operateHistoryService.insertOH(request, "34", ServerResult.getCodeMsg(code, msg), "success".equals(msg)?1:0, 2);
 		return new AppJsonModel(code, ServerResult.getCodeMsg(code, msg), info);
 	}
 	

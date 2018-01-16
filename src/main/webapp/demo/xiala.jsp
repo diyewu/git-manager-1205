@@ -50,7 +50,6 @@ background-image: url(img/jt1.gif);background-repeat:no-repeat;background-positi
 </head>
 
 <body>
-<div id="lr_systembox">
 
     <div id="lr_systembtn" class="lr_systembtn">
         <a href="#" class="lr_abtn"><span>懒人建站为您提供</span></a>
@@ -63,22 +62,9 @@ background-image: url(img/jt1.gif);background-repeat:no-repeat;background-positi
              <dd><a href="#" target="_blank">三级菜单测试</a></dd>
              <dd><a href="#" target="_blank">三级菜单测试</a></dd>
           </dl>   
-          <dl>
-             <dt><a href="http://www.51xuediannao.com/js/slide/" target="_blank">焦点幻灯片</a></dt>
-          </dl>
-          <dl>
-             <dt><a href="http://www.51xuediannao.com/js/texiao/" target="_blank">网页特效</a></dt>
-          </dl>
-          <dl>
-             <dt><a href="http://www.51xuediannao.com/qqkefu/" target="_blank">qq在线客服代码</a></dt>
-          </dl>   
-          <dl>
-             <dt><a href="http://www.51xuediannao.com/jquery_tanchu/" target="_blank">jquery弹出层</a></dt>
-          </dl>       
         </div>
     </div>
 
-</div>
 
 
 </div>

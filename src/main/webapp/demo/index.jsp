@@ -14,8 +14,9 @@ String showName = realName == null?loginName:realName;
 <link rel="icon" href="img/title.png" type="img/x-ico" />
 <script src="js/jquery-3.2.1.min.js"></script>
 
-<link href="plugins/bootstrap-3.3.7-dist/css/bootstrap.min.css"	rel="stylesheet">
-<link href="css/viewer.min.css"	rel="stylesheet">
+<link href="plugins/bootstrap-3.3.7-dist/css/bootstrap.min.css"
+	rel="stylesheet">
+<link href="css/viewer.min.css" rel="stylesheet">
 <link href="plugins/font-awesome-4.7.0/css/font-awesome.min.css"
 	rel="stylesheet">
 <script src="plugins/bootstrap-3.3.7-dist/js/bootstrap.min.js"></script>
@@ -51,14 +52,14 @@ String showName = realName == null?loginName:realName;
     var path = "<%=path%>";
     var basePath = "<%=basePath%>";
     var showName = "<%=showName%>";
-	</script>
+</script>
 </head>
 <jsp:include page="permission.jsp">
 	<jsp:param name="pathName" value="index" />
 </jsp:include>
 <body style="overflow:hidden;" class="demo-1">
 
-	<div id="loader-wrapper" >
+	<div id="loader-wrapper">
 		<div id="loader"></div>
 		<div class="loader-section section-left"></div>
 		<div class="loader-section section-right"></div>
@@ -86,9 +87,10 @@ String showName = realName == null?loginName:realName;
 					:style="{width:firstIndex!==''?(secondIndex!==''?'99%':'66%'):'33%'}">
 					<div class="selectedResultBtn" @click="cascadeClose()">确定</div>
 					<div class="selectedResultContainer">
-						<div class="selectedResultWrap"	:style="{width:selectedIndex.length*250+100+'px'}">
-							<span class="selectedResultWrapText">全部结果：</span> 
-							<span class="selectedResultWrapItem" v-for="(v,i) in selectedIndex">{{v.menuName}}</span>
+						<div class="selectedResultWrap"
+							:style="{width:selectedIndex.length*250+100+'px'}">
+							<span class="selectedResultWrapText">全部结果：</span> <span
+								class="selectedResultWrapItem" v-for="(v,i) in selectedIndex">{{v.menuName}}</span>
 						</div>
 					</div>
 				</div>
@@ -96,12 +98,10 @@ String showName = realName == null?loginName:realName;
 
 				<div class="selectedLine"
 					:style="{borderRight:firstIndex!==''?'1px solid #ddd':''}">
-					<div class="selectedItem" :style="{color:firstIndex===i?'#3086c3':''}"
-						@click="firstClick(v,i)" @mouseenter="firstOver(v,i)" v-for="(v,i) in cascaderData">
-						<!-- 
-						<input style="width:auto;height:auto;margin:5px;padding:auto;float:none"
-							:checked="v.status" type="checkbox">{{v.value}}
-						-->
+					<div class="selectedItem"
+						:style="{color:firstIndex===i?'#3086c3':''}"
+						@click="firstClick(v,i)" @mouseenter="firstOver(v,i)"
+						v-for="(v,i) in cascaderData">
 						<label><input type="checkbox" :checked="v.status"><i>✓</i>{{v.menuName}}</label>
 					</div>
 				</div>
@@ -113,10 +113,6 @@ String showName = realName == null?loginName:realName;
 						:style="{color:secondIndex===i?'#3086c3':''}"
 						@click="secondClick(v,i)" @mouseenter="secondOver(v,i)"
 						v-for="(v,i) in cascaderData[firstIndex].children">
-						<!-- 
-						<input style="width:auto;height:auto;margin:5px;padding:auto;float:none"
-							:checked="v.status" type="checkbox">{{v.value}}
-						-->
 						<label><input type="checkbox" :checked="v.status"><i>✓</i>{{v.menuName}}</label>
 					</div>
 				</div>
@@ -128,21 +124,10 @@ String showName = realName == null?loginName:realName;
 					<div @click="thirdClick(v,i)" class="selectedItem"
 						:style="{color:v.status?'#3086c3':''}"
 						v-for="(v,i) in cascaderData[firstIndex].children[secondIndex].children">
-						<!-- 
-						<input style="width:auto;height:auto;margin:5px;padding:auto;float:none"
-							:checked="v.status" type="checkbox">
-							{{v.value}}
-						 -->
-						 <label><input type="checkbox" :checked="v.status"><i>✓</i>{{v.menuName}}</label>
+						<label><input type="checkbox" :checked="v.status"><i>✓</i>{{v.menuName}}</label>
 					</div>
 				</div>
 				</transition>
-
-				<!-- <div style="width:150px;float:left" v-if="cascaderData[firstIndex].children[secondIndex].children">
-                        <div @click="thirdClick(v)" v-for="(v,i) in cascaderData">
-                            {{v.id}}
-                        </div>
-                    </div> -->
 			</div>
 			</transition>
 
@@ -177,73 +162,15 @@ String showName = realName == null?loginName:realName;
 				</div>
 				<div class="condition-box slide-transition" style="display:none;"
 					v-show="subFlag=='more'" @mouseenter="subOver('more')"
-					@mouseleave="subOut('more')">
-					<div class="condition-row">
-						<div class="condition-title">
-							<span>测试测试</span>
-						</div>
-						<div class="condition-colon">：</div>
-						<div class="condition-body">
-							<div class="condition-item" @click="cbSelect($event)">
-								<div class="checkbox checkbox-lg">
-									<span class="check"></span>
-								</div>
-								<span class="condition-txt">测试</span>
-							</div>
-							<div class="condition-item" @click="cbSelect($event)">
-								<div class="checkbox checkbox-lg">
-									<span class="check"></span>
-								</div>
-								<span class="condition-txt">测试</span>
-							</div>
-							<div class="condition-item" @click="cbSelect($event)">
-								<div class="checkbox checkbox-lg">
-									<span class="check"></span>
-								</div>
-								<span class="condition-txt">测试</span>
-							</div>
-						</div>
-					</div>
-					<div class="condition-row">
-						<div class="condition-title">
-							<span>测试测试</span>
-
-						</div>
-						<div class="condition-colon">：</div>
-						<div class="condition-body">
-							<div class="condition-item" @click="cbSelect($event)">
-								<div class="checkbox checkbox-lg">
-									<span class="check"></span>
-								</div>
-								<span class="condition-txt">测试</span>
-							</div>
-							<div class="condition-item" @click="cbSelect($event)">
-								<div class="checkbox checkbox-lg">
-									<span class="check"></span>
-								</div>
-								<span class="condition-txt">测试</span>
-							</div>
-							<div class="condition-item" @click="cbSelect($event)">
-								<div class="checkbox checkbox-lg">
-									<span class="check"></span>
-								</div>
-								<span class="condition-txt">测试</span>
-							</div>
-							<div class="condition-item" @click="cbSelect($event)">
-								<div class="checkbox checkbox-lg">
-									<span class="check"></span>
-								</div>
-								<span class="condition-txt">测试</span>
-							</div>
-						</div>
-					</div>
-
-				</div>
+					@mouseleave="subOut('more')"></div>
 				<div class="login-register">
 					<i class="fa fa-user" aria-hidden="true"></i>
 					<div class="typeUserInfo">
 						<div class="no-login">
-							<a class="login login-user-btn btn-login "><%=showName%></a> 
+							<a class="login login-user-btn btn-login "><%=showName%></a> | 
+							<i style="color: #3086c3;" class=" fa fa-address-card" aria-hidden="true"></i>
+							<a	href="../demo/resetpwd/forgetPwd1.jsp" target="_blank"
+								class="register">密码管理</a>
 						</div>
 						<div class="logged" style="display: none;">
 							<a class="user-name" href=""></a> <a href="" class="">退出</a>
@@ -255,86 +182,42 @@ String showName = realName == null?loginName:realName;
 			</div>
 			<div id="allmap" class="content"></div>
 			<div id="autoShowList" class="expander fadeOut" @click="expander()"></div>
-			<div class="list-container" id ="list-container-id">
+			<div class="list-container" id="list-container-id">
 				<div class="overlay" style="display: none;"></div>
 				<div class="list-header">
-					<span class="total-count">共<em id='finditemlength'>0</em>条信息</span>
-					<span class="sort" onClick="turnback();">&nbsp;&nbsp;返回上一级<i class="fa fa-reply-all" aria-hidden="true"></i>&nbsp;&nbsp;</span>
-                    <!-- <span class="sort" >&nbsp;&nbsp;主页<i class="fa fa-home"  aria-hidden="true">&nbsp;&nbsp;</i></span> -->
-                    <!-- <span class="sort on" data-dianji="default/排序">默认</span> -->
+					<span class="total-count">共<em id='finditemlength'>0</em>条信息
+					</span> <span class="sort" onClick="turnback();">&nbsp;&nbsp;返回上一级<i
+						class="fa fa-reply-all" aria-hidden="true"></i>&nbsp;&nbsp;
+					</span>
+					<!-- <span class="sort" >&nbsp;&nbsp;主页<i class="fa fa-home"  aria-hidden="true">&nbsp;&nbsp;</i></span> -->
+					<!-- <span class="sort on" data-dianji="default/排序">默认</span> -->
 				</div>
-				<div class="item-wrap" id="right-item-wrap" style="overflow-x:hidden;overflow-y:auto;">
-					<!-- 
-					<div class="list-item" @click="showDetail()">
-						<img alt="" onerror="this.src='img/mz.jpg';this.onerror=null;"	src="img/mz.jpg">
-						<div class="right-info">
-							<div>
-								<span class="title"> <a>南龙谭苑小区</a>
-								</span> <span class="villa-name">松江区</span>
-								<span class="sale-status" >正常</span>
-								<i class="iconfont favor-icon" style="display: none;"
-									data-dianji="favor/测试图片详情"></i>
-							</div>
-							<div>
-								<span>检查人员：赵苏鸣</span> <span class="price">详情</span>
-							</div>
-							<div>
-								<span>经度：121.239</span>
-							</div>
-							<div>
-								<span>纬度：31.015</span>
-							</div>
-						</div>
-						<hr>
-					</div>
-					-->
-				</div>
+				<div class="item-wrap" id="right-item-wrap"
+					style="overflow-x:hidden;overflow-y:auto;"></div>
 			</div>
 			<div class="detail" style="display:none;overflow:hidden;">
-				<div class="imgBox" >
-					<img id='detailimg' style="width:100%;height:100%;" onerror="javascript:this.src='img/white3.png';" src="" alt="">
-					<!--<div class="js-silder">
-						<div class="silder-scroll">
-							<div class="silder-main">
-								<div class="silder-main-img">
-									<img  src="img/1.jpg" alt="">
-								</div>
-								<div class="silder-main-img">
-									<img src="img/2.jpg" alt="">
-								</div>
-								<div class="silder-main-img">
-									<img src="img/3.jpg" alt="">
-								</div>
-								<div class="silder-main-img">
-									<img src="img/4.jpg" alt="">
-								</div>
-								<div class="silder-main-img">
-									<img src="img/5.jpg" alt="">
-								</div>
-							</div>
-						</div>
-					</div>
-					 -->
+				<div class="imgBox">
+					<img id='detailimg' style="width:100%;height:100%;"
+						onerror="javascript:this.src='img/white3.png';" src="" alt="">
 				</div>
 				<div class="houseInfo" style="margin: 0.3rem 0.85rem;">
 					<span class="title" style="font-weight:bolder;font-size:0.9rem;">
 						<a id='detailtitle'></a>
-					</span> <span class="villa-name" id = 'detailsubhead'></span>
-					<i class="iconfont favor-icon" style="display: none;"></i>
+					</span> <span class="villa-name" id='detailsubhead'></span> <i
+						class="iconfont favor-icon" style="display: none;"></i>
 					<div class="inlineText">
-						<span><span class="tag" id = 'detailitem1'></span></span><span
-							class="afterSpan"><span class="tag" id = 'detailitem2'></span></span>
+						<span><span class="tag" id='detailitem1'></span></span><span
+							class="afterSpan"><span class="tag" id='detailitem2'></span></span>
 					</div>
 					<div class="inlineText">
-						<span><span class="tag" id = 'detailitem3'></span></span><span
-							class="afterSpan"><span class="tag" id = 'detailitem4'></span></span>
+						<span><span class="tag" id='detailitem3'></span></span><span
+							class="afterSpan"><span class="tag" id='detailitem4'></span></span>
 					</div>
-                    <div class="inlineText"><span>
-                    <span class="tag" id = 'detailitem5'></span>
-                    </span>
-                    <span class="afterSpan">
-                    <span class="tag" id = 'detailitem6'></span></span>
-                	</div>
+					<div class="inlineText">
+						<span> <span class="tag" id='detailitem5'></span>
+						</span> <span class="afterSpan"> <span class="tag"
+							id='detailitem6'></span></span>
+					</div>
 				</div>
 			</div>
 		</div>

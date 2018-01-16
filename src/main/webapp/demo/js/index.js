@@ -100,6 +100,18 @@
     	//自定义覆盖物*************************************
     	
         
+        var lr_systembtn = $("#lr_systembtn");
+    	var lr_menu = $("#lr_menu");
+    	lr_systembtn.mouseenter(function(){
+    		t_delay= setTimeout(function(){
+    			lr_menu.fadeIn("slow");
+    		},200);
+    	});
+    	lr_systembtn.mouseleave(function(){
+    		clearTimeout(t_delay);
+    		lr_menu.fadeOut("slow");
+    	});
+        
     }); 
 	
 	function projectClk(projectId){
@@ -621,7 +633,6 @@ var vm = new Vue({
             this.subFlag = current;
         },
         subOut: function (current) {
-        	console.log(this);
             this.subFlag = 0;
             this.expand = 0;
         },

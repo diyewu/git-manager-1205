@@ -26,6 +26,7 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.xz.common.SessionConstant;
 import com.xz.entity.OperateHistory;
 
 @Service
@@ -53,6 +54,32 @@ public class OperateHistoryService {
 		try {
 			jdbcTemplate.update(sql, operateUserId, opereteTypeId, ip, mac,
 					serverIp, operateUserCity, operateSummary,isSuccess);
+		} catch (Exception e) {
+			e.printStackTrace();
+			logger.error("operateUserId = "+operateUserId +",opereteTypeId="+opereteTypeId+",operateSummary ="+operateSummary+",ip="+ip+",mac="+mac+",serverIp="+serverIp+",出错信息："+e.getMessage());
+		}
+	}
+	public void insertOH(HttpServletRequest request, String opereteTypeId, String operateSummary,int isSuccess,int type) {
+		String ip = "";
+		String mac = "";
+		String serverIp = "";
+		String operateUserId = "";
+		try {
+			operateUserId = (String)request.getSession().getAttribute(SessionConstant.WEB_USER_ID);
+			try {
+				ip = getIpAddr(request);
+	//			mac = getMACAddr(ip);
+				serverIp = request.getLocalAddr();
+			} catch (Exception e) {
+				e.printStackTrace();
+				logger.error(e.getMessage());
+			}
+			String operateUserCity = "";
+			String sql = "insert into operate_history (operate_user_id,operete_type_id,create_time,operate_user_ip,operate_user_mac,local_server,operate_user_city,operate_summary,is_success,type)" +
+				"values(?,?,sysdate(),?,?,?,?,?,?,?)";
+		
+			jdbcTemplate.update(sql, operateUserId, opereteTypeId, ip, mac,
+					serverIp, operateUserCity, operateSummary,isSuccess,type);
 		} catch (Exception e) {
 			e.printStackTrace();
 			logger.error("operateUserId = "+operateUserId +",opereteTypeId="+opereteTypeId+",operateSummary ="+operateSummary+",ip="+ip+",mac="+mac+",serverIp="+serverIp+",出错信息："+e.getMessage());
@@ -141,6 +168,10 @@ public class OperateHistoryService {
 			}
 			if (condition.containsKey("createDateEnd")) {
 				sbud.append(" and a.create_time <= '" + condition.get("createDateEnd") + "'");
+			}
+			if (condition.containsKey("type")) {
+				sbud.append(" and a.type = ? ");
+				params.add(condition.get("type")+"");
 			}
 			sbud.append(" order by a.create_time desc ");
 			try {
