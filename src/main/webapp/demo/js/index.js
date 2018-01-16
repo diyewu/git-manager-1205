@@ -99,18 +99,36 @@
         }
     	//自定义覆盖物*************************************
     	
-        
-        var lr_systembtn = $("#lr_systembtn");
-    	var lr_menu = $("#lr_menu");
-    	lr_systembtn.mouseenter(function(){
-    		t_delay= setTimeout(function(){
-    			lr_menu.fadeIn("slow");
-    		},200);
-    	});
-    	lr_systembtn.mouseleave(function(){
-    		clearTimeout(t_delay);
-    		lr_menu.fadeOut("slow");
-    	});
+        $(".go-to-list").click(function(){
+            layer.open({
+                type: 1,
+                title: false,
+                closeBtn: 0,
+                area: ['20rem', '20rem'],
+                shadeClose: true,
+                scrollbar: false, 
+                content: '<div><img src="../demo/img/20180116230158.png" width="100%" height="100%"/></div>'
+            });
+        });
+        var tipindex;
+        $(".go-to-list").mouseenter(function(){
+        	tipindex = layer.tips('<div><img src="../demo/img/20180116230158.png" width="100%" height="100%"/></div>', this,{
+        		  tips: [3, '#fff'],
+        		  time: 500000
+        	});
+//        	layer.open({
+//        		type: 1,
+//        		title: false,
+//        		closeBtn: 0,
+//        		area: ['20rem', '20rem'],
+//        		shadeClose: true,
+//        		scrollbar: false, 
+//        		content: '<div><img src="../demo/img/20180116215105.png" width="100%" height="100%"/></div>'
+//        	});
+        });
+        $(".go-to-list").mouseleave (function(){
+        	layer.close(tipindex);
+        });
         
     }); 
 	
