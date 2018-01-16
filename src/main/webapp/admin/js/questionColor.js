@@ -35,23 +35,18 @@
 	            {header:"颜色",align:'center',dataIndex:"color_name",sortable:true},
 	            {header:"操作",align:'center',dataIndex:"id",width:50,
 	            renderer: function (value, meta, record) {
-//	            	console.log(record);
-					            			var formatStr = "<input id = 'bt_edit_" + record.get('id')
-							+ "' onclick=\"showEditQuestionType('" + record.get('id') + "','"
-							+ record.get('question_type') + "','"
-							+ record.get('color_name')
-							+ "');\" type='button' value='编辑' width ='15px'/>&nbsp;&nbsp;"; 
+//	            	var formatStr = "<input id = 'bt_edit_" + record.get('id')
+//							+ "' onclick=\"showEditQuestionType('" + record.get('id') + "','"
+//							+ record.get('question_type') + "','"
+//							+ record.get('color_name').replace(/'/g, '\"')
+//							+ "');\" type='button' value='编辑' width ='15px'/>&nbsp;&nbsp;"; 
 
 										     var deleteBtn = "<input id = 'bt_delete_" + record.get('id')
 							+ "' onclick=\"deleteQuestionType('" + record.get('id')
 							+ "');\" type='button' value='删除' width ='15px'/>";
 										            			
-            				var resultStr = String.format(formatStr);
-            				if(loginUserId != record.id){
-            					return "<div>" + resultStr+deleteBtn + "</div>";
-            				}else{
-            					return "";
-            				}
+//            				var resultStr = String.format(formatStr);
+            				return "<div>" + deleteBtn + "</div>";
         				  } .createDelegate(this)
 	            } 
             ] 
