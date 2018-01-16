@@ -40,20 +40,29 @@ img{ max-width:100%; height:auto;}
 .subtijiao input{width:85px; height:32px; background:#f60;color:#fff; font-size:14px; cursor:pointer;}
 .successs{ text-align:center;padding: 20px 0 60px 0;}
 .successs h3{padding:20px; font-size:25px;color:#A0CD4E;}
+.successs span{padding:20px; font-size:20px;color:#000;}
 
-.logo {
-    width: 7.55rem;
-    height: 1.45rem;
-    display: inline-block;
-    background: url('../img/logo.png') left top no-repeat;
-        background-size: auto auto;
-    background-size: contain;
-    margin: 1rem 0 0 0.8rem;
-    float: left;
+.headerBox {
+    position: relative;
+    line-height: 55px;
+    height: 55px;
+    width: 100%;
+    margin-bottom: 40px;
+    box-shadow: 0 3px 7px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e9e9ea\9;
 }
-
-
-
+.gotoIndex {
+    position: absolute;
+    color: #6C707A;
+    font-size: 14px;
+    right: 19px;
+    text-decoration: none;
+}
+.headerLogo {
+    display: inline-block;
+    height: 55px;
+    width: 151px;
+}
 
 
 

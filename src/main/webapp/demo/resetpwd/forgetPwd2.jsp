@@ -9,25 +9,27 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<meta name="Author" contect="http://www.webqin.net">
 <title>忘记密码</title>
-<link rel="shortcut icon" href="images/favicon.ico" />
-<link type="text/css" href="../../css/css.css" rel="stylesheet" />
+<link rel="icon" href="../img/title.png" type="img/x-ico" />
+<link type="text/css" href="../css/css.css" rel="stylesheet" />
 <script type="text/javascript" src="../js/jquery-3.2.1.min.js"></script>
 <script src="../../demo/plugins/layer/layer.js"></script>
 <script type="text/javascript">
 var path = "<%=path%>";
 var email = '<%=email%>'; 
+var hasEmail = false;
  //导航定位
 $(document).ready(function () {
-	if(email){
-	 $(".selyz").val(0);
-	 $(".sel-yzsj").show();
-	 $(".sel-yzyx").hide();
-	}else{
+	if(email && "null" != email){
+	 hasEmail = true;
 	 $(".selyz").val(1);
 	 $(".sel-yzsj").hide();
 	 $(".sel-yzyx").show();
+	 $("#yzemail").val(email);
+	}else{
+	 $(".selyz").val(0);
+	 $(".sel-yzsj").show();
+	 $(".sel-yzyx").hide();
 	}
 });
 
@@ -37,10 +39,15 @@ var btn;
 function sendCode(thisBtn) {
 	btn = thisBtn;
 	btn.disabled = true; //将按钮置为不可点击
-	var email = $("#femail").val();
+	var temail = "";
+	if(hasEmail){
+		temail = email;
+	}else{
+		temail = $("#femail").val();
+	}
 	$.post(path+"/webctrl/forgetPwdMailCode/", 
 		{
-    		email:email
+    		email:temail
 		},
 		function(result){
 			if(result.success == true){//登陆成功
@@ -92,6 +99,12 @@ function checkCode(){
 </head>
 
 <body>
+<div class="headerBox">
+     <img src="../img/logo.png" class="headerLogo">
+     <a href="../index.jsp" class="gotoIndex">返回首页</a>
+</div>
+
+
 
   <div class="content">
    <div class="web-width">
@@ -139,7 +152,7 @@ function checkCode(){
         <dt>邮箱验证码：</dt>
         <dd>
         	<input type="text" id="emailcode"/> 	
-        	<input type="button" id="getcode" style="height:32px;width:120px;" value="点击发送验证码" onclick="sendCode(this)" />
+        	<input type="button" id="getcode" style="height:32px;width:120px;cursor: pointer;" value="点击发送验证码" onclick="sendCode(this)" />
         </dd>
         <div class="clears"></div>
        </dl>

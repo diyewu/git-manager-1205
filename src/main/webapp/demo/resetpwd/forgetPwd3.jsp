@@ -7,8 +7,8 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<meta name="Author" contect="http://www.webqin.net">
 <title>忘记密码</title>
+<link rel="icon" href="../img/title.png" type="img/x-ico" />
  <style type="text/css">
 	 #tips{ font-size: 12px; width: 400px; height: 25px; margin: 4px 0 0 20px;}
 	 #tips span{float: left; width: 40px; height: 20px; color: #fff; overflow:hidden; margin-right: 10px;margin-left: 3px; background: #D7D9DD; line-height:20px; text-align: center; }
@@ -17,11 +17,11 @@
 	 #tips .s3{background: #14B12F;}/*绿色*/
 	 #tips .s4{background: #D7D9DD;}/*灰色*/
  </style>
-<link type="text/css" href="../../css/css.css" rel="stylesheet" />
+<link type="text/css" href="../css/css.css" rel="stylesheet" />
 <script type="text/javascript" src="../js/jquery-3.2.1.min.js"></script>
 <script src="../../demo/plugins/layer/layer.js"></script>
  <script type="text/javascript">
- 
+ var path = "<%=path%>";
  $(document).ready(function () {
  	$("#firpwd").keyup(function(){
  	  $("#sp1")
@@ -63,31 +63,36 @@
  	var fpwd = $("#firpwd").val();
  	var spwd = $("#secpwd").val();
  	if(fpwd != spwd){
- 		layer.tips('两次输入密码不一致', '#getcode', {
+ 		layer.tips('两次输入密码不一致', '#subbtn', {
 			tips: [2, '#CC0033']
 		});
 		return;
  	}
  	var email = $("#femail").val();
-	$.post(path+"/webctrl/forgetPwdMailCode/", 
+	$.post(path+"/webctrl/forgetPwdUpdatePwd/", 
 		{
-    		email:email
+    		pwd:fpwd
 		},
 		function(result){
 			if(result.success == true){//登陆成功
-				//window.location.href="forgetPwd2.jsp"; 
-				changeClock(thisBtn);
+				window.location.href="forgetPwd4.jsp"; 
 			}else {
-				layer.tips('操作失败：'+result.msg, '#getcode', {
+				layer.tips('操作失败：'+result.msg, '#subbtn', {
 					tips: [2, '#CC0033']
 				});
-				btn.disabled = false;
 			}
 	},'json');
  }
  </script>
 </head>
 <body>
+
+<div class="headerBox">
+     <img src="../img/logo.png" class="headerLogo">
+     <a href="../index.jsp" class="gotoIndex">返回首页</a>
+</div>
+
+
   <div class="content">
    <div class="web-width">
      <div class="for-liucheng">
@@ -119,7 +124,7 @@
         <dd><input type="password" id ="secpwd"/></dd>
         <div class="clears"></div>
        </dl> 
-       <div class="subtijiao"><input type="submit" onClick="next();" value="提交" /></div> 
+       <div class="subtijiao"><input type="submit" onclick="next();" id="subbtn" value="提交" /></div> 
       </div><!--forget-pwd/-->
    </div><!--web-width/-->
   </div><!--content/-->

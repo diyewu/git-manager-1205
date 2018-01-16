@@ -7,13 +7,23 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<meta name="Author" contect="http://www.webqin.net">
 <title>忘记密码</title>
-<link type="text/css" href="../../css/css.css" rel="stylesheet" />
+<link rel="icon" href="../img/title.png" type="img/x-ico" />
+<link type="text/css" href="../css/css.css" rel="stylesheet" />
 <script type="text/javascript" src="../js/jquery-3.2.1.min.js"></script>
 <script src="../../demo/plugins/layer/layer.js"></script>
+<style type="text/css">
+
+</style>
 </head>
 <body>
+
+<div class="headerBox">
+     <img src="../img/logo.png" class="headerLogo">
+     <a href="../index.jsp" class="gotoIndex">返回首页</a>
+</div>
+
+
   <div class="content">
    <div class="web-width">
      <div class="for-liucheng">

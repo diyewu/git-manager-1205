@@ -405,17 +405,27 @@ public class WebController extends BaseController{
 	@ResponseBody
 	public JsonModel forgetPwdMailCode(HttpServletRequest request){
 		HttpSession session = request.getSession(); 
-		String sessionUserName = (String)session.getAttribute(SessionConstant.WEB_USER_NAME);
+		String webUserId =  (String)session.getAttribute(SessionConstant.WEB_USER_ID);
 		String email = request.getParameter("email");
 		
 		String msg = null;
-		if(StringUtils.isBlank(sessionUserName)){
+		if(StringUtils.isBlank(webUserId)){
 			msg = "登陆超时，请重新登陆";
 		}
 		if(StringUtils.isBlank(email)){
 			msg = "请填写邮箱地址";
 		}
 		if(msg == null){
+			try {
+				appService.updateWebUserEmail(email, webUserId);
+			} catch (Exception e) {
+				e.printStackTrace();
+				msg = e.getMessage();
+			}
+		}
+		
+		if(msg == null){
+			session.setAttribute(SessionConstant.WEB_USER_EMAIL, email);
 			String randomCode = RandomText.getRandomString(8);
 			session.removeAttribute(SessionConstant.WEB_USER_RANDOM_CODE);
 			session.setAttribute(SessionConstant.WEB_USER_RANDOM_CODE, randomCode);

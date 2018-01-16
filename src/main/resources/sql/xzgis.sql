@@ -10,7 +10,7 @@ Target Server Type    : MYSQL
 Target Server Version : 50629
 File Encoding         : 65001
 
-Date: 2018-01-15 18:23:18
+Date: 2018-01-16 09:45:11
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -760,6 +760,7 @@ CREATE TABLE `web_user_login` (
   `real_name` varchar(255) DEFAULT NULL,
   `enable_time` varchar(50) DEFAULT NULL COMMENT '启用时间',
   `disable_time` varchar(50) DEFAULT NULL COMMENT '禁用时间',
+  `email` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `USER_LOGIN_ID` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -767,11 +768,11 @@ CREATE TABLE `web_user_login` (
 -- ----------------------------
 -- Records of web_user_login
 -- ----------------------------
-INSERT INTO `web_user_login` VALUES ('2bb49d9d514c48c5bebbf78beab3e179', 'admin', 'admin', '1', '0', null, null, null, null, '123', '12123啊实打实', '2018-01-03', '2023-01-05');
-INSERT INTO `web_user_login` VALUES ('60672052e98a45ec800173a9b1829f5b', 'zhou', 'user', '7', '1', null, null, null, null, '1', '周期', null, null);
-INSERT INTO `web_user_login` VALUES ('8e81294de42949f6b18d4262cdd6bebe', '123', '123', '2', '0', null, null, null, null, '1', '123', null, null);
-INSERT INTO `web_user_login` VALUES ('e2058de4d2704de08c952c768578bd20', '546a', 'asd', '9', '1', null, null, null, null, '1', '阿斯顿', null, null);
-INSERT INTO `web_user_login` VALUES ('f36df2a40fe248589b99ce0a3f4a05b8', 'wuqiuming', 'wuqiuming', '12', '0', null, null, null, null, '3', '吴秋明', null, null);
+INSERT INTO `web_user_login` VALUES ('2bb49d9d514c48c5bebbf78beab3e179', 'admin', 'admin', '1', '0', null, null, null, null, '123', '12123啊实打实', '2018-01-03', '2023-01-05', null);
+INSERT INTO `web_user_login` VALUES ('60672052e98a45ec800173a9b1829f5b', 'zhou', 'user', '7', '1', null, null, null, null, '1', '周期', null, null, null);
+INSERT INTO `web_user_login` VALUES ('8e81294de42949f6b18d4262cdd6bebe', '123', '123', '2', '0', null, null, null, null, '1', '123', null, null, null);
+INSERT INTO `web_user_login` VALUES ('e2058de4d2704de08c952c768578bd20', '546a', 'asd', '9', '1', null, null, null, null, '1', '阿斯顿', null, null, null);
+INSERT INTO `web_user_login` VALUES ('f36df2a40fe248589b99ce0a3f4a05b8', 'wuqiuming', 'wuqiuming', '12', '0', null, null, null, null, '3', '吴秋明', null, null, null);
 
 -- ----------------------------
 -- Table structure for web_user_login_phone

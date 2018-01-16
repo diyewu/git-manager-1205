@@ -7,13 +7,40 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<meta name="Author" contect="http://www.webqin.net">
 <title>忘记密码</title>
-<link rel="shortcut icon" href="images/favicon.ico" />
-<link type="text/css" href="../../css/css.css" rel="stylesheet" />
+<link rel="icon" href="../img/title.png" type="img/x-ico" />
+<link type="text/css" href="../css/css.css" rel="stylesheet" />
+<script type="text/javascript" src="../js/jquery-3.2.1.min.js"></script>
+<script type="text/javascript">
+var path = "<%=path%>";
+ //导航定位
+ var emv;
+$(document).ready(function () {
+	changeClock();
+});
+var clock = '';
+var nums = 5;
+function changeClock() {
+	clock = setInterval(doLoop, 1000); //一秒执行一次
+}
+function doLoop() {
+	nums--;
+	if (nums > 0) {
+		$("#secoend").html(nums);
+	} else {
+		clearInterval(clock); //清除js定时器
+		location.href="../index.jsp";
+	}
+}
+</script>
+
 </head>
 
 <body>
+<div class="headerBox">
+     <img src="../img/logo.png" class="headerLogo">
+     <a href="../index.jsp" class="gotoIndex">返回首页</a>
+</div>
 
   <div class="content">
      <div class="for-liucheng">
@@ -30,6 +57,7 @@
      </div><!--for-liucheng/-->
       <div class="successs">
        <h3>恭喜您，修改成功！</h3>
+       <span><em id="secoend" style="color:red">5</em> 秒自动<a style="color:blue" href="../index.jsp">返回首页</a>...</span>
       </div>
    </div><!--web-width/-->
   </div><!--content/-->

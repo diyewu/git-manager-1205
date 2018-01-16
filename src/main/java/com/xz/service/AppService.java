@@ -801,4 +801,9 @@ public class AppService implements InitializingBean{
 		jdbcTemplate.update(sql, pwd,userId);
 	}
 	
+	public void updateWebUserEmail(String email,String userId){
+		String sql = " update web_user_login set email = ? where id = ?  ";
+		jdbcTemplate.update(sql, email,userId);
+	}
+	
 }
