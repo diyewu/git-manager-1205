@@ -177,8 +177,7 @@ String showName = realName == null?loginName:realName;
 						</div>
 					</div>
 				</div>
-				<a class="go-to-list"><i class="fa fa-list-ul"
-					aria-hidden="true"></i>联系管理员</a>
+				<a class="go-to-list"><i class="fa fa-android"	aria-hidden="true"></i>下载APP</a>
 			</div>
 			<div id="allmap" class="content"></div>
 			<div id="autoShowList" class="expander fadeOut" @click="expander()"></div>
