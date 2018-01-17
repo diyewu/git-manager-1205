@@ -32,6 +32,7 @@ import com.xz.service.WebService;
 import com.xz.utils.AgingCache;
 import com.xz.utils.MailSam;
 import com.xz.utils.RandomText;
+import com.xz.utils.WebUtil;
 
 @RequestMapping("webctrl")
 @Controller
@@ -376,13 +377,13 @@ public class WebController extends BaseController {
 	}
 	
 	/**
-	 * 忘记密码填写用户名
+	 * 重设密码填写用户名
 	 * @param request
 	 * @return
 	 */
-	@RequestMapping("forgetPwdCheckNameAndCode")
+	@RequestMapping("resetPwdCheckNameAndCode")
 	@ResponseBody
-	public JsonModel forgetPwdCheckNameAndCode(HttpServletRequest request){
+	public JsonModel resetPwdCheckNameAndCode(HttpServletRequest request){
 		HttpSession session = request.getSession(); 
 		String sessionUserName = (String)session.getAttribute(SessionConstant.WEB_USER_NAME);
 		
@@ -411,9 +412,9 @@ public class WebController extends BaseController {
 	 * @param request
 	 * @return
 	 */
-	@RequestMapping("forgetPwdMailCode")
+	@RequestMapping("resetPwdMailCode")
 	@ResponseBody
-	public JsonModel forgetPwdMailCode(HttpServletRequest request){
+	public JsonModel resetPwdMailCode(HttpServletRequest request){
 		HttpSession session = request.getSession(); 
 		String webUserId =  (String)session.getAttribute(SessionConstant.WEB_USER_ID);
 		String email = request.getParameter("email");
@@ -454,9 +455,9 @@ public class WebController extends BaseController {
 	 * @param request
 	 * @return
 	 */
-	@RequestMapping("forgetPwdCheckMailCode")
+	@RequestMapping("resetPwdCheckMailCode")
 	@ResponseBody
-	public JsonModel forgetPwdCheckMailCode(HttpServletRequest request){
+	public JsonModel resetPwdCheckMailCode(HttpServletRequest request){
 		HttpSession session = request.getSession(); 
 		String sessionUserName = (String)session.getAttribute(SessionConstant.WEB_USER_NAME);
 		String code = request.getParameter("code");
@@ -481,9 +482,9 @@ public class WebController extends BaseController {
 	 * @param request
 	 * @return
 	 */
-	@RequestMapping("forgetPwdUpdatePwd")
+	@RequestMapping("resetPwdUpdatePwd")
 	@ResponseBody
-	public JsonModel forgetPwdUpdatePwd(HttpServletRequest request){
+	public JsonModel resetPwdUpdatePwd(HttpServletRequest request){
 		HttpSession session = request.getSession(); 
 		String sessionUserName = (String)session.getAttribute(SessionConstant.WEB_USER_NAME);
 		String webUserId =  (String)session.getAttribute(SessionConstant.WEB_USER_ID);
@@ -506,5 +507,136 @@ public class WebController extends BaseController {
 		operateHistoryService.insertOH(request, "27", msg, msg==null?1:0, 1);
 		return new JsonModel(msg == null,msg);
 	}
+	/**
+	 * 忘记密码填写用户名
+	 * @param request
+	 * @return
+	 */
+	@RequestMapping("forgetPwdCheckNameAndCode")
+	@ResponseBody
+	public JsonModel forgetPwdCheckNameAndCode(HttpServletRequest request){
+		HttpSession session = request.getSession(); 
+		String code = request.getParameter("code");
+		String userName = request.getParameter("userName");
+		String sessionIMgCode = session.getAttribute(SessionConstant.WEB_IMG_CODE)+"";
+		String msg = null;
+		if(StringUtils.isBlank(userName)){
+			msg = "用户名不能为空！";
+		}
+		List<Map<String, Object>> list = new ArrayList<Map<String,Object>>();
+		if(msg == null){
+			if(!sessionIMgCode.equals(code)){
+				msg = "验证码填写错误！";
+			}
+		}
+		if(msg == null){
+			list = appService.getWebUserInfoByUserName(userName);
+		}
+		if(list == null || list.size() == 0){
+			msg = "用户名："+userName+"不存在！";
+		}
+		if(msg == null){
+			String email = (String)list.get(0).get("email");
+			if(StringUtils.isNotBlank(email)){
+				session.setAttribute(SessionConstant.WEB_USER_EMAIL, email);
+				session.setAttribute(SessionConstant.WEB_USER_ID, (String)list.get(0).get("id"));
+			}else{
+				msg ="尚未设置邮箱，无法重设密码，请联系管理员处理。";
+			}
+		}
+		operateHistoryService.insertOH(request, "34", msg, msg==null?1:0, 1);
+		return new JsonModel(msg == null,msg);
+	}
 	
+	
+	/**
+	 * PC WEB忘记密码 发送邮箱验证码
+	 * @param request
+	 * @return
+	 */
+	@RequestMapping("forgetPwdMailCode")
+	@ResponseBody
+	public JsonModel forgetPwdMailCode(HttpServletRequest request){
+		HttpSession session = request.getSession(); 
+		String sessionEmail = (String)session.getAttribute(SessionConstant.WEB_USER_EMAIL);
+		String comfirmEmail = request.getParameter("comfirmEmail");
+		String msg = null;
+		if(StringUtils.isBlank(sessionEmail)){
+			msg = "操作失败，请返回登陆页面重新操作";
+		}
+		if(!sessionEmail.equals(comfirmEmail)){
+			msg = "完整邮箱地址填写错误！";
+		}
+		if(msg == null){
+			String randomCode = RandomText.getRandomString(8);
+			session.removeAttribute(SessionConstant.WEB_USER_RANDOM_CODE);
+			session.setAttribute(SessionConstant.WEB_USER_RANDOM_CODE, randomCode);
+			String content="尊敬的用户：<br/>您的验证码为："+randomCode+"（60分钟内有效，区分大小写），为了保证您的账户安全，请勿向任何人提供此验证码。";
+			try {
+				MailSam.send(customConfig.getSmtp(), customConfig.getPort(), customConfig.getUser(), customConfig.getPwd(), sessionEmail, "旭中咨询", content);
+			} catch (MessagingException e) {
+				e.printStackTrace();
+			}
+		}
+		operateHistoryService.insertOH(request, "35", msg, msg==null?1:0, 1);
+		return new JsonModel(msg == null,msg);
+	}
+	
+	/**
+	 * WEB PC 忘记密码验证 邮箱验证码
+	 * @param request
+	 * @return
+	 */
+	@RequestMapping("forgetPwdCheckMailCode")
+	@ResponseBody
+	public JsonModel forgetPwdCheckMailCode(HttpServletRequest request){
+		HttpSession session = request.getSession(); 
+		String sessionUserMail = (String)session.getAttribute(SessionConstant.WEB_USER_EMAIL);
+		String code = request.getParameter("code");
+		String sessionCode = (String)session.getAttribute(SessionConstant.WEB_USER_RANDOM_CODE);
+		String msg = null;
+		if(StringUtils.isBlank(sessionUserMail)){
+			msg = "操作失败，请返回登陆页面重新操作";
+		}
+		if(StringUtils.isBlank(code)){
+			msg = "请填写验证码";
+		}
+		if(msg == null){
+			if(!code.equals(sessionCode)){
+				msg = "验证码填写错误";
+			}
+		}
+		operateHistoryService.insertOH(request, "36", msg, msg==null?1:0, 1);
+		return new JsonModel(msg == null,msg);
+	}
+	
+	/**
+	 * PC WEB 忘记密码 重设密码
+	 * @param request
+	 * @return
+	 */
+	@RequestMapping("forgetPwdUpdatePwd")
+	@ResponseBody
+	public JsonModel forgetPwdUpdatePwd(HttpServletRequest request){
+		HttpSession session = request.getSession(); 
+		String sessionWebUserId =  (String)session.getAttribute(SessionConstant.WEB_USER_ID);
+		String pwd = request.getParameter("pwd");
+		String msg = null;
+		if(StringUtils.isBlank(sessionWebUserId)){
+			msg = "操作失败，请返回登陆页面重新操作";
+		}
+		if(StringUtils.isBlank(pwd)){
+			msg = "密码不能为空！";
+		}
+		if(msg == null){
+			try {
+				appService.updateWebUserPwdById(pwd, sessionWebUserId);
+			} catch (Exception e) {
+				e.printStackTrace();
+				msg = e.getMessage();
+			}
+		}
+		operateHistoryService.insertOH(request, "37", msg, msg==null?1:0, 1);
+		return new JsonModel(msg == null,msg);
+	}
 }

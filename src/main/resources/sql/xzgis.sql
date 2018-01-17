@@ -10,7 +10,7 @@ Target Server Type    : MYSQL
 Target Server Version : 50629
 File Encoding         : 65001
 
-Date: 2018-01-16 18:31:12
+Date: 2018-01-17 17:38:05
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -105,7 +105,7 @@ CREATE TABLE `operate_history` (
   `type` int(2) DEFAULT '0' COMMENT '0:后台，1前台，2APP',
   PRIMARY KEY (`id`),
   UNIQUE KEY `IDX_RS_operate_history_ID` (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=26 DEFAULT CHARSET=utf8 COMMENT='is_success : 0 false(失败)，1 true (成功)';
+) ENGINE=InnoDB AUTO_INCREMENT=81 DEFAULT CHARSET=utf8 COMMENT='is_success : 0 false(失败)，1 true (成功)';
 
 -- ----------------------------
 -- Records of operate_history
@@ -132,6 +132,61 @@ INSERT INTO `operate_history` VALUES ('22', '2bb49d9d514c48c5bebbf78beab3e179', 
 INSERT INTO `operate_history` VALUES ('23', '2bb49d9d514c48c5bebbf78beab3e179', '2', '2018-01-16 17:55:38', '0:0:0:0:0:0:0:1', '', '0:0:0:0:0:0:0:1', '', null, '1', null, null, '1');
 INSERT INTO `operate_history` VALUES ('24', '2bb49d9d514c48c5bebbf78beab3e179', '8', '2018-01-16 17:55:38', '0:0:0:0:0:0:0:1', '', '0:0:0:0:0:0:0:1', '', null, '1', null, null, '1');
 INSERT INTO `operate_history` VALUES ('25', '2bb49d9d514c48c5bebbf78beab3e179', '21', '2018-01-16 17:56:02', '0:0:0:0:0:0:0:1', '', '0:0:0:0:0:0:0:1', '', null, '1', null, null, '1');
+INSERT INTO `operate_history` VALUES ('26', null, '34', '2018-01-17 11:58:23', '0:0:0:0:0:0:0:1', '', '0:0:0:0:0:0:0:1', '', null, '1', null, null, '1');
+INSERT INTO `operate_history` VALUES ('27', null, '34', '2018-01-17 12:01:20', '0:0:0:0:0:0:0:1', '', '0:0:0:0:0:0:0:1', '', '尚未设置邮箱，无法重设密码，请联系管理员处理。', '0', null, null, '1');
+INSERT INTO `operate_history` VALUES ('28', null, '34', '2018-01-17 12:01:33', '0:0:0:0:0:0:0:1', '', '0:0:0:0:0:0:0:1', '', '尚未设置邮箱，无法重设密码，请联系管理员处理。', '0', null, null, '1');
+INSERT INTO `operate_history` VALUES ('29', '2bb49d9d514c48c5bebbf78beab3e179', '1', '2018-01-17 12:06:32', '0:0:0:0:0:0:0:1', '', '0:0:0:0:0:0:0:1', '', null, '1', null, null, '1');
+INSERT INTO `operate_history` VALUES ('30', '2bb49d9d514c48c5bebbf78beab3e179', '2', '2018-01-17 12:06:34', '0:0:0:0:0:0:0:1', '', '0:0:0:0:0:0:0:1', '', null, '1', null, null, '1');
+INSERT INTO `operate_history` VALUES ('31', '2bb49d9d514c48c5bebbf78beab3e179', '3', '2018-01-17 12:06:34', '0:0:0:0:0:0:0:1', '', '0:0:0:0:0:0:0:1', '', null, '1', null, null, '1');
+INSERT INTO `operate_history` VALUES ('32', '2bb49d9d514c48c5bebbf78beab3e179', '8', '2018-01-17 12:06:35', '0:0:0:0:0:0:0:1', '', '0:0:0:0:0:0:0:1', '', null, '1', null, null, '1');
+INSERT INTO `operate_history` VALUES ('33', '2bb49d9d514c48c5bebbf78beab3e179', '34', '2018-01-17 12:06:49', '0:0:0:0:0:0:0:1', '', '0:0:0:0:0:0:0:1', '', null, '1', null, null, '1');
+INSERT INTO `operate_history` VALUES ('34', '2bb49d9d514c48c5bebbf78beab3e179', '34', '2018-01-17 13:38:42', '0:0:0:0:0:0:0:1', '', '0:0:0:0:0:0:0:1', '', null, '1', null, null, '1');
+INSERT INTO `operate_history` VALUES ('35', '2bb49d9d514c48c5bebbf78beab3e179', '35', '2018-01-17 13:42:57', '0:0:0:0:0:0:0:1', '', '0:0:0:0:0:0:0:1', '', '完整邮箱地址填写错误！', '0', null, null, '1');
+INSERT INTO `operate_history` VALUES ('36', '2bb49d9d514c48c5bebbf78beab3e179', '35', '2018-01-17 13:43:07', '0:0:0:0:0:0:0:1', '', '0:0:0:0:0:0:0:1', '', '完整邮箱地址填写错误！', '0', null, null, '1');
+INSERT INTO `operate_history` VALUES ('37', '2bb49d9d514c48c5bebbf78beab3e179', '35', '2018-01-17 13:43:15', '0:0:0:0:0:0:0:1', '', '0:0:0:0:0:0:0:1', '', '完整邮箱地址填写错误！', '0', null, null, '1');
+INSERT INTO `operate_history` VALUES ('38', '2bb49d9d514c48c5bebbf78beab3e179', '35', '2018-01-17 13:43:38', '0:0:0:0:0:0:0:1', '', '0:0:0:0:0:0:0:1', '', '完整邮箱地址填写错误！', '0', null, null, '1');
+INSERT INTO `operate_history` VALUES ('39', '2bb49d9d514c48c5bebbf78beab3e179', '35', '2018-01-17 13:44:39', '0:0:0:0:0:0:0:1', '', '0:0:0:0:0:0:0:1', '', null, '1', null, null, '1');
+INSERT INTO `operate_history` VALUES ('40', '2bb49d9d514c48c5bebbf78beab3e179', '36', '2018-01-17 13:44:57', '0:0:0:0:0:0:0:1', '', '0:0:0:0:0:0:0:1', '', '验证码填写错误', '0', null, null, '1');
+INSERT INTO `operate_history` VALUES ('41', '2bb49d9d514c48c5bebbf78beab3e179', '36', '2018-01-17 13:44:59', '0:0:0:0:0:0:0:1', '', '0:0:0:0:0:0:0:1', '', null, '1', null, null, '1');
+INSERT INTO `operate_history` VALUES ('42', '2bb49d9d514c48c5bebbf78beab3e179', '37', '2018-01-17 13:45:07', '0:0:0:0:0:0:0:1', '', '0:0:0:0:0:0:0:1', '', null, '1', null, null, '1');
+INSERT INTO `operate_history` VALUES ('43', '2bb49d9d514c48c5bebbf78beab3e179', '1', '2018-01-17 13:45:21', '0:0:0:0:0:0:0:1', '', '0:0:0:0:0:0:0:1', '', null, '1', null, null, '1');
+INSERT INTO `operate_history` VALUES ('44', '2bb49d9d514c48c5bebbf78beab3e179', '3', '2018-01-17 13:45:22', '0:0:0:0:0:0:0:1', '', '0:0:0:0:0:0:0:1', '', null, '1', null, null, '1');
+INSERT INTO `operate_history` VALUES ('45', '2bb49d9d514c48c5bebbf78beab3e179', '2', '2018-01-17 13:45:22', '0:0:0:0:0:0:0:1', '', '0:0:0:0:0:0:0:1', '', null, '1', null, null, '1');
+INSERT INTO `operate_history` VALUES ('46', '2bb49d9d514c48c5bebbf78beab3e179', '8', '2018-01-17 13:45:23', '0:0:0:0:0:0:0:1', '', '0:0:0:0:0:0:0:1', '', null, '1', null, null, '1');
+INSERT INTO `operate_history` VALUES ('47', '2bb49d9d514c48c5bebbf78beab3e179', '24', '2018-01-17 13:45:33', '0:0:0:0:0:0:0:1', '', '0:0:0:0:0:0:0:1', '', null, '1', null, null, '1');
+INSERT INTO `operate_history` VALUES ('48', '2bb49d9d514c48c5bebbf78beab3e179', '25', '2018-01-17 13:45:35', '0:0:0:0:0:0:0:1', '', '0:0:0:0:0:0:0:1', '', null, '1', null, null, '1');
+INSERT INTO `operate_history` VALUES ('49', '2bb49d9d514c48c5bebbf78beab3e179', '26', '2018-01-17 13:45:49', '0:0:0:0:0:0:0:1', '', '0:0:0:0:0:0:0:1', '', null, '1', null, null, '1');
+INSERT INTO `operate_history` VALUES ('50', '2bb49d9d514c48c5bebbf78beab3e179', '27', '2018-01-17 13:46:10', '0:0:0:0:0:0:0:1', '', '0:0:0:0:0:0:0:1', '', null, '1', null, null, '1');
+INSERT INTO `operate_history` VALUES ('51', '2bb49d9d514c48c5bebbf78beab3e179', '2', '2018-01-17 13:46:15', '0:0:0:0:0:0:0:1', '', '0:0:0:0:0:0:0:1', '', null, '1', null, null, '1');
+INSERT INTO `operate_history` VALUES ('52', '2bb49d9d514c48c5bebbf78beab3e179', '3', '2018-01-17 13:46:15', '0:0:0:0:0:0:0:1', '', '0:0:0:0:0:0:0:1', '', null, '1', null, null, '1');
+INSERT INTO `operate_history` VALUES ('53', '2bb49d9d514c48c5bebbf78beab3e179', '8', '2018-01-17 13:46:16', '0:0:0:0:0:0:0:1', '', '0:0:0:0:0:0:0:1', '', null, '1', null, null, '1');
+INSERT INTO `operate_history` VALUES ('54', '2bb49d9d514c48c5bebbf78beab3e179', '3', '2018-01-17 13:50:33', '0:0:0:0:0:0:0:1', '', '0:0:0:0:0:0:0:1', '', null, '1', null, null, '1');
+INSERT INTO `operate_history` VALUES ('55', '2bb49d9d514c48c5bebbf78beab3e179', '2', '2018-01-17 13:50:33', '0:0:0:0:0:0:0:1', '', '0:0:0:0:0:0:0:1', '', null, '1', null, null, '1');
+INSERT INTO `operate_history` VALUES ('56', '2bb49d9d514c48c5bebbf78beab3e179', '8', '2018-01-17 13:50:33', '0:0:0:0:0:0:0:1', '', '0:0:0:0:0:0:0:1', '', null, '1', null, null, '1');
+INSERT INTO `operate_history` VALUES ('57', '2bb49d9d514c48c5bebbf78beab3e179', '16', '2018-01-17 14:23:35', '0:0:0:0:0:0:0:1', '', '0:0:0:0:0:0:0:1', '', null, '1', null, null, '0');
+INSERT INTO `operate_history` VALUES ('58', null, '1', '2018-01-17 15:25:50', '0:0:0:0:0:0:0:1', '', '0:0:0:0:0:0:0:1', '', '验证码错误！', '0', null, null, '1');
+INSERT INTO `operate_history` VALUES ('59', '2bb49d9d514c48c5bebbf78beab3e179', '1', '2018-01-17 15:25:56', '0:0:0:0:0:0:0:1', '', '0:0:0:0:0:0:0:1', '', null, '1', null, null, '1');
+INSERT INTO `operate_history` VALUES ('60', '2bb49d9d514c48c5bebbf78beab3e179', '3', '2018-01-17 15:25:56', '0:0:0:0:0:0:0:1', '', '0:0:0:0:0:0:0:1', '', null, '1', null, null, '1');
+INSERT INTO `operate_history` VALUES ('61', '2bb49d9d514c48c5bebbf78beab3e179', '2', '2018-01-17 15:25:56', '0:0:0:0:0:0:0:1', '', '0:0:0:0:0:0:0:1', '', null, '1', null, null, '1');
+INSERT INTO `operate_history` VALUES ('62', '2bb49d9d514c48c5bebbf78beab3e179', '8', '2018-01-17 15:25:57', '0:0:0:0:0:0:0:1', '', '0:0:0:0:0:0:0:1', '', null, '1', null, null, '1');
+INSERT INTO `operate_history` VALUES ('63', null, '1', '2018-01-17 15:28:32', '0:0:0:0:0:0:0:1', '', '0:0:0:0:0:0:0:1', '', '验证码错误！', '0', null, null, '1');
+INSERT INTO `operate_history` VALUES ('64', '2bb49d9d514c48c5bebbf78beab3e179', '1', '2018-01-17 15:28:36', '0:0:0:0:0:0:0:1', '', '0:0:0:0:0:0:0:1', '', null, '1', null, null, '1');
+INSERT INTO `operate_history` VALUES ('65', '2bb49d9d514c48c5bebbf78beab3e179', '3', '2018-01-17 15:28:37', '0:0:0:0:0:0:0:1', '', '0:0:0:0:0:0:0:1', '', null, '1', null, null, '1');
+INSERT INTO `operate_history` VALUES ('66', '2bb49d9d514c48c5bebbf78beab3e179', '2', '2018-01-17 15:28:37', '0:0:0:0:0:0:0:1', '', '0:0:0:0:0:0:0:1', '', null, '1', null, null, '1');
+INSERT INTO `operate_history` VALUES ('67', '2bb49d9d514c48c5bebbf78beab3e179', '8', '2018-01-17 15:28:37', '0:0:0:0:0:0:0:1', '', '0:0:0:0:0:0:0:1', '', null, '1', null, null, '1');
+INSERT INTO `operate_history` VALUES ('68', '2bb49d9d514c48c5bebbf78beab3e179', '1', '2018-01-17 15:32:32', '0:0:0:0:0:0:0:1', '', '0:0:0:0:0:0:0:1', '', null, '1', null, null, '1');
+INSERT INTO `operate_history` VALUES ('69', '2bb49d9d514c48c5bebbf78beab3e179', '2', '2018-01-17 15:32:33', '0:0:0:0:0:0:0:1', '', '0:0:0:0:0:0:0:1', '', null, '1', null, null, '1');
+INSERT INTO `operate_history` VALUES ('70', '2bb49d9d514c48c5bebbf78beab3e179', '3', '2018-01-17 15:32:33', '0:0:0:0:0:0:0:1', '', '0:0:0:0:0:0:0:1', '', null, '1', null, null, '1');
+INSERT INTO `operate_history` VALUES ('71', '2bb49d9d514c48c5bebbf78beab3e179', '8', '2018-01-17 15:32:33', '0:0:0:0:0:0:0:1', '', '0:0:0:0:0:0:0:1', '', null, '1', null, null, '1');
+INSERT INTO `operate_history` VALUES ('72', '2bb49d9d514c48c5bebbf78beab3e179', '2', '2018-01-17 15:33:33', '0:0:0:0:0:0:0:1', '', '0:0:0:0:0:0:0:1', '', null, '1', null, null, '1');
+INSERT INTO `operate_history` VALUES ('73', '2bb49d9d514c48c5bebbf78beab3e179', '3', '2018-01-17 15:33:33', '0:0:0:0:0:0:0:1', '', '0:0:0:0:0:0:0:1', '', null, '1', null, null, '1');
+INSERT INTO `operate_history` VALUES ('74', '2bb49d9d514c48c5bebbf78beab3e179', '8', '2018-01-17 15:33:33', '0:0:0:0:0:0:0:1', '', '0:0:0:0:0:0:0:1', '', null, '1', null, null, '1');
+INSERT INTO `operate_history` VALUES ('75', '2bb49d9d514c48c5bebbf78beab3e179', '2', '2018-01-17 15:34:16', '0:0:0:0:0:0:0:1', '', '0:0:0:0:0:0:0:1', '', null, '1', null, null, '1');
+INSERT INTO `operate_history` VALUES ('76', '2bb49d9d514c48c5bebbf78beab3e179', '3', '2018-01-17 15:34:16', '0:0:0:0:0:0:0:1', '', '0:0:0:0:0:0:0:1', '', null, '1', null, null, '1');
+INSERT INTO `operate_history` VALUES ('77', '2bb49d9d514c48c5bebbf78beab3e179', '8', '2018-01-17 15:34:16', '0:0:0:0:0:0:0:1', '', '0:0:0:0:0:0:0:1', '', null, '1', null, null, '1');
+INSERT INTO `operate_history` VALUES ('78', '2bb49d9d514c48c5bebbf78beab3e179', '3', '2018-01-17 15:34:41', '0:0:0:0:0:0:0:1', '', '0:0:0:0:0:0:0:1', '', null, '1', null, null, '1');
+INSERT INTO `operate_history` VALUES ('79', '2bb49d9d514c48c5bebbf78beab3e179', '2', '2018-01-17 15:34:41', '0:0:0:0:0:0:0:1', '', '0:0:0:0:0:0:0:1', '', null, '1', null, null, '1');
+INSERT INTO `operate_history` VALUES ('80', '2bb49d9d514c48c5bebbf78beab3e179', '8', '2018-01-17 15:34:41', '0:0:0:0:0:0:0:1', '', '0:0:0:0:0:0:0:1', '', null, '1', null, null, '1');
 
 -- ----------------------------
 -- Table structure for operate_type
@@ -169,16 +224,20 @@ INSERT INTO `operate_type` VALUES ('20', '导入调研编号');
 INSERT INTO `operate_type` VALUES ('21', 'PC WEB根据用户角色和项目编号获取全部地图点信息');
 INSERT INTO `operate_type` VALUES ('22', 'PC WEB根据用户选择的坐标点，获取该坐标点的下一级坐标');
 INSERT INTO `operate_type` VALUES ('23', 'PC WEB返回上一级坐标');
-INSERT INTO `operate_type` VALUES ('24', 'PC WEB忘记密码填写用户名');
-INSERT INTO `operate_type` VALUES ('25', 'PC WEB发送邮箱验证码');
-INSERT INTO `operate_type` VALUES ('26', 'PC WEB验证邮箱验证码');
-INSERT INTO `operate_type` VALUES ('27', 'PC WEB更新密码');
+INSERT INTO `operate_type` VALUES ('24', 'PC WEB重设密码填写用户名');
+INSERT INTO `operate_type` VALUES ('25', 'PC WEB重设密码发送邮箱验证码');
+INSERT INTO `operate_type` VALUES ('26', 'PC WEB重设密码验证邮箱验证码');
+INSERT INTO `operate_type` VALUES ('27', 'PC WEB重设密码更新密码');
 INSERT INTO `operate_type` VALUES ('28', 'APP 用户登陆');
 INSERT INTO `operate_type` VALUES ('29', 'APP 根据登陆用户获取菜单');
 INSERT INTO `operate_type` VALUES ('30', 'APP 根据用不选择菜单获取地图点信息');
 INSERT INTO `operate_type` VALUES ('31', 'APP 根据当前点击坐标点获取下一级坐标');
 INSERT INTO `operate_type` VALUES ('32', 'APP 根据用户点击坐标获取坐标点详细信息');
 INSERT INTO `operate_type` VALUES ('33', 'APP 根据详细信息ID获取图片信息');
+INSERT INTO `operate_type` VALUES ('34', 'PC WEB忘记密码填写用户名');
+INSERT INTO `operate_type` VALUES ('35', 'PC WEB忘记密码 发送邮箱验证码');
+INSERT INTO `operate_type` VALUES ('36', 'PC WEB 忘记密码验证 邮箱验证码');
+INSERT INTO `operate_type` VALUES ('37', 'PC WEB 忘记密码 重设密码');
 
 -- ----------------------------
 -- Table structure for project_attribute
@@ -635,24 +694,25 @@ CREATE TABLE `user_auth` (
   `menu_id` int(11) DEFAULT NULL,
   `role_id` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=127 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=141 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Records of user_auth
 -- ----------------------------
-INSERT INTO `user_auth` VALUES ('114', '3', '1');
-INSERT INTO `user_auth` VALUES ('115', '133', '1');
-INSERT INTO `user_auth` VALUES ('116', '132', '1');
-INSERT INTO `user_auth` VALUES ('117', '131', '1');
-INSERT INTO `user_auth` VALUES ('118', '2', '1');
-INSERT INTO `user_auth` VALUES ('119', '123', '1');
-INSERT INTO `user_auth` VALUES ('120', '121', '1');
-INSERT INTO `user_auth` VALUES ('121', '120', '1');
-INSERT INTO `user_auth` VALUES ('122', '1', '1');
-INSERT INTO `user_auth` VALUES ('123', '115', '1');
-INSERT INTO `user_auth` VALUES ('124', '114', '1');
-INSERT INTO `user_auth` VALUES ('125', '113', '1');
-INSERT INTO `user_auth` VALUES ('126', '112', '1');
+INSERT INTO `user_auth` VALUES ('127', '3', '1');
+INSERT INTO `user_auth` VALUES ('128', '133', '1');
+INSERT INTO `user_auth` VALUES ('129', '132', '1');
+INSERT INTO `user_auth` VALUES ('130', '131', '1');
+INSERT INTO `user_auth` VALUES ('131', '2', '1');
+INSERT INTO `user_auth` VALUES ('132', '123', '1');
+INSERT INTO `user_auth` VALUES ('133', '121', '1');
+INSERT INTO `user_auth` VALUES ('134', '120', '1');
+INSERT INTO `user_auth` VALUES ('135', '1', '1');
+INSERT INTO `user_auth` VALUES ('136', '115', '1');
+INSERT INTO `user_auth` VALUES ('137', '114', '1');
+INSERT INTO `user_auth` VALUES ('138', '113', '1');
+INSERT INTO `user_auth` VALUES ('139', '112', '1');
+INSERT INTO `user_auth` VALUES ('140', '111', '1');
 
 -- ----------------------------
 -- Table structure for user_login
@@ -727,6 +787,7 @@ CREATE TABLE `user_menu` (
 INSERT INTO `user_menu` VALUES ('1', null, null, '系统管理', '0', '0', '0');
 INSERT INTO `user_menu` VALUES ('2', null, null, '前端管理', '0', '0', '0');
 INSERT INTO `user_menu` VALUES ('3', null, null, '项目管理', '0', '0', '0');
+INSERT INTO `user_menu` VALUES ('111', '1', 'qrcode.jsp', '二维码管理', '1', null, '01');
 INSERT INTO `user_menu` VALUES ('112', '1', 'operateHistory.jsp', '操作记录', '1', '0', '1');
 INSERT INTO `user_menu` VALUES ('113', '1', 'PasswordMgr.jsp', '密码管理', '1', '0', '1');
 INSERT INTO `user_menu` VALUES ('114', '1', 'userMgr.jsp', '用户管理', '1', '0', '1');
@@ -782,7 +843,7 @@ CREATE TABLE `web_user_auth` (
 DROP TABLE IF EXISTS `web_user_login`;
 CREATE TABLE `web_user_login` (
   `id` varchar(32) NOT NULL,
-  `user_name` varchar(32) DEFAULT NULL,
+  `user_name` varchar(32) NOT NULL,
   `user_password` varchar(32) DEFAULT NULL,
   `user_role` int(32) DEFAULT NULL,
   `is_delete` int(32) DEFAULT '0',
@@ -796,7 +857,8 @@ CREATE TABLE `web_user_login` (
   `disable_time` varchar(50) DEFAULT NULL COMMENT '禁用时间',
   `email` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`),
-  KEY `USER_LOGIN_ID` (`id`)
+  UNIQUE KEY `WEB_USER_LOGIN_USER_NAME` (`user_name`) USING BTREE,
+  KEY `WEB_USER_LOGIN_ID` (`id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- ----------------------------
