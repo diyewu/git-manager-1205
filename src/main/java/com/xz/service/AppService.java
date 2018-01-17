@@ -806,4 +806,10 @@ public class AppService implements InitializingBean{
 		jdbcTemplate.update(sql, email,userId);
 	}
 	
+	public List<Map<String, Object>> getWebUserInfoByUserName(String name){
+		String sql = " select * from web_user_login where user_name = ? ";
+		List<Map<String, Object>> list = jdbcTemplate.queryForList(sql, name);
+		return list;
+	}
+	
 }

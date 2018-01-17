@@ -1,5 +1,6 @@
 package com.xz.controller;
 
+import java.io.File;
 import java.io.IOException;
 
 import javax.servlet.ServletException;
@@ -7,16 +8,19 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.xz.common.SessionConstant;
+import com.xz.model.json.JsonModel;
+import com.xz.utils.QRCodeUtil;
 import com.xz.utils.VerifyCodeUtils;
 
 @RequestMapping("authimg")
 @Controller
-public class AuthImageController {
+public class AuthImageController extends BaseController{
 	
 	@RequestMapping("generateImage")
 	@ResponseBody
@@ -37,5 +41,32 @@ public class AuthImageController {
         int w = 100, h = 30; 
         VerifyCodeUtils.outputImage(w, h, response.getOutputStream(), verifyCode); 
    
-    } 
+    }
+	
+	@RequestMapping("generateQrcode")
+	@ResponseBody
+	public JsonModel generateQrcode(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException { 
+		String code = request.getParameter("code");
+		String msg = null;
+		int width = 300; // 二维码图片的宽
+		int height = 300; // 二维码图片的高
+		String format = "png"; // 二维码图片的格式
+		String path =  request.getSession().getServletContext().getRealPath("/")+"demo"+File.separator+"img"+File.separator;
+		System.out.println("_________"+path);
+		if(StringUtils.isBlank(code)){
+			msg = "请填写二维码内容";
+		}
+		if(msg == null){
+			try {
+				// 生成二维码图片，并返回图片路径
+				String pathName = QRCodeUtil.generateQRCode(code, width, height, format,path+"qrcode.png");
+						
+				System.out.println("生成二维码的图片路径： " + pathName);
+			} catch (Exception e) {
+				e.printStackTrace();
+				msg = e.getMessage();
+			}
+		}
+		return new JsonModel(msg == null, msg);
+    }
 }
