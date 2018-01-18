@@ -158,10 +158,11 @@ public class ProjectServices {
 						for (Map.Entry<String, String> entry : map.entrySet()) {
 						    imagePath = entry.getValue();  
 						    imgs = StringUtils.split(imagePath, ".");
-						    
 						    newPath = imgs[0]+"_thumb."+imgs[1];
-						    
 						    BufferedImage image = ImageIO.read(new File(imagePath));  
+						    if(null == image){
+						    	continue;
+						    }
 						    Builder<BufferedImage> builder = null;  
 						    int imageWidth = image.getWidth();  
 						    int imageHeitht = image.getHeight();  
