@@ -8,6 +8,7 @@ boolean isNotAdmin = !"0".equals(userRole);
 <html>
 	<head>
 		<title>数据管理</title>
+		<link rel="icon" href="images/title.png" type="img/x-ico" />
 		<meta http-equiv="content-type" content="text/html; charset=UTF-8">
 		<meta http-equiv="pragma" content="no-cache">
 		<meta http-equiv="cache-control" content="no-cache">

@@ -54,7 +54,6 @@
         </div>
         <div class="inputBox pwdBox">
             <input type="password" class="form-control" id="userPwd" placeholder="请输入密码" aria-describedby="basic-addon1">
-            <!-- <a href="#" class="forgetPwd">忘记密码</a> -->
         </div>
         <div class="inputBox codeBox">
             <input type="text" class="form-control" id="userImgCode" placeholder="请输入验证码" aria-describedby="basic-addon1">
@@ -63,6 +62,7 @@
         </div>
         <div class="inputBox pwdBox">
 			<button type="button" style="width: 100%;" class="btn btn-secondary" id="loginBtn_">登录</button>
+            <a href="../demo/forgetpwd/forgetPwd1.jsp" class="forgetPwd" style="color:#fff">忘记密码</a>
         </div>
         <div class="btnBox">
             <button type="button" class="btn btn-secondary" id="loginBtn">登录</button>

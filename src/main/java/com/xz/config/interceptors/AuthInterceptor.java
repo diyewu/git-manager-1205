@@ -28,6 +28,7 @@ public class AuthInterceptor implements HandlerInterceptor {
 		whitelist.add("/authimg/generateImage");//验证码
 		whitelist.add("/app/getImgBydetailId");//获取图片
 		whitelist.add("/login");//登陆
+		whitelist.add("/userlogin");//登陆
 		whitelist.add("/forgetPwdCheckNameAndCode");//忘记密码
 	}
 	
