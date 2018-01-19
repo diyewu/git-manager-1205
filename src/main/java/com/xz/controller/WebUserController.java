@@ -291,7 +291,7 @@ public class WebUserController extends BaseController {
 		ObjectMapper mapper = new ObjectMapper();
 		Map<String, String> map = new HashMap<String, String>();
 		String params = request.getParameter("json");
-		System.out.println("_____"+params);
+//		System.out.println("_____"+params);
 		String roleId = request.getParameter("roleId");
 		
 		List<String> paramList = new ArrayList<String>(Arrays.asList(params.split(",")));

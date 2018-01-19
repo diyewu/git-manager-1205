@@ -117,6 +117,7 @@ public class AppController extends BaseController{
 			}
 		}
 		//TODO  判断当前是否已经登陆
+		AppLoginBean appLoginBean = new AppLoginBean();
 		if(code == 0){
 			token = UUID.randomUUID().toString().replaceAll("-", "");
 			String userId = list.get(0).get("id")+"";
@@ -124,13 +125,12 @@ public class AppController extends BaseController{
 			String realName = list.get(0).get("real_name")+"";
 			resultMap.put("token", token);
 			resultMap.put("real_name", realName);
-			AppLoginBean appLoginBean = new AppLoginBean();
 			appLoginBean.setToken(token);
 			appLoginBean.setUserId(userId);
 			appLoginBean.setUserRoleId(roleId);
 			AgingCache.putCacheInfo(phoneId, appLoginBean,30);
 		}
-		operateHistoryService.insertOH(request, "28", ServerResult.getCodeMsg(code, msg), "success".equals(msg)?1:0, 2);
+		operateHistoryService.insertOHAPP(request,appLoginBean.getUserId() ,"28", ServerResult.getCodeMsg(code, msg)+",phoneId="+phoneId, "success".equals(msg)?1:0, 2);
 		return new AppJsonModel(code, ServerResult.getCodeMsg(code, msg), resultMap);
 	}
 	
@@ -155,7 +155,8 @@ public class AppController extends BaseController{
 		if(code == 0){
 			newList = appService.getMenulist(appLoginBean.getUserRoleId());
 		}
-		operateHistoryService.insertOH(request, "29", ServerResult.getCodeMsg(code, msg), "success".equals(msg)?1:0, 2);
+//		operateHistoryService.insertOH(request, "29", ServerResult.getCodeMsg(code, msg), "success".equals(msg)?1:0, 2);
+		operateHistoryService.insertOHAPP(request,appLoginBean.getUserId() ,"29", ServerResult.getCodeMsg(code, msg)+",phoneId="+phoneId, "success".equals(msg)?1:0, 2);
 		return new AppJsonModel(code, ServerResult.getCodeMsg(code, msg), newList);
 	}
 //	@RequestMapping("getMenu")
@@ -240,7 +241,8 @@ public class AppController extends BaseController{
 				}
 			}
 		}
-		operateHistoryService.insertOH(request, "30", ServerResult.getCodeMsg(code, msg), "success".equals(msg)?1:0, 2);
+//		operateHistoryService.insertOH(request, "30", ServerResult.getCodeMsg(code, msg), "success".equals(msg)?1:0, 2);
+		operateHistoryService.insertOHAPP(request,appLoginBean.getUserId() ,"30", ServerResult.getCodeMsg(code, msg)+",phoneId="+phoneId, "success".equals(msg)?1:0, 2);
 		return new AppJsonModel(code, ServerResult.getCodeMsg(code, msg), info);
 	}
 	
@@ -275,7 +277,8 @@ public class AppController extends BaseController{
 			List<Map<String, Object>> tlist = (List<Map<String, Object>>)AgingCache.getCacheInfo(cacheKey).getValue();
 			info = appService.generateCod(key,tlist, cacheKey,currentLevel);
 		}
-		operateHistoryService.insertOH(request, "31", ServerResult.getCodeMsg(code, msg), "success".equals(msg)?1:0, 2);
+//		operateHistoryService.insertOH(request, "31", ServerResult.getCodeMsg(code, msg), "success".equals(msg)?1:0, 2);
+		operateHistoryService.insertOHAPP(request,appLoginBean.getUserId() ,"31", ServerResult.getCodeMsg(code, msg)+",phoneId="+phoneId, "success".equals(msg)?1:0, 2);
 		return new AppJsonModel(code, ServerResult.getCodeMsg(code, msg), info);
 	}
 	
@@ -308,7 +311,8 @@ public class AppController extends BaseController{
 				code = ServerResult.RESULT_SERVER_ERROR;
 			}
 		}
-		operateHistoryService.insertOH(request, "32", ServerResult.getCodeMsg(code, msg), "success".equals(msg)?1:0, 2);
+//		operateHistoryService.insertOH(request, "32", ServerResult.getCodeMsg(code, msg), "success".equals(msg)?1:0, 2);
+		operateHistoryService.insertOHAPP(request,appLoginBean.getUserId() ,"32", ServerResult.getCodeMsg(code, msg)+",phoneId="+phoneId, "success".equals(msg)?1:0, 2);
 		return new AppJsonModel(code, ServerResult.getCodeMsg(code, msg), resplist);
 	}
 	
@@ -428,7 +432,8 @@ public class AppController extends BaseController{
 		if(code == 0){
 			info = appService.turnback(cacheKey, key, currentLevel);
 		}
-		operateHistoryService.insertOH(request, "34", ServerResult.getCodeMsg(code, msg), "success".equals(msg)?1:0, 2);
+//		operateHistoryService.insertOH(request, "34", ServerResult.getCodeMsg(code, msg), "success".equals(msg)?1:0, 2);
+		operateHistoryService.insertOHAPP(request,appLoginBean.getUserId() ,"34", ServerResult.getCodeMsg(code, msg)+",phoneId="+phoneId, "success".equals(msg)?1:0, 2);
 		return new AppJsonModel(code, ServerResult.getCodeMsg(code, msg), info);
 	}
 	

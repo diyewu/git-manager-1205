@@ -1,14 +1,19 @@
 package com.xz.config.interceptors;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.lang.StringUtils;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
+
+import com.xz.common.SessionConstant;
 
 /**
  * 自定义拦截器
@@ -18,6 +23,13 @@ import org.springframework.web.servlet.ModelAndView;
 public class AuthInterceptor implements HandlerInterceptor {
 	
 	private static Set<String> excludeUrls = new HashSet<String>(); // 不需要拦截的资源
+	private static List<String> whitelist = new ArrayList<String>();
+	static{
+		whitelist.add("/authimg/generateImage");//验证码
+		whitelist.add("/app/getImgBydetailId");//获取图片
+		whitelist.add("/login");//登陆
+		whitelist.add("/forgetPwdCheckNameAndCode");//忘记密码
+	}
 	
 	/**
 	 * 这个方法的主要作用是用于清理资源的，当然这个方法也只能在当前这个Interceptor的preHandle方法的返回值为true时才会执行。
@@ -59,7 +71,41 @@ public class AuthInterceptor implements HandlerInterceptor {
 			isAjax = true;
 		}
 		
-		System.out.println("请求url为：    " + requestURI);
+		for(String tem:whitelist){
+			if(requestURI.contains(tem)){
+				return true;
+			}
+		}
+		
+		String adminUserId = (String)session.getAttribute("userId");
+		String adminUserName = (String)session.getAttribute("userName");
+		String webUserId = (String)session.getAttribute(SessionConstant.WEB_USER_ID);
+		String wenUserName = (String)session.getAttribute(SessionConstant.WEB_USER_EMAIL);
+		if(StringUtils.isBlank(adminUserId) && StringUtils.isBlank(adminUserName)
+				&& StringUtils.isBlank(webUserId)&& StringUtils.isBlank(wenUserName)){
+			System.out.println("URI:"+requestURI+"被拦截");
+			if(requestURI.contains("/webctrl/")){
+				response.sendRedirect("../demo/login.jsp");
+			}else{
+				response.sendRedirect("../admin/login.jsp");
+			}
+			return false;
+		}
+		
+//		if(requestURI.contains("/projectmgr/") 
+//				|| 	requestURI.contains("/operate/")
+//				|| requestURI.contains("/user/")
+//				){
+//			String userId = (String)session.getAttribute("userId");
+//			if(StringUtils.isBlank(userId)){
+//				response.sendRedirect("../admin/login.jsp");
+//				return false;
+//			}
+//		}
+		
+		if(requestURI.contains("/operate/")){
+			
+		}
 		
 		if (true) {
 		}

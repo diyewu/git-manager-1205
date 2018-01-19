@@ -130,7 +130,8 @@ public class WebController extends BaseController {
 	@ResponseBody
 	public JsonModel getObjectListByUserRole(HttpServletRequest request,HttpServletResponse response){
 		HttpSession session = request.getSession(); 
-		String userRole = session.getAttribute(SessionConstant.WEB_USER_ROLE)+"";
+//		String userRole = session.getAttribute(SessionConstant.WEB_USER_ROLE)+"";
+		String userRole = (String)session.getAttribute(SessionConstant.WEB_USER_ROLE);
 		String msg = null;
 		List<Map<String, Object>> list = new ArrayList<Map<String,Object>>();
 		if(StringUtils.isNotBlank(userRole)){
@@ -152,7 +153,7 @@ public class WebController extends BaseController {
 	@ResponseBody
 	public JsonModel getObjectDetail(HttpServletRequest request,HttpServletResponse response){
 		HttpSession session = request.getSession(); 
-		String userRole = session.getAttribute(SessionConstant.WEB_USER_ROLE)+"";
+		String userRole = (String)session.getAttribute(SessionConstant.WEB_USER_ROLE);
 		String msg = null;
 		List<AppMenu> list = new ArrayList<AppMenu>();
 		if(StringUtils.isNotBlank(userRole)){
@@ -221,7 +222,7 @@ public class WebController extends BaseController {
 //	@ResponseBody
 	public JsonModel getMapInfoByUserRole_bak(HttpServletRequest request){
 		HttpSession session = request.getSession(); 
-		String userRole = session.getAttribute(SessionConstant.WEB_USER_ROLE)+"";
+		String userRole = (String)session.getAttribute(SessionConstant.WEB_USER_ROLE);
 		String msg = null;
 		List<AppMenu> list = new ArrayList<AppMenu>();
 		if(StringUtils.isNotBlank(userRole)){
@@ -256,7 +257,7 @@ public class WebController extends BaseController {
 	@ResponseBody
 	public JsonModel getMapInfoByUserRole(HttpServletRequest request){
 		HttpSession session = request.getSession(); 
-		String userRole = session.getAttribute(SessionConstant.WEB_USER_ROLE)+"";
+		String userRole = (String)session.getAttribute(SessionConstant.WEB_USER_ROLE);
 		String msg = null;
 		List<AppMenu> list = new ArrayList<AppMenu>();
 		if(StringUtils.isNotBlank(userRole)){
@@ -269,7 +270,7 @@ public class WebController extends BaseController {
 			ObjectMapper mapper = new ObjectMapper();
 			try {
 				String jsonIds = mapper.writeValueAsString(list);
-				System.out.println(jsonIds);
+//				System.out.println(jsonIds);
 				if(StringUtils.isNotBlank(jsonIds)){
 					JSONArray projectArray = JSONArray.parseArray(jsonIds);
 					info = appService.analyzeJson(projectArray, "is_check");
@@ -293,7 +294,7 @@ public class WebController extends BaseController {
 	@ResponseBody
 	public JsonModel getMapInfoByUserRoleAndProjectId(HttpServletRequest request){
 		HttpSession session = request.getSession(); 
-		String userRole = session.getAttribute(SessionConstant.WEB_USER_ROLE)+"";
+		String userRole = (String)session.getAttribute(SessionConstant.WEB_USER_ROLE);
 		String projectId = request.getParameter("projectId");
 		String msg = null;
 		List<AppMenu> list = new ArrayList<AppMenu>();
@@ -334,7 +335,7 @@ public class WebController extends BaseController {
 	@ResponseBody
 	public JsonModel getNextMapInfoByKey(HttpServletRequest request){
 		HttpSession session = request.getSession(); 
-		String userRole = session.getAttribute(SessionConstant.WEB_USER_ROLE)+"";
+		String userRole = (String)session.getAttribute(SessionConstant.WEB_USER_ROLE);
 		String cacheKey = request.getParameter("cacheKey");
 		String key = request.getParameter("key");
 		String currentLevel = request.getParameter("currentLevel");
@@ -359,7 +360,7 @@ public class WebController extends BaseController {
 	@ResponseBody
 	public JsonModel getPreMapInfoByKey(HttpServletRequest request){
 		HttpSession session = request.getSession(); 
-		String userRole = session.getAttribute(SessionConstant.WEB_USER_ROLE)+"";
+		String userRole = (String)session.getAttribute(SessionConstant.WEB_USER_ROLE);
 		
 		String cacheKey = request.getParameter("cacheKey");
 		String key = request.getParameter("key");
@@ -389,7 +390,7 @@ public class WebController extends BaseController {
 		
 		String webUserName = request.getParameter("userName");
 		String code = request.getParameter("code");
-		String sessionIMgCode = session.getAttribute(SessionConstant.WEB_IMG_CODE)+"";
+		String sessionIMgCode = (String)session.getAttribute(SessionConstant.WEB_IMG_CODE);
 		String msg = null;
 		if(StringUtils.isBlank(sessionUserName)){
 			msg = "登陆超时，请重新登陆";
@@ -518,7 +519,7 @@ public class WebController extends BaseController {
 		HttpSession session = request.getSession(); 
 		String code = request.getParameter("code");
 		String userName = request.getParameter("userName");
-		String sessionIMgCode = session.getAttribute(SessionConstant.WEB_IMG_CODE)+"";
+		String sessionIMgCode = (String)session.getAttribute(SessionConstant.WEB_IMG_CODE);
 		String msg = null;
 		if(StringUtils.isBlank(userName)){
 			msg = "用户名不能为空！";
@@ -544,7 +545,7 @@ public class WebController extends BaseController {
 				msg ="尚未设置邮箱，无法重设密码，请联系管理员处理。";
 			}
 		}
-		operateHistoryService.insertOH(request, "34", msg, msg==null?1:0, 1);
+		operateHistoryService.insertOHById(request,(String)session.getAttribute(SessionConstant.WEB_USER_ID),"34", msg, msg==null?1:0, 1);
 		return new JsonModel(msg == null,msg);
 	}
 	
@@ -578,7 +579,8 @@ public class WebController extends BaseController {
 				e.printStackTrace();
 			}
 		}
-		operateHistoryService.insertOH(request, "35", msg, msg==null?1:0, 1);
+//		operateHistoryService.insertOH(request, "35", msg, msg==null?1:0, 1);
+		operateHistoryService.insertOHById(request,(String)session.getAttribute(SessionConstant.WEB_USER_ID),"35", msg, msg==null?1:0, 1);
 		return new JsonModel(msg == null,msg);
 	}
 	
@@ -606,7 +608,8 @@ public class WebController extends BaseController {
 				msg = "验证码填写错误";
 			}
 		}
-		operateHistoryService.insertOH(request, "36", msg, msg==null?1:0, 1);
+//		operateHistoryService.insertOH(request, "36", msg, msg==null?1:0, 1);
+		operateHistoryService.insertOHById(request,(String)session.getAttribute(SessionConstant.WEB_USER_ID),"36", msg, msg==null?1:0, 1);
 		return new JsonModel(msg == null,msg);
 	}
 	
@@ -636,7 +639,8 @@ public class WebController extends BaseController {
 				msg = e.getMessage();
 			}
 		}
-		operateHistoryService.insertOH(request, "37", msg, msg==null?1:0, 1);
+//		operateHistoryService.insertOH(request, "37", msg, msg==null?1:0, 1);
+		operateHistoryService.insertOHById(request,(String)session.getAttribute(SessionConstant.WEB_USER_ID),"37", msg, msg==null?1:0, 1);
 		return new JsonModel(msg == null,msg);
 	}
 }
