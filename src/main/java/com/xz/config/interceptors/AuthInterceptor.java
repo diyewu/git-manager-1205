@@ -81,14 +81,14 @@ public class AuthInterceptor implements HandlerInterceptor {
 		String adminUserId = (String)session.getAttribute("userId");
 		String adminUserName = (String)session.getAttribute("userName");
 		String webUserId = (String)session.getAttribute(SessionConstant.WEB_USER_ID);
-		String wenUserName = (String)session.getAttribute(SessionConstant.WEB_USER_EMAIL);
+		String wenUserName = (String)session.getAttribute(SessionConstant.WEB_USER_NAME);
 		if(StringUtils.isBlank(adminUserId) && StringUtils.isBlank(adminUserName)
 				&& StringUtils.isBlank(webUserId)&& StringUtils.isBlank(wenUserName)){
 			System.out.println("URI:"+requestURI+"被拦截");
 			if(requestURI.contains("/webctrl/")){
-				response.sendRedirect("../demo/login.jsp");
+				response.sendRedirect("../../demo/login.jsp");
 			}else{
-				response.sendRedirect("../admin/login.jsp");
+				response.sendRedirect("../../admin/login.jsp");
 			}
 			return false;
 		}
