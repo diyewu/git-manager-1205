@@ -100,20 +100,19 @@
     	//自定义覆盖物*************************************
     	
         $(".go-to-list").click(function(){
-//            layer.open({
-//                type: 1,
-//                title: false,
-//                closeBtn: 0,
-//                area: ['20rem', '20rem'],
-//                shadeClose: true,
-//                scrollbar: false, 
-//                content: '<div><img src="../demo/img/20180116230158.png" width="100%" height="100%"/></div>'
-//            });
-        	window.location= path+"/demo/app/gisapp.apk";
+            layer.open({
+                type: 1,
+                title: false,
+                closeBtn: 0,
+                area: ['20rem', '20rem'],
+                shadeClose: true,
+                scrollbar: false, 
+                content: '<div><img src="../demo/img/20180116230158.png" width="100%" height="100%"/></div>'
+            });
         });
         var tipindex;
         $(".go-to-list").mouseenter(function(){
-        	tipindex = layer.tips('<div><img src="../demo/img/qrcode.png" width="100%" height="100%"/></div>', this,{
+        	tipindex = layer.tips('<div><img src="../demo/img/20180116230158.png" width="100%" height="100%"/></div>', this,{
         		  tips: [3, '#fff'],
         		  time: 500000
         	});

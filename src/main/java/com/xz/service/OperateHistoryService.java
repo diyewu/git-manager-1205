@@ -68,7 +68,6 @@ public class OperateHistoryService {
 			operateUserId = (String)request.getSession().getAttribute(SessionConstant.WEB_USER_ID);
 			try {
 				ip = getIpAddr(request);
-	//			mac = getMACAddr(ip);
 				serverIp = request.getLocalAddr();
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -85,6 +84,60 @@ public class OperateHistoryService {
 			logger.error("operateUserId = "+operateUserId +",opereteTypeId="+opereteTypeId+",operateSummary ="+operateSummary+",ip="+ip+",mac="+mac+",serverIp="+serverIp+",出错信息："+e.getMessage());
 		}
 	}
+	public void insertOHById(HttpServletRequest request, String userId,String opereteTypeId, String operateSummary,int isSuccess,int type) {
+		String ip = "";
+		String mac = "";
+		String serverIp = "";
+//		String operateUserId = "";
+		try {
+//			operateUserId = (String)request.getSession().getAttribute(SessionConstant.WEB_USER_ID);
+			try {
+				ip = getIpAddr(request);
+				serverIp = request.getLocalAddr();
+			} catch (Exception e) {
+				e.printStackTrace();
+				logger.error(e.getMessage());
+			}
+			String operateUserCity = "";
+			String sql = "insert into operate_history (operate_user_id,operete_type_id,create_time,operate_user_ip,operate_user_mac,local_server,operate_user_city,operate_summary,is_success,type)" +
+					"values(?,?,sysdate(),?,?,?,?,?,?,?)";
+			
+			jdbcTemplate.update(sql, userId, opereteTypeId, ip, mac,
+					serverIp, operateUserCity, operateSummary,isSuccess,type);
+		} catch (Exception e) {
+			e.printStackTrace();
+			logger.error("operateUserId = "+userId +",opereteTypeId="+opereteTypeId+",operateSummary ="+operateSummary+",ip="+ip+",mac="+mac+",serverIp="+serverIp+",出错信息："+e.getMessage());
+		}
+	}
+	public void insertOHAPP(HttpServletRequest request,String operateUserId, String opereteTypeId, String operateSummary,int isSuccess,int type) {
+		String ip = "";
+		String mac = "";
+		String serverIp = "";
+//		String operateUserId = "";
+		try {
+			operateUserId = (String)request.getSession().getAttribute(SessionConstant.WEB_USER_ID);
+			try {
+				ip = getIpAddr(request);
+				//			mac = getMACAddr(ip);
+				serverIp = request.getLocalAddr();
+			} catch (Exception e) {
+				e.printStackTrace();
+				logger.error(e.getMessage());
+			}
+			String operateUserCity = "";
+			String sql = "insert into operate_history (operate_user_id,operete_type_id,create_time,operate_user_ip,operate_user_mac,local_server,operate_user_city,operate_summary,is_success,type)" +
+					"values(?,?,sysdate(),?,?,?,?,?,?,?)";
+			
+			jdbcTemplate.update(sql, operateUserId, opereteTypeId, ip, mac,
+					serverIp, operateUserCity, operateSummary,isSuccess,type);
+		} catch (Exception e) {
+			e.printStackTrace();
+			logger.error("operateUserId = "+operateUserId +",opereteTypeId="+opereteTypeId+",operateSummary ="+operateSummary+",ip="+ip+",mac="+mac+",serverIp="+serverIp+",出错信息："+e.getMessage());
+		}
+	}
+	
+	
+	
 	public void insertOH(HttpSession session, String opereteTypeId, String operateSummary,int isSuccess) {
 		String ip = "";
 		String mac = "";

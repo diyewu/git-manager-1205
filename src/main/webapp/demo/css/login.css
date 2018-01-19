@@ -126,7 +126,7 @@ input:-ms-input-placeholder {
     left: 15rem;
     top: 0px;
     display: inline-block;
-    /*color: #3086c3 !important;*/
+    color: #3086c3 !important;
     opacity: 0.8;
     font-weight: bold;
     width: 3.5rem;

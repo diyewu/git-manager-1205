@@ -739,7 +739,7 @@ public class AppService implements InitializingBean{
 	
 	
 	public List<Map<String, Object>> getCoordinateInfo(String detailId){
-		String attrSql = " SELECT pa.id, pat.alias_name, pa.attribute_index, pa.attribute_name FROM project_attribute_type pat LEFT JOIN ( SELECT * FROM project_attribute WHERE project_id = ( SELECT project_id FROM project_detail WHERE id = ? )) pa ON pa.attribute_info_type = pat.id WHERE pat.type = 1 ORDER BY alias_name; ";
+		String attrSql = " SELECT pa.id, pat.alias_name, pa.attribute_index, pa.attribute_name FROM project_attribute_type pat LEFT JOIN ( SELECT * FROM project_attribute WHERE project_id = ( SELECT project_id FROM project_detail WHERE id = ? )) pa ON pa.attribute_info_type = pat.id WHERE pat.type = 1 and pa.id is not null ORDER BY alias_name ";
 		List<Map<String, Object>> list = jdbcTemplate.queryForList(attrSql, detailId);
 		if(list == null || list.size()==0){
 			return null;
@@ -756,6 +756,10 @@ public class AppService implements InitializingBean{
 				sb.append(" 'null' as "+attrMap.get("alias_name")+"_key,");
 				sb.append("'null' as "+attrMap.get("alias_name")+"_value,");
 			}
+			//测试使用
+//			sb.append(" 'null' as "+"detail_8_key,");
+//			sb.append("'null' as "+"detail_8_value,");
+			//测试使用
 		}
 		sb.append(" id from project_detail where id = ? ");
 		return jdbcTemplate.queryForList(sb.toString(), detailId);
