@@ -9,6 +9,24 @@
 	var divIdIndex = 0;
 	var viewer ;
 	$(document).ready(function() { 
+		
+//		$("label").click(function(e){
+//			console.log(e);
+//			if(!e.target.is("input")) return;
+////			其它代码....
+//		});
+		
+//		$('.no-label').click(function(e){
+//			e.stopPropagation;
+//		});
+//		$('label').each(function(e){
+//			console.log(e);
+//		     var labelval= $(this).val() ;
+//		     $(this).click=function(e){
+//		    	 e.stopPropagation;
+//		     }
+//		});
+		
 		// 百度地图API功能
 		initMap();
     	//===================
@@ -819,4 +837,11 @@ function turnback(){
 	}else{
 		showPreLevel(_level, _key, _cacheKey, _currentLevel);
 	}
+}
+
+
+
+function changelabel(e){
+	console.log(e);
+	e.stopPropagation;
 }
