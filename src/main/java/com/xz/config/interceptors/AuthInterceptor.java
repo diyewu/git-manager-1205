@@ -77,20 +77,30 @@ public class AuthInterceptor implements HandlerInterceptor {
 				return true;
 			}
 		}
-		
-		String adminUserId = (String)session.getAttribute("userId");
-		String adminUserName = (String)session.getAttribute("userName");
-		String webUserId = (String)session.getAttribute(SessionConstant.WEB_USER_ID);
-		String wenUserName = (String)session.getAttribute(SessionConstant.WEB_USER_NAME);
-		if(StringUtils.isBlank(adminUserId) && StringUtils.isBlank(adminUserName)
-				&& StringUtils.isBlank(webUserId)&& StringUtils.isBlank(wenUserName)){
-			System.out.println("URI:"+requestURI+"被拦截");
-			if(requestURI.contains("/webctrl/")){
-				response.sendRedirect("../../demo/login.jsp");
-			}else{
-				response.sendRedirect("../../admin/login.jsp");
+		//APP 接口
+		if(requestURI.contains("/app/")){
+			String phoneId = request.getHeader("phoneId");
+			String token = request.getHeader("token");
+			if(StringUtils.isBlank(phoneId) || StringUtils.isBlank(token)){
+				return false;
 			}
-			return false;
+			return true;
+		}else{
+			//后台和WEB PC请求
+			String adminUserId = (String)session.getAttribute("userId");
+			String adminUserName = (String)session.getAttribute("userName");
+			String webUserId = (String)session.getAttribute(SessionConstant.WEB_USER_ID);
+			String wenUserName = (String)session.getAttribute(SessionConstant.WEB_USER_NAME);
+			if(StringUtils.isBlank(adminUserId) && StringUtils.isBlank(adminUserName)
+					&& StringUtils.isBlank(webUserId)&& StringUtils.isBlank(wenUserName)){
+				System.out.println("URI:"+requestURI+"被拦截");
+				if(requestURI.contains("/webctrl/")){
+					response.sendRedirect("../../demo/login.jsp");
+				}else{
+					response.sendRedirect("../../admin/login.jsp");
+				}
+				return false;
+			}
 		}
 		
 //		if(requestURI.contains("/projectmgr/") 
@@ -104,12 +114,10 @@ public class AuthInterceptor implements HandlerInterceptor {
 //			}
 //		}
 		
-		if(requestURI.contains("/operate/")){
-			
-		}
+//		if(requestURI.contains("/operate/")){
+//			
+//		}
 		
-		if (true) {
-		}
 		return true;
 	}
 
