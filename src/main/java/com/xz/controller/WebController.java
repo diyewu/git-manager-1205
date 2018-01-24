@@ -533,8 +533,10 @@ public class WebController extends BaseController {
 		if(msg == null){
 			list = appService.getWebUserInfoByUserName(userName);
 		}
-		if(list == null || list.size() == 0){
-			msg = "用户名："+userName+"不存在！";
+		if(msg == null){
+			if(list == null || list.size() == 0){
+				msg = "用户名："+userName+"不存在！";
+			}
 		}
 		if(msg == null){
 			String email = (String)list.get(0).get("email");

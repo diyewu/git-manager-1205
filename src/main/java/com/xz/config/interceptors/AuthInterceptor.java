@@ -28,6 +28,7 @@ public class AuthInterceptor implements HandlerInterceptor {
 		whitelist.add("/authimg/generateImage");//验证码
 		whitelist.add("/app/getImgBydetailId");//获取图片
 		whitelist.add("/login");//登陆
+		whitelist.add("/userlogin");//登陆
 		whitelist.add("/forgetPwdCheckNameAndCode");//忘记密码
 	}
 	
@@ -80,14 +81,14 @@ public class AuthInterceptor implements HandlerInterceptor {
 		String adminUserId = (String)session.getAttribute("userId");
 		String adminUserName = (String)session.getAttribute("userName");
 		String webUserId = (String)session.getAttribute(SessionConstant.WEB_USER_ID);
-		String wenUserName = (String)session.getAttribute(SessionConstant.WEB_USER_EMAIL);
+		String wenUserName = (String)session.getAttribute(SessionConstant.WEB_USER_NAME);
 		if(StringUtils.isBlank(adminUserId) && StringUtils.isBlank(adminUserName)
 				&& StringUtils.isBlank(webUserId)&& StringUtils.isBlank(wenUserName)){
 			System.out.println("URI:"+requestURI+"被拦截");
 			if(requestURI.contains("/webctrl/")){
-				response.sendRedirect("../demo/login.jsp");
+				response.sendRedirect("../../demo/login.jsp");
 			}else{
-				response.sendRedirect("../admin/login.jsp");
+				response.sendRedirect("../../admin/login.jsp");
 			}
 			return false;
 		}

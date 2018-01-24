@@ -3,6 +3,8 @@
 String path = request.getContextPath();
 String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+path+"/";
 String pathName = request.getParameter("pathName")==null?"index":request.getParameter("pathName");
+session.removeAttribute("userId");
+session.removeAttribute("userName");
 %>
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">

@@ -30,10 +30,11 @@
     $(document).ready(function() { 
         $('body').addClass('loaded');
         $('#loader-wrapper .load_title').remove();
+        document.getElementById("img").src="<%=path%>/authimg/generateImage?date=" + new Date();
     }); 
     function changeImg(){
         var img = document.getElementById("img"); 
-        img.src = "<%=path%>/authimg/generateImage?date=" + new Date();;
+        img.src = "<%=path%>/authimg/generateImage?date=" + new Date();
     } 
 </script>
 </head>
@@ -58,7 +59,7 @@
         <div class="inputBox codeBox">
             <input type="text" class="form-control" id="userImgCode" placeholder="请输入验证码" aria-describedby="basic-addon1">
             <!-- <img src="img/code.jpg" alt="code"> -->
-            <img id="img" src="<%=path%>/authimg/generateImage" onclick="javascript:changeImg()" alt="点击切换"/>
+            <img id="img" onclick="javascript:changeImg()" alt="点击切换"/>
         </div>
         <div class="inputBox pwdBox">
 			<button type="button" style="width: 100%;" class="btn btn-secondary" id="loginBtn_">登录</button>
@@ -66,7 +67,7 @@
         </div>
         <div class="btnBox">
             <button type="button" class="btn btn-secondary" id="loginBtn">登录</button>
-            <button type="button" class="btn btn-secondary" style="float:right" id="registerBtn_">联系我们</button>
+            <a href="http://www.sunrise-market-research.com/"><button type="button" class="btn btn-secondary" style="float:right" id="registerBtn_">联系我们</button></a>
         </div>
     </div>
     <div id="main" style="z-index:-1;position:absolute;top:0;left:0;bottom:0;right:0;"></div>

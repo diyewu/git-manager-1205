@@ -8,9 +8,7 @@ import org.apache.commons.lang.StringUtils;
 
 public class MainTest {
 	public static void main(String[] args) {
-		String s =null;
-		String a = (String)s;
-		System.out.println(StringUtils.isBlank(a));
+		splitTest();
 	}
 	public static void formatTest(){
 		DecimalFormat df = new DecimalFormat("#.00000");

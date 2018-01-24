@@ -85,7 +85,7 @@ String showName = realName == null?loginName:realName;
 				<transition name="fade">
 				<div class="selectedResult"
 					:style="{width:firstIndex!==''?(secondIndex!==''?'99%':'66%'):'33%'}">
-					<div class="selectedResultBtn" @click="cascadeClose()">确定</div>
+					<div class="selectedResultBtn" style="background-color: #3086c3;border-radius: 0.2rem;color:#fff" @click="cascadeClose()">确定</div>
 					<div class="selectedResultContainer">
 						<div class="selectedResultWrap"
 							:style="{width:selectedIndex.length*250+100+'px'}">
@@ -102,7 +102,7 @@ String showName = realName == null?loginName:realName;
 						:style="{color:firstIndex===i?'#3086c3':''}"
 						@click="firstClick(v,i)" @mouseenter="firstOver(v,i)"
 						v-for="(v,i) in cascaderData">
-						<label><input type="checkbox" :checked="v.status"><i>✓</i>{{v.menuName}}</label>
+						<label><input type="checkbox" :checked="v.status"><i>✓</i></label>{{v.menuName}}
 					</div>
 				</div>
 				<transition name="fade">
@@ -113,7 +113,7 @@ String showName = realName == null?loginName:realName;
 						:style="{color:secondIndex===i?'#3086c3':''}"
 						@click="secondClick(v,i)" @mouseenter="secondOver(v,i)"
 						v-for="(v,i) in cascaderData[firstIndex].children">
-						<label><input type="checkbox" :checked="v.status"><i>✓</i>{{v.menuName}}</label>
+						<label><input type="checkbox" :checked="v.status"><i>✓</i></label>{{v.menuName}}
 					</div>
 				</div>
 				</transition>
@@ -124,7 +124,7 @@ String showName = realName == null?loginName:realName;
 					<div @click="thirdClick(v,i)" class="selectedItem"
 						:style="{color:v.status?'#3086c3':''}"
 						v-for="(v,i) in cascaderData[firstIndex].children[secondIndex].children">
-						<label><input type="checkbox" :checked="v.status"><i>✓</i>{{v.menuName}}</label>
+						<label><input type="checkbox" :checked="v.status"><i>✓</i></label>{{v.menuName}}
 					</div>
 				</div>
 				</transition>
