@@ -8,7 +8,7 @@ server:
 spring:
     datasource:
         name: test
-        url: jdbc:mysql://127.0.0.1:3306/xzgis
+        url: jdbc:mysql://localhost:3306/xzgis
         username: root
         password: 123456
         # 使用druid数据源
@@ -71,8 +71,8 @@ logging:
 #custom settings
 custom:
 #     clientFileUpladPath: E:\gistools\img/
-#     clientFileUpladPath: /opt/gis/temp/
-     clientFileUpladPath: F:\tempfilepath/
+     clientFileUpladPath: /opt/gis/temp/
+#     clientFileUpladPath: F:\tempfilepath/
 #     clientFileUpladPath: /Users/calvin/Work/Tomcat/temp/
      smtp: smtp.ym.163.com
      port: 25

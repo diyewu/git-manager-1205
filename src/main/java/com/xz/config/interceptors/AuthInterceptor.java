@@ -30,6 +30,7 @@ public class AuthInterceptor implements HandlerInterceptor {
 		whitelist.add("/login");//登陆
 		whitelist.add("/userlogin");//登陆
 		whitelist.add("/forgetPwdCheckNameAndCode");//忘记密码
+		whitelist.add("/uploadwxradio/");//上传语音
 	}
 	
 	/**

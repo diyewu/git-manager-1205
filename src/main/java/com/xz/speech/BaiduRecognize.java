@@ -18,7 +18,7 @@ import org.json.JSONObject;
 public class BaiduRecognize {
 
 	private static String TOKEN = "7a49ddf0dc913e6b9";
-	private static final String testFileName = "F:\\OnMyWay\\定做网站\\百度语音\\public\\8k.pcm";
+	private static final String testFileName = "F:\\OnMyWay\\小程序语音工具\\1517628304150tmp_e488db7984b7376d74375097a623ada2.pcm";
 	private static final String cuid = "7a49ddf0dc913e6b9b80a6d26ec9619e";
 	// put your own params here
 
@@ -56,7 +56,37 @@ public class BaiduRecognize {
 		return recText;
 	}
 	private static int kk = 0;
+	
+	public static String convertSilk2Pcm(String path){
+		InputStreamReader in = null;
+		try {
+//			String shpath = "/opt/ffmpeg/silk-v3-decoder-master/converter.sh";
+			String[] cmd = {"/bin/sh","-c","/opt/ffmpeg/silk-v3-decoder-master/converter.sh "+path+" pcm"}; 
+			Process ps = Runtime.getRuntime().exec(cmd); ;
+			ps.waitFor();
+			in = new InputStreamReader(ps.getInputStream());
+			BufferedReader br = new BufferedReader(in);
+			StringBuffer sb = new StringBuffer();
+			String line;
+			while ((line = br.readLine()) != null) {
+				sb.append(line).append("\n");
+			}
+			String result = sb.toString();
+			System.out.println(result);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}finally{
+			if(in != null)
+				try {
+					in.close();
+				} catch (IOException e) {
+				}
+		}
+		return path.replace(".silk", ".pcm");
+	}
+	
 	public static String recognizeByBaidu(String filePath) {
+		filePath = convertSilk2Pcm(filePath);
 		String recText = "";
 		String resp = "";
 		try {
@@ -78,6 +108,7 @@ public class BaiduRecognize {
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
+			throw new RuntimeException(e.getMessage());
 		}
 		return recText;
 	}
@@ -95,7 +126,7 @@ public class BaiduRecognize {
 		// construct params
 		JSONObject params = new JSONObject();
 		params.put("format", "pcm");
-		params.put("rate", 8000);
+		params.put("rate", 16000);
 		params.put("channel", "1");
 		params.put("token", TOKEN);
 		params.put("cuid", cuid);
@@ -123,7 +154,7 @@ public class BaiduRecognize {
 		// construct params
 		JSONObject params = new JSONObject();
 		params.put("format", "pcm");
-		params.put("rate", 8000);
+		params.put("rate", 16000);
 		params.put("channel", "1");
 		params.put("token", TOKEN);
 		params.put("cuid", cuid);
@@ -153,7 +184,7 @@ public class BaiduRecognize {
 
 		// add request header
 		conn.setRequestMethod("POST");
-		conn.setRequestProperty("Content-Type", "audio/pcm; rate=8000");
+		conn.setRequestProperty("Content-Type", "audio/pcm; rate=16000");
 
 		conn.setDoInput(true);
 		conn.setDoOutput(true);

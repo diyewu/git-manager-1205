@@ -69,7 +69,7 @@ public class UploadWeixinRadioController extends BaseController {
 			map.put("i_msg", respText);
 		} else {
 			map.put("i_type", "error");
-			map.put("i_msg", "保存失败：" + msg);
+			map.put("i_msg", "识别失败：" + msg);
 		}
 		writeJson(map, response);
 	}
