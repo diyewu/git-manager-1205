@@ -88,6 +88,7 @@ public class ProjectServices {
 		StringBuilder sb = new StringBuilder(); 
 		attrList = new ArrayList<Object>();
 		for(int i=0;i<list.size();i++){
+			boolean allNull = true;
 			if(i>1){//从第三行开始
 				attrList = list.get(i);
 				if(attrList != null && attrList.size() != 0){
@@ -103,6 +104,13 @@ public class ProjectServices {
 						sb.append(",ext"+(k+1));
 						params.add(attrList.get(k)+"");
 						marks.add("?");
+						
+						if(StringUtils.isNotBlank(attrList.get(k)+"") && !"null".equals(attrList.get(k)+"")){
+							allNull = false;
+						}
+					}
+					if(allNull){
+						continue;
 					}
 //					System.out.println(params);
 					sb.append(")values("+StringUtils.join(marks.toArray(), ",")+")");
