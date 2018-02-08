@@ -714,22 +714,22 @@ function showDetail(title,subhead,imgSrc,detail1,detail2,detail3,detail4,detail5
 	$("#detailimg").attr("src",imgSrc);
 	$("#detailtitle").html(title);
 	$("#detailsubhead").html(subhead);
-	if("null：null" != detail1){
+	if("null：null" != detail1 && "undefined：undefined"!= detail1){
 		$("#detailitem1").html(detail1);
 	}
-	if("null：null" != detail2){
+	if("null：null" != detail2 && "undefined：undefined"!= detail2){
 		$("#detailitem2").html(detail2);
 	}
-	if("null：null" != detail3){
+	if("null：null" != detail3 && "undefined：undefined"!= detail3){
 		$("#detailitem3").html(detail3);
 	}
-	if("null：null" != detail4){
+	if("null：null" != detail4 && "undefined：undefined"!= detail4){
 		$("#detailitem4").html(detail4);
 	}
-	if("null：null" != detail5){
+	if("null：null" != detail5 && "undefined：undefined"!= detail5){
 		$("#detailitem5").html(detail5);
 	}
-	if("null：null" != detail6){
+	if("null：null" != detail6&& "undefined：undefined"!= detail6){
 		$("#detailitem6").html(detail6);
 	}
     layer.open({
