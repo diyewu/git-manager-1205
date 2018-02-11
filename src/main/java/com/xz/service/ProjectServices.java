@@ -601,10 +601,21 @@ public class ProjectServices {
 				String sql = " INSERT into project_searchno_dictionary(search_no,search_name,create_date,update_date)VALUES(?,?,NOW(),NOW()) ";
 				String checkSql = " select * from project_searchno_dictionary where search_no = ? or search_name = ? ";
 				List<Map<String, Object>> checkList = new ArrayList<Map<String,Object>>();
+				boolean allnull = true;
 				for(int i=1;i<list.size();i++){
+					allnull = true;
 					objList = list.get(i);
 					searchNo = objList.get(0)+"";
 					searchName = objList.get(1)+"";
+					if(StringUtils.isNotBlank(searchNo) && !"null".equals(searchNo)){
+						allnull = false;
+					}
+					if(StringUtils.isNotBlank(searchName) && !"null".equals(searchName)){
+						allnull = false;
+					}
+					if(allnull){
+						continue;
+					}
 					checkList = jdbcTemplate.queryForList(checkSql, searchNo,searchName);
 					if (checkList == null || checkList.size() == 0) {
 						jdbcTemplate.update(sql, searchNo,searchName);

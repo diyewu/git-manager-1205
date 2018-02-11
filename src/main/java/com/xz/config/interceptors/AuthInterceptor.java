@@ -31,6 +31,8 @@ public class AuthInterceptor implements HandlerInterceptor {
 		whitelist.add("/userlogin");//登陆
 		whitelist.add("/forgetPwdCheckNameAndCode");//忘记密码
 		whitelist.add("/uploadwxradio/");//上传语音
+		whitelist.add(".jpg");//下载图片
+		whitelist.add(".png");//下载图片
 	}
 	
 	/**
@@ -72,7 +74,6 @@ public class AuthInterceptor implements HandlerInterceptor {
 		if (requestType != null && requestType.equals("XMLHttpRequest")) {// 异步
 			isAjax = true;
 		}
-		
 		for(String tem:whitelist){
 			if(requestURI.contains(tem)){
 				return true;
