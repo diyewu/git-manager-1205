@@ -385,7 +385,8 @@ public class AppService implements InitializingBean{
 							smap.put("preKey", currentKey);
 							smap.put("preLevel", currentLevelInt);
 							smap.put("cacheKey", cacheKey);
-							smap.put("text", "问题分类:"+(StringUtils.isBlank(researchNoMap.get(resultmap.get("question_type")))?resultmap.get("question_type"):researchNoMap.get(resultmap.get("question_type"))));
+//							smap.put("text", "问题类型:"+(StringUtils.isBlank(researchNoMap.get(resultmap.get("question_type")))?resultmap.get("question_type"):researchNoMap.get(resultmap.get("question_type"))));
+							smap.put("text", (StringUtils.isBlank(researchNoMap.get(resultmap.get("question_type")))?resultmap.get("question_type"):researchNoMap.get(resultmap.get("question_type"))));
 							smap.put("longitude", longitudeF);
 							smap.put("latitude", latitudeF);
 							smap.put("ids", resultmap.get("id"));
@@ -452,6 +453,58 @@ public class AppService implements InitializingBean{
 			}
 //			System.out.println(sList);
 		}
+		
+		if(currentLevelInt == 5){
+			if(sList != null && sList.size()>0){
+				Map<String,Object> tempMap = new HashMap<String, Object>();
+				Map<String,Object> tempMap1 = new HashMap<String, Object>();
+				Map<String,Object> tempMap2 = new HashMap<String, Object>();
+				String longitude = "";
+				String latitude = "";
+				String text = "";
+				String stext = "";
+				String ids = "";
+				
+				for (int i = 0; i < sList.size(); i++) {
+					stext = "";
+					tempMap = new HashMap<String, Object>();
+					tempMap = sList.get(i);
+					longitude = tempMap.get("longitude")+"";
+					latitude = tempMap.get("latitude")+"";
+					if(!tempMap1.containsKey(longitude+latitude)){//不存在
+						tempMap1.put(longitude+latitude, tempMap);
+					}else{//已经存在，则合并
+						tempMap2 = new HashMap<String, Object>();
+						tempMap2 = (Map<String, Object>) tempMap1.get(longitude+latitude);
+						text = (String)tempMap.get("text");
+						ids = (String)tempMap.get("ids");
+						stext =tempMap2.get("text")+"";
+//						tempMap.put("text", tempMap2.get("text")+","+text);
+//						tempMap.put("text", (stext.contains("问题类型：")?"":"问题类型：")+(stext.contains(text)?stext:stext+","+text));
+						tempMap.put("text", stext.contains(text)?stext:stext+","+text);
+						tempMap.put("ids", tempMap2.get("ids")+","+ids);
+						tempMap.put("totalitem", (Integer.parseInt(tempMap2.get("totalitem")+""))+1);
+						tempMap1.put(longitude+latitude, tempMap);
+						
+					}
+				}
+				sList = new ArrayList<Map<String,Object>>();
+				if(!tempMap1.isEmpty()){
+					sList = new ArrayList<Map<String,Object>>();
+					Map<String, Object> ttmap = new HashMap<String, Object>();
+					for (Map.Entry<String,Object> entry : tempMap1.entrySet()) {
+//						System.out.println("Key = " + entry.getKey() + ", Value = " + entry.getValue());
+						text = "问题类型:"; 
+						ttmap = (Map<String, Object>) entry.getValue();
+						text += (String) ttmap.get("text");
+						ttmap.put("text", text);
+						sList.add(ttmap);
+					}
+				}
+				
+			}
+		}
+		System.out.println(sList);
 		return sList;
 	}
 	public List<Map<String, Object>> turnback(String cacheKey,String key,String currentLevel){

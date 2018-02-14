@@ -1,6 +1,0 @@
-https://github.com/diyewu/gis-manager.git
-https://github.com/diyewu/git-manager-1205.git
-
-diyewu
-wu6586309
-refs/heads/master
