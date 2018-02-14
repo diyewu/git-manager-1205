@@ -770,6 +770,7 @@ function showInfo(ids){
 	function(result){
 		if(result.success == true){//登陆成功
 			var data = result.data;
+			console.log(data);
 			var itemlength =  data.length;
 			if(itemlength){
 				$('#finditemlength').html(itemlength);
@@ -842,6 +843,5 @@ function turnback(){
 
 
 function changelabel(e){
-	console.log(e);
 	e.stopPropagation;
 }
