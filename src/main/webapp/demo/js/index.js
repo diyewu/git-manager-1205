@@ -10,23 +10,6 @@
 	var viewer ;
 	$(document).ready(function() { 
 		
-//		$("label").click(function(e){
-//			console.log(e);
-//			if(!e.target.is("input")) return;
-////			其它代码....
-//		});
-		
-//		$('.no-label').click(function(e){
-//			e.stopPropagation;
-//		});
-//		$('label').each(function(e){
-//			console.log(e);
-//		     var labelval= $(this).val() ;
-//		     $(this).click=function(e){
-//		    	 e.stopPropagation;
-//		     }
-//		});
-		
 		// 百度地图API功能
 		initMap();
     	//===================
@@ -230,8 +213,9 @@
 	       		myCompOverlay.addEventListener("click", function(){
 	       			if(currentLevel != '6'){
 	       				showNextLevel(level,key,cacheKey,currentLevel,nextLevel,ids);
+	       			}else{
+	       				showInfo(ids);
 	       			}
-	           	    showInfo(ids);
 	       		});
           })();  
     	   k++;
@@ -276,7 +260,6 @@
 		function(result){
 			if(result.success == true){
 				var data = result.data;
-				console.log(data);
 				if(data){
 					_key = data[0].preKey;
 					_currentLevel = data[0].preLevel;
