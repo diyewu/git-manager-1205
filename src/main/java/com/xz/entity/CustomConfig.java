@@ -11,6 +11,8 @@ public class CustomConfig {
     private String port;
     private String user;
     private String pwd;
+    private String appid;
+    private String secret;
 
 	public String getClientFileUpladPath() {
 		return clientFileUpladPath;
@@ -51,6 +53,24 @@ public class CustomConfig {
 
 	public void setPwd(String pwd) {
 		this.pwd = pwd;
+	}
+
+	public String getAppid() {
+		return appid;
+	}
+
+	public void setAppid(String appid) {
+		this.appid = appid;
+	}
+
+	public String getSecret() {
+		return secret;
+	}
+
+	public void setSecret(String secret) {
+		this.secret = secret;
 	} 
+	
+	
       
 }  

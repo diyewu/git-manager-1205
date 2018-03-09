@@ -44,7 +44,6 @@
           div.style.background=this._showcolor;
           div.style.border="1px solid #ffffff";
           
-          
           div.style.position = "absolute";
           div.style.zIndex = BMap.Overlay.getZIndex(this._point.lat);
           div.style.color = "white";
@@ -444,11 +443,10 @@
     	
     	
     	map.addEventListener("zoomend", function(){//监听地图放大缩小事件
-    		console.log(' this.getZoom()='+ this.getZoom());
-    		console.log(' cachezoom='+ cachezoom);
     		var currentzoom = this.getZoom()
     		var change = cachezoom - currentzoom;
 			if(change > 0){//地图缩小
+	    		cachezoom = currentzoom;
 				turnback();
 				if ($('.expander').hasClass("fadeOut")) {
 					$('#autoShowList').trigger("click");
