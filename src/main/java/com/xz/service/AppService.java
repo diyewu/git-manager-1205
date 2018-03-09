@@ -494,7 +494,8 @@ public class AppService implements InitializingBean{
 					Map<String, Object> ttmap = new HashMap<String, Object>();
 					for (Map.Entry<String,Object> entry : tempMap1.entrySet()) {
 //						System.out.println("Key = " + entry.getKey() + ", Value = " + entry.getValue());
-						text = "问题类型:"; 
+//						text = "问题类型:"; 
+						text = ""; 
 						ttmap = (Map<String, Object>) entry.getValue();
 						text += (String) ttmap.get("text");
 						ttmap.put("text", text);
