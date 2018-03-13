@@ -1,8 +1,12 @@
 package com.xz.service;
 
 import java.awt.image.BufferedImage;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.net.URLEncoder;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -425,13 +429,97 @@ public class ProjectServices {
 	
 	
 	public void updateAttrType(String id,String typeName,String infoTypeName){
-		StringBuilder sb = new StringBuilder();
 		String sql = " update project_attribute set "
 				+ "attribute_type = (select id from project_attribute_type where type_name = ? and type = 0 ) "
 				+ ",attribute_info_type = (select id from project_attribute_type where type_name = ? and type = 1 ) "
 				+ "where project_attribute.id = ? ";
 		jdbcTemplate.update(sql,typeName,infoTypeName,id);
 	}
+	public void geoDetailAddr(String attrId,HttpSession session ,String apikey){
+		String attrSql = " select * from project_attribute where id = ? ";
+		List<Map<String, Object>> attrList = jdbcTemplate.queryForList(attrSql, attrId);
+		if (attrList != null && attrList.size() > 0) {
+			String projectId = (String)attrList.get(0).get("project_id");
+			String index = attrList.get(0).get("attribute_index")+"";
+			String detailSql = "select id, ext"+index+" from project_detail where project_id = ?";
+			List<Map<String, Object>> detailList = jdbcTemplate.queryForList(detailSql, projectId);
+			if (detailList != null && detailList.size() > 0) {
+				String address = "";
+				String key = "ext"+index;
+				Map<String, String> respMap = new HashMap<String, String>();
+				String longitude = "";
+				String latitude = "";
+				String id = "";
+				String insSql = " update project_detail set latitude = ? ,longitude = ? where id = ? ";
+				String type = "0";
+				String msg = null;
+				for (int i = 0; i < detailList.size(); i++) {
+					longitude = "";
+					latitude = "";
+					id = "";
+					respMap = new HashMap<String, String>();
+					address = (String)detailList.get(i).get(key);
+					id = (String)detailList.get(i).get("id");
+					if(StringUtils.isNotBlank(address) && !"null".equals(address)){
+						respMap = getGeocoderLatitude(address, apikey);
+					}
+					longitude = respMap.get("longitude");
+					latitude = respMap.get("latitude");
+					if(StringUtils.isNotBlank(latitude) && StringUtils.isNotBlank(latitude) && StringUtils.isNotBlank(longitude)){
+						jdbcTemplate.update(insSql, latitude,longitude,id);
+					}else{
+						msg = address+" 解析出错.";
+						operateHistoryService.insertOH(session, "38", msg, 1);
+						type = "1";
+					}
+				}
+				if("0".equals(type)){
+					operateHistoryService.insertOH(session, "38", msg, 0);
+				}
+			}
+		}
+		
+	}
+	
+	
+	
+	public static Map<String,String> getGeocoderLatitude(String address,String key) {
+		Map<String,String> map = new HashMap<String, String>();
+		BufferedReader in = null;
+		try {
+			address = URLEncoder.encode(address, "UTF-8");
+			URL tirc = new URL("http://api.map.baidu.com/geocoder/v2/?address=" + address + "&output=json&ak=" + key+"&callback=showLocation");
+			in = new BufferedReader(new InputStreamReader(tirc.openStream(), "UTF-8"));
+			String res;
+			StringBuilder sb = new StringBuilder("");
+			while ((res = in.readLine()) != null) {
+				sb.append(res.trim());
+			}
+			String str = sb.toString();
+			if (StringUtils.isNotEmpty(str)) {
+				int lngStart = str.indexOf("lng\":");
+				int lngEnd = str.indexOf(",\"lat");
+				int latEnd = str.indexOf("},\"precise");
+				if (lngStart > 0 && lngEnd > 0 && latEnd > 0) {
+					String lng = str.substring(lngStart + 5, lngEnd);
+					String lat = str.substring(lngEnd + 7, latEnd);
+					map.put("longitude", lng);//经度
+					map.put("latitude", lat);//纬度
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				in.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		System.out.println(map);
+		return map;
+	}
+	
 	public Page<Map<String, Object>> getAttrType(int type){
 		Page<Map<String, Object>> page = new Page<Map<String, Object>>(0, 1010, false);
 		String sql = " select id as value,type_name as text from project_attribute_type where type = ? ";

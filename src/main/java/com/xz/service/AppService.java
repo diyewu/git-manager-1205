@@ -47,6 +47,7 @@ public class AppService implements InitializingBean{
 		keyList.add("question_type");
 		keyList.add("longitude");
 		keyList.add("latitude");
+//		keyList.add("detail_address");
 		levelMap.put(1, 2);
 		levelMap.put(2, 4);
 		levelMap.put(3, 6);
@@ -260,19 +261,23 @@ public class AppService implements InitializingBean{
 				sb.append(" select ");
 				String aliasName = "";
 				String questionAttr = "";
+				boolean hasLatInfo = false;
 				for (int i = 0; i < attributeList.size(); i++) {
 					aliasName = (String)attributeList.get(i).get("alias_name");
 					if(StringUtils.isNotBlank(aliasName)){
-						/**
-						 * keyList={first_area,second_area,third_area,forth_area,latitude,longitude}
-						 */
 						if(keyList.contains(aliasName)){
+							if("longitude".equals(aliasName)){
+								hasLatInfo = true;
+							}
 							sb.append(" pd.ext"+attributeList.get(i).get("attribute_index") +" as " + aliasName +",");
 							if("question_type".equals(aliasName)){
 								questionAttr = "pd.ext"+attributeList.get(i).get("attribute_index");
 							}
 						}
 					}
+				}
+				if(!hasLatInfo){//没有设置经纬度信息，则去查找详细地址 映射的经纬度
+					sb.append(" pd.longitude,pd.latitude, ");
 				}
 				
 				if(StringUtils.isNotBlank(questionAttr)){

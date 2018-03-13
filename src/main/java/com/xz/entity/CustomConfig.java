@@ -13,6 +13,7 @@ public class CustomConfig {
     private String pwd;
     private String appid;
     private String secret;
+    private String baiduapikey;
 
 	public String getClientFileUpladPath() {
 		return clientFileUpladPath;
@@ -69,8 +70,14 @@ public class CustomConfig {
 
 	public void setSecret(String secret) {
 		this.secret = secret;
+	}
+
+	public String getBaiduapikey() {
+		return baiduapikey;
+	}
+
+	public void setBaiduapikey(String baiduapikey) {
+		this.baiduapikey = baiduapikey;
 	} 
-	
-	
       
 }  

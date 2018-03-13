@@ -110,6 +110,26 @@ public class ProjectMgrController extends BaseController {
 			return resp;
 		}
 	}
+	class GeoCallable implements Callable<Object>{
+		private String attrId;
+		private HttpSession session;
+		private String key;
+		GeoCallable(String attrId,HttpSession session,String key) {
+			this.attrId = attrId;
+			this.session =session;
+			this.key =key;
+		}
+		@Override
+		public Object call() throws Exception {
+			String resp = "";
+			try {
+				projectServices.geoDetailAddr(attrId,session,key);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			return resp;
+		}
+	}
 	/*
 	 * 采用spring提供的上传文件的方法
 	 */
@@ -234,6 +254,7 @@ public class ProjectMgrController extends BaseController {
     
     @RequestMapping("saveAttrType")
     public void saveAttrType(HttpServletRequest request,HttpServletResponse response) throws JsonParseException, JsonMappingException, IOException{
+    	HttpSession session=request.getSession();
     	String msg = null;
     	Map<String, String> map = new HashMap<String, String>();
     	mapper = new ObjectMapper();
@@ -251,6 +272,11 @@ public class ProjectMgrController extends BaseController {
 					typeName = pMap.get("type_name")+"";
 					infoTypeName = pMap.get("info_type_name")+"";
 					projectServices.updateAttrType(id, typeName,infoTypeName);
+					if("详细地址".equals(typeName)){//进行地址解析
+						String key = customConfig.getBaiduapikey();
+						GeoCallable gc = new GeoCallable(id,session,key);
+						threadPool.submit(gc);
+					}
 				}
 			}
 		}else{
