@@ -48,84 +48,90 @@ public class ProjectServices {
 	
 	@Transactional
 	public String importProjectData(HttpSession session,File file,String title,String createUser){
-		ArrayList<ArrayList<Object>> list = new ArrayList<ArrayList<Object>>();
 		String msg = null;
 		String type = "5";//导入项目数据
-		try {
-			 list = ExcelReadUtils.readAllRows(file);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		if (list == null || list.size() == 0) {
-			msg = "请检查上传附件内容，数据为空！";
-			insertOperateHistory(session, type, msg);
-			return null;
-		}
-		if(StringUtils.isBlank(title)){
-			title = list.get(0).get(0)+"";
-		}
-		if(StringUtils.isBlank(title)){
-			msg = "格式有误，请确认第一行第一列为项目标题！";
-			insertOperateHistory(session, type, msg);
-			return null;
-		}
-		//插入项目主表数据
 		String projectId = SortableUUID.randomUUID();
-		String mainSql = " insert into project_main(id,project_name,create_time,create_user_id,file_path)values(?,?,NOW(),?,?) ";
-		jdbcTemplate.update(mainSql, projectId,title,createUser,file.getPath());
-		
-		//插入项目属性表数据
-		ArrayList<Object> attrList = list.get(1);
-		if(attrList == null || attrList.size() == 0){
-			insertOperateHistory(session, type, msg);
-			msg = "格式有误，请确认第二行数据不能为空！";
-			return null ;
-		}
-		int attrSize = attrList.size();
-		String attrSql = " insert into project_attribute(id,project_id,attribute_name,attribute_index)VALUES(?,?,?,?) ";
-		for (int i = 0; i < attrSize; i++) {
-			jdbcTemplate.update(attrSql, SortableUUID.randomUUID(),projectId,attrList.get(i)+"",i+1);
-		}
-		//插入项目详细数据,从第三行还是为详细数据
-		List<String> params = new ArrayList<String>();
-		List<String> marks = new ArrayList<String>();
-		StringBuilder sb = new StringBuilder(); 
-		attrList = new ArrayList<Object>();
-		for(int i=0;i<list.size();i++){
-			boolean allNull = true;
-			if(i>1){//从第三行开始
-				attrList = list.get(i);
-				if(attrList != null && attrList.size() != 0){
-					sb = new StringBuilder();
-					params = new ArrayList<String>();
-					marks = new ArrayList<String>();
-					sb.append(" insert into project_detail(id,project_id ");
-					marks.add("?");
-					marks.add("?");
-					params.add(SortableUUID.randomUUID());
-					params.add(projectId);
-					for(int k =0;k<attrList.size();k++){
-						sb.append(",ext"+(k+1));
-						params.add(attrList.get(k)+"");
+		try{
+			ArrayList<ArrayList<Object>> list = new ArrayList<ArrayList<Object>>();
+			try {
+				 list = ExcelReadUtils.readAllRows(file);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			if (list == null || list.size() == 0) {
+				msg = "请检查上传附件内容，数据为空！";
+				insertOperateHistory(session, type, msg);
+				return null;
+			}
+			if(StringUtils.isBlank(title)){
+				title = list.get(0).get(0)+"";
+			}
+			if(StringUtils.isBlank(title)){
+				msg = "格式有误，请确认第一行第一列为项目标题！";
+				insertOperateHistory(session, type, msg);
+				return null;
+			}
+			//插入项目主表数据
+//			String projectId = SortableUUID.randomUUID();
+			String mainSql = " insert into project_main(id,project_name,create_time,create_user_id,file_path)values(?,?,NOW(),?,?) ";
+			jdbcTemplate.update(mainSql, projectId,title,createUser,file.getPath());
+			
+			//插入项目属性表数据
+			ArrayList<Object> attrList = list.get(1);
+			if(attrList == null || attrList.size() == 0){
+				insertOperateHistory(session, type, msg);
+				msg = "格式有误，请确认第二行数据不能为空！";
+				return null ;
+			}
+			int attrSize = attrList.size();
+			String attrSql = " insert into project_attribute(id,project_id,attribute_name,attribute_index)VALUES(?,?,?,?) ";
+			for (int i = 0; i < attrSize; i++) {
+				jdbcTemplate.update(attrSql, SortableUUID.randomUUID(),projectId,attrList.get(i)+"",i+1);
+			}
+			//插入项目详细数据,从第三行还是为详细数据
+			List<String> params = new ArrayList<String>();
+			List<String> marks = new ArrayList<String>();
+			StringBuilder sb = new StringBuilder(); 
+			attrList = new ArrayList<Object>();
+			for(int i=0;i<list.size();i++){
+				boolean allNull = true;
+				if(i>1){//从第三行开始
+					attrList = list.get(i);
+					if(attrList != null && attrList.size() != 0){
+						sb = new StringBuilder();
+						params = new ArrayList<String>();
+						marks = new ArrayList<String>();
+						sb.append(" insert into project_detail(id,project_id ");
 						marks.add("?");
-						
-						if(StringUtils.isNotBlank(attrList.get(k)+"") && !"null".equals(attrList.get(k)+"")){
-							allNull = false;
+						marks.add("?");
+						params.add(SortableUUID.randomUUID());
+						params.add(projectId);
+						for(int k =0;k<attrList.size();k++){
+							sb.append(",ext"+(k+1));
+							params.add(attrList.get(k)+"");
+							marks.add("?");
+							
+							if(StringUtils.isNotBlank(attrList.get(k)+"") && !"null".equals(attrList.get(k)+"")){
+								allNull = false;
+							}
 						}
+						if(allNull){
+							continue;
+						}
+	//					System.out.println(params);
+						sb.append(")values("+StringUtils.join(marks.toArray(), ",")+")");
+						jdbcTemplate.update(sb.toString(), params.toArray());
+					}else{
+						msg = "格式有误，请确认第三行数据不能为空！";
+						insertOperateHistory(session, type, msg);
+						return null;
 					}
-					if(allNull){
-						continue;
-					}
-//					System.out.println(params);
-					sb.append(")values("+StringUtils.join(marks.toArray(), ",")+")");
-					jdbcTemplate.update(sb.toString(), params.toArray());
-				}else{
-					msg = "格式有误，请确认第三行数据不能为空！";
-					insertOperateHistory(session, type, msg);
-					return null;
 				}
 			}
-		}
+			}catch(Exception e){
+				msg = e.getMessage();
+				throw new RuntimeException("运行出错："+msg);
+			}
 		insertOperateHistory(session, type, msg);
 		return projectId;
 	}

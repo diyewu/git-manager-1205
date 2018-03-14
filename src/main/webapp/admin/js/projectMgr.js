@@ -536,7 +536,7 @@
 			} 
 		});
 
-       sastore.load({params:{start:0,limit:20,projectId : projectId}})
+       sastore.load({params:{start:0,limit:sa_pageSize,projectId : projectId}})
 		
        var satbar = new Ext.Toolbar({  
             renderTo : Ext.grid.GridPanel.tbar,// 其中grid是上边创建的grid容器  

@@ -81,7 +81,11 @@ public class ProjectMgrController extends BaseController {
 	    			projectServices.addRelateImg(session,webProjectId, zipFile, desPath);;
 	    		}
 	    		if(xlsFile != null){
-	    			projectServices.importProjectData(session, xlsFile, title,createUser);
+	    			try {
+						projectServices.importProjectData(session, xlsFile, title, createUser);
+					} catch (Exception e) {
+						projectServices.insertOperateHistory(session, "5", e.getMessage());
+					}
 	    		}
 			} catch (Exception e) {
 				e.printStackTrace();
