@@ -875,4 +875,10 @@ public class AppService implements InitializingBean{
 		return list;
 	}
 	
+	public void updateWxBind(String userId ,String appId){
+		String sql = " update web_user_login set wx_appid = ? ,wx_bind_time = NOW() where id = ? ";
+		jdbcTemplate.update(sql, appId,userId);
+	}
+	
+	
 }

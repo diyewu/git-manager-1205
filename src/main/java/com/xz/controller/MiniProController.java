@@ -1,6 +1,7 @@
 package com.xz.controller;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -56,7 +57,7 @@ public class MiniProController extends BaseController{
 	public AppJsonModel login(HttpServletRequest request){
 		String userName = request.getParameter("userName");
 		String userPwd = request.getParameter("userPwd");
-		String openId = request.getHeader("openId");
+//		String openId = request.getHeader("openId");
 		String token = "";
 		String msg = "success";
 		int code = 0;
@@ -66,6 +67,7 @@ public class MiniProController extends BaseController{
 			code = ServerResult.RESULT_ERROE_PARAM;
 			msg = ServerResult.RESULT_ERROE_PARAM_MSG;
 		}
+		String userId = "";
 		if(code == 0){
 			try {
 				list = appService.getUserInfoByNameandPwd(userName, userPwd);
@@ -83,6 +85,7 @@ public class MiniProController extends BaseController{
 		}
 		//验证账户是否失效
 		if(code == 0){
+			userId = list.get(0).get("id")+"";
 			String enableTime = list.get(0).get("enable_time")+"";
 			String disableTime = list.get(0).get("disable_time")+"";
 			if(StringUtils.isNotBlank(enableTime) && StringUtils.isNotBlank(disableTime)){
@@ -102,25 +105,47 @@ public class MiniProController extends BaseController{
 				code = ServerResult.RESULT_CHECK_USER_EXPIRY_DATE_ERROE;
 			}
 		}
-		//验证phone是否允许登陆
-		/*
-		if(code == 0){
-			int allowSize = list.get(0).get("allow_phone_size") ==null?1:Integer.parseInt(list.get(0).get("allow_phone_size")+"");
-			String webUserId = list.get(0).get("id")+"";
+		//绑定微信
+		String wxcode = request.getParameter("code");
+		String randomkey = request.getParameter("randomkey");
+		System.out.println("wxcode="+wxcode);
+		if(StringUtils.isNotBlank(wxcode)){
+			String appid = customConfig.getAppid();
+			String secret = customConfig.getSecret();
+			String url = "https://api.weixin.qq.com/sns/jscode2session?appid="+appid+"&secret="+secret+"&js_code="+code+"&grant_type=authorization_code";
+			String resp = "";
 			try {
-				code = appService.checkPhoneId(phoneId, allowSize, webUserId);
+//				resp = HttpUtil.httpGetRequest(url , new HashMap<String, Object>());
+				resp = HttpUtil.httpGetRequest(url);
+			} catch (Exception e1) {
+				e1.printStackTrace();
+			}
+			ObjectMapper mapper = new ObjectMapper();
+			Map<String, Object> map = new HashMap<String, Object>();
+			String openid = "";
+			String session_key = "";
+			String unionid = "";
+			try {
+				map = mapper.readValue(resp, Map.class);
 			} catch (Exception e) {
 				e.printStackTrace();
-				msg = e.getMessage();
-				code = ServerResult.RESULT_SERVER_ERROR;
+			}
+			if(map.containsKey("errcode")){//错误时返回JSON数据包(示例为Code无效)
+				code = ServerResult.RESULT_GETWXINFO_ERROR;
+			}else{
+				randomkey = (String)map.get("openid");
+				session_key = (String)map.get("session_key");
+				unionid = (String)map.get("unionid");
+				//更新绑定信息到数据库
+				appService.updateWxBind(userId, randomkey);
 			}
 		}
-		*/
+
 		//TODO  判断当前是否已经登陆
 		AppLoginBean appLoginBean = new AppLoginBean();
 		if(code == 0){
 			token = UUID.randomUUID().toString().replaceAll("-", "");
-			String userId = list.get(0).get("id")+"";
+//			String userId = list.get(0).get("id")+"";
 			String roleId = list.get(0).get("user_role")+"";
 			String realName = list.get(0).get("real_name")+"";
 			resultMap.put("token", token);
@@ -128,9 +153,9 @@ public class MiniProController extends BaseController{
 			appLoginBean.setToken(token);
 			appLoginBean.setUserId(userId);
 			appLoginBean.setUserRoleId(roleId);
-			AgingCache.putCacheInfo(openId, appLoginBean,30);
+			AgingCache.putCacheInfo(randomkey, appLoginBean,30);
 		}
-		operateHistoryService.insertOHAPP(request,appLoginBean.getUserId() ,"28", ServerResult.getCodeMsg(code, msg)+",openId="+openId, "success".equals(msg)?1:0, 2);
+		operateHistoryService.insertOHAPP(request,appLoginBean.getUserId() ,"28", ServerResult.getCodeMsg(code, msg)+",openId="+randomkey, "success".equals(msg)?1:0, 2);
 		return new AppJsonModel(code, ServerResult.getCodeMsg(code, msg), resultMap);
 	}
 	
@@ -148,7 +173,12 @@ public class MiniProController extends BaseController{
 		String secret = customConfig.getSecret();
 		
 		String url = "https://api.weixin.qq.com/sns/jscode2session?appid="+appid+"&secret="+secret+"&js_code="+code+"&grant_type=authorization_code";
-		String resp = HttpUtil.sendPost(url , new HashMap<String, Object>(), "UTF-8");
+		String resp = "";
+		try {
+			resp = HttpUtil.httpGetRequest(url , new HashMap<String, Object>());
+		} catch (URISyntaxException e1) {
+			e1.printStackTrace();
+		}
 		ObjectMapper mapper = new ObjectMapper();
 		Map<String, Object> map = new HashMap<String, Object>();
 		String openid = "";
@@ -165,7 +195,9 @@ public class MiniProController extends BaseController{
 			openid = (String)map.get("openid");
 			session_key = (String)map.get("session_key");
 			unionid = (String)map.get("unionid");
+			
 		}
+		
 		return null;
 	}
 	

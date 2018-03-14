@@ -1,4 +1,4 @@
-package com.xz.utils;
+package wzh.Http;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
