@@ -793,3 +793,19 @@
 	text-indent: 24px;
 	background-position: 16px center;
 }
+
+.loadmore{
+	height: 3rem;
+    padding: 1.15rem 0.8rem;
+    position: relative;
+    box-sizing: border-box;
+    width: 100%;
+    color: #2a90d7;
+    background: rgba(41,144,215,.08);
+    text-align: center;
+    cursor: pointer;
+    margin-left: 0.8rem;
+}
+.loadmore:hover {
+    background: rgba(41,144,215,.2);
+}

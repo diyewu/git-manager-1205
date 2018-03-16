@@ -9,24 +9,6 @@
 	var divIdIndex = 0;
 	var viewer ;
 	$(document).ready(function() { 
-		
-//		$("label").click(function(e){
-//			console.log(e);
-//			if(!e.target.is("input")) return;
-////			其它代码....
-//		});
-		
-//		$('.no-label').click(function(e){
-//			e.stopPropagation;
-//		});
-//		$('label').each(function(e){
-//			console.log(e);
-//		     var labelval= $(this).val() ;
-//		     $(this).click=function(e){
-//		    	 e.stopPropagation;
-//		     }
-//		});
-		
 		// 百度地图API功能
 		initMap();
     	//===================
@@ -60,6 +42,7 @@
           div.style.borderRadius="4px";
           div.style.boxShadow="1px 1px 2px 1px rgba(0, 0, 0, 0.24)";
           div.style.background=this._showcolor;
+          div.style.border="1px solid #ffffff";
           
           div.style.position = "absolute";
           div.style.zIndex = BMap.Overlay.getZIndex(this._point.lat);
@@ -148,6 +131,18 @@
         $(".go-to-list").mouseleave (function(){
         	layer.close(tipindex);
         });
+     
+//        $(".item-wrap").scroll(function(){
+//            var $this =$(this),
+//            viewH =$(this).height(),//可见高度
+//            contentH =$(this).get(0).scrollHeight,//内容高度
+//            scrollTop =$(this).scrollTop();//滚动高度
+//           if(contentH - viewH - scrollTop <= 100) { //到达底部100px时,加载新内容
+////           if(scrollTop/(contentH -viewH)>=0.95){ //到达底部100px时,加载新内容
+////        	   alert(123123);
+//        	   showNextPageInfo();
+//           }
+//        });
         
     }); 
 	
@@ -194,6 +189,9 @@
 	}
 	var overlays = new Array();
 	function generateMarker(array,level){
+		if(level == 12){
+			cachezoom = 12;
+		}
 		for(var k in overlays){
 			map.removeOverlay(overlays[k]);
 		}
@@ -202,21 +200,24 @@
     	_level = level;
     	for (var i in array) {
     		pt = new BMap.Point(array[i].longitude , array[i].latitude);
-			if(k == 0){
-				if(array[i].nextLevel){
-					map.centerAndZoom(pt, level);
-				}else{
-					map.centerAndZoom(pt, 19);
-				}
-			}
 //    	   var marker = new BMap.Marker(pt);
     	   var mouseoverTxt = array[i].text + " 共" + array[i].totalitem + "条问题点" ;
-    	   var tcolor = "rgba(0,153,51, 0.9)";
+//    	   var tcolor = "rgba(0,153,51, 0.9)";
+    	   var tcolor = "rgba(35,174,244, 0.9)";
     	   if(array[i].color){
     		   tcolor = array[i].color;
     	   }
-    	   var myCompOverlay = 
-    		   new ComplexCustomOverlay(pt, array[i].text,mouseoverTxt,tcolor,"rgba(254,116,66, 0.8)");
+    	   if(k == 0){
+				map.centerAndZoom(pt, level);
+				/*
+				if(array[i].nextLevel){
+					map.centerAndZoom(pt, level);
+				}else{
+					map.centerAndZoom(pt, 18);
+				}
+				*/
+			}
+    	   var myCompOverlay = new ComplexCustomOverlay(pt, array[i].text,mouseoverTxt,tcolor,"rgba(254,116,66, 0.8)");
     	   divIdIndex++;
     	   map.addOverlay(myCompOverlay);
     	   overlays.push(myCompOverlay);
@@ -228,12 +229,21 @@
 	       		var nextLevel = array[i].nextLevel;
 	       		var ids = array[i].ids;
 	       		myCompOverlay.addEventListener("click", function(){
-	       			if(currentLevel != '6'){
+	       			if(currentLevel != '7'){
+	       				$(".item-wrap").empty();
+	       				$('#finditemlength').html(0);
+	       				if ($('.expander').hasClass("fadeOut")) {
+	       					$('#autoShowList').trigger("click");
+	       				}
 	       				showNextLevel(level,key,cacheKey,currentLevel,nextLevel,ids);
+	       			}else{
+	       				if ($('.expander').hasClass("fadeIn")) {
+	       					$('#autoShowList').trigger("click");
+	       				}
+	       				showInfo(ids);
 	       			}
-	           	    showInfo(ids);
 	       		});
-          })();  
+          })();
     	   k++;
     	}
 	}
@@ -259,14 +269,17 @@
 		function(result){
 			if(result.success == true){
 				var data = result.data;
-				generateMarker(data,level+2);
+				if(cachezoom != 19){
+					cachezoom = cachezoom + 1;
+				}
+				generateMarker(data,level + 1);
 			}else {
 				 
 			}
 		},'json');
 	}
 	function showPreLevel(level,key,cacheKey,currentLevel){
-		_level = level-2;
+		_level = level-1;
 		$.post(path+"/webctrl/getPreMapInfoByKey/", 
 		{
 			key:key,
@@ -276,16 +289,8 @@
 		function(result){
 			if(result.success == true){
 				var data = result.data;
-				console.log(data);
 				if(data){
 					_key = data[0].preKey;
-					_currentLevel = data[0].preLevel;
-					generateMarker(data,level-2);
-					var ids ="";
-					for (var i in data) {
-						ids = ids + data[i].ids+",";
-					}
-					showInfo(ids);
 					if(!_key){
 						if ($('.expander').hasClass("fadeOut")) {
 							$('#autoShowList').trigger("click");
@@ -293,6 +298,20 @@
 						$(".item-wrap").empty();
 						$('#finditemlength').html(0);
 					}
+					_currentLevel = data[0].preLevel;
+					generateMarker(data,level-1);
+					var ids ="";
+					for (var i in data) {
+						ids = ids + data[i].ids+",";
+					}
+					showInfo(ids);
+//					if(!_key){
+//						if ($('.expander').hasClass("fadeOut")) {
+//							$('#autoShowList').trigger("click");
+//						}
+//						$(".item-wrap").empty();
+//						$('#finditemlength').html(0);
+//					}
 				}
 			}else {
 				
@@ -406,7 +425,7 @@
 	function setPlace(detailAddress){// 创建地址解析器实例
 		myGeo.getPoint(detailAddress, function(point){
 			if (point) {
-			    map.centerAndZoom(point, 14);
+			    map.centerAndZoom(point, 12);
 			    //map.addOverlay(new BMap.Marker(point));
 			}else{
 				alert("没有查询到相关信息");
@@ -418,7 +437,8 @@
 		var input = $("#suggestId").val();
 		setPlace(input);
 	}
-
+	
+	var cachezoom = 12;
 	function initMap(){
 		map = new BMap.Map("allmap",{enableMapClick:false});    // 创建Map实例
     	map.centerAndZoom(new BMap.Point(121.47, 31.23), 12);  // 初始化地图,设置中心点坐标和地图级别
@@ -427,6 +447,41 @@
     	map.addControl(new BMap.OverviewMapControl());
     	map.setCurrentCity("上海");          // 设置地图显示的城市 此项是必须设置的
     	map.enableScrollWheelZoom(true);     //开启鼠标滚轮缩放
+    	
+//    	map.setMapType(BMAP_HYBRID_MAP);
+    	map.setMapStyle({style:'grayscale'});
+    	
+    	
+    	map.addEventListener("zoomend", function(){//监听地图放大缩小事件
+    		var currentzoom = this.getZoom()
+    		var change = cachezoom - currentzoom;
+			if(change > 0){//地图缩小
+	    		cachezoom = currentzoom;
+				turnback();
+				if ($('.expander').hasClass("fadeOut")) {
+					$('#autoShowList').trigger("click");
+				}
+				/*
+				var times = parseInt(change/2);
+				if(times > 0){
+					cachezoom = currentzoom;
+				}
+				for(var i=0;i<times;i++){
+					turnback();
+				}
+				if(times >=1){
+					if ($('.expander').hasClass("fadeOut")) {
+						$('#autoShowList').trigger("click");
+					}
+				}
+				*/
+			}else{//地图，不下钻
+			}
+			if(currentzoom == 12){
+				cachezoom == currentzoom;
+			}
+    	});
+    	
     	
     	/* 
     	 * 下面是markerclusterer逻辑
@@ -444,11 +499,10 @@
     				backgroundColor : '#E64B4E'
     			}],
     		});
-    	markerClusterer.setMaxZoom(13);
+    	markerClusterer.setMaxZoom(12);
     	markerClusterer.setGridSize(100);
     	*/
 	}
-
 
 
 
@@ -714,22 +768,22 @@ function showDetail(title,subhead,imgSrc,detail1,detail2,detail3,detail4,detail5
 	$("#detailimg").attr("src",imgSrc);
 	$("#detailtitle").html(title);
 	$("#detailsubhead").html(subhead);
-	if("null：null" != detail1){
+	if("null：null" != detail1 && "undefined：undefined"!= detail1){
 		$("#detailitem1").html(detail1);
 	}
-	if("null：null" != detail2){
+	if("null：null" != detail2 && "undefined：undefined"!= detail2){
 		$("#detailitem2").html(detail2);
 	}
-	if("null：null" != detail3){
+	if("null：null" != detail3 && "undefined：undefined"!= detail3){
 		$("#detailitem3").html(detail3);
 	}
-	if("null：null" != detail4){
+	if("null：null" != detail4 && "undefined：undefined"!= detail4){
 		$("#detailitem4").html(detail4);
 	}
-	if("null：null" != detail5){
+	if("null：null" != detail5 && "undefined：undefined"!= detail5){
 		$("#detailitem5").html(detail5);
 	}
-	if("null：null" != detail6){
+	if("null：null" != detail6&& "undefined：undefined"!= detail6){
 		$("#detailitem6").html(detail6);
 	}
     layer.open({
@@ -741,27 +795,15 @@ function showDetail(title,subhead,imgSrc,detail1,detail2,detail3,detail4,detail5
         scrollbar: false, 
         content: $('.detail')
     });
-    /*
-    $(".js-silder").silder({
-        auto: true,//自动播放，传入任何可以转化为true的值都会自动轮播
-        speed: 20,//轮播图运动速度
-        sideCtrl: true,//是否需要侧边控制按钮
-        bottomCtrl: true,//是否需要底部控制按钮
-        defaultView: 0,//默认显示的索引
-        interval: 3000,//自动轮播的时间，以毫秒为单位，默认3000毫秒
-        activeClass: "active",//小的控制按钮激活的样式，不包括作用两边，默认active
-    });
-    $('.silder-ctrl-con').each((idx,val) => {
-        idx >= 5 ? $(val).remove() : val
-    });
-    */
 }
 
+var detailData = null;
+var detailIndex = 0;
 
 function showInfo(ids){
-	if ($('.expander').hasClass("fadeIn")) {
-		$('#autoShowList').trigger("click");
-	}
+//	if ($('.expander').hasClass("fadeIn")) {
+//		$('#autoShowList').trigger("click");
+//	}
 	$(".item-wrap").empty();
 	$.post(path+"/webctrl/getCoordinateInfo/", 
 	{
@@ -770,30 +812,65 @@ function showInfo(ids){
 	function(result){
 		if(result.success == true){//登陆成功
 			var data = result.data;
+//			console.log(data);
 			var itemlength =  data.length;
 			if(itemlength){
 				$('#finditemlength').html(itemlength);
 			}
-			$.each(data, function (index, obj) {
-			   var htm = generateRightItem(obj.detail_1_value, 
-					   '详情',
-					   	basePath+'app/getImgBydetailId?id='+obj.id,
-					   	basePath+'app/getImgBydetailId?id='+obj.id+"&type=thumb",
-					   	obj.detail_2_key+"："+obj.detail_2_value,
-					   	obj.detail_3_key+"："+obj.detail_3_value,
-					   	obj.detail_4_key+"："+obj.detail_4_value,
-					   	obj.detail_5_key+"："+obj.detail_5_value,
-					   	obj.detail_6_key+"："+obj.detail_6_value,
-					   	obj.detail_7_key+"："+obj.detail_7_value
-					   	);
-               $(".item-wrap").append(htm);
-	        });
-			viewer = new Viewer(document.getElementById('list-container-id'), {
-				url: 'data-original'
-			});
+			detailData = data;
+			foreachData(data,0);
+//			viewer = new Viewer(document.getElementById('list-container-id'), {
+//				url: 'data-original'
+//			});
 		}else {
 		}
 	},'json');
+}
+
+function showNextPageInfo(){
+	if(detailData){
+		if(detailData.length >= detailIndex+1){
+//			$(".item-wrap").empty();
+			foreachData(detailData,detailIndex);
+		}
+	}
+}
+
+function foreachData(curdata,curidx){
+//	console.log();
+	$(".item-wrap").children().last().remove();
+	$.each(curdata, function (index, obj) {
+		if(index >= curidx && index < curidx+10){
+		   var htm = generateRightItem(obj.detail_1_value, 
+				   '详情',
+				   	basePath+'app/getImgBydetailId?id='+obj.id,
+				   	basePath+'app/getImgBydetailId?id='+obj.id+"&type=thumb",
+				   	obj.detail_2_key+"："+obj.detail_2_value,
+				   	obj.detail_3_key+"："+obj.detail_3_value,
+				   	obj.detail_4_key+"："+obj.detail_4_value,
+				   	obj.detail_5_key+"："+obj.detail_5_value,
+				   	obj.detail_6_key+"："+obj.detail_6_value,
+				   	obj.detail_7_key+"："+obj.detail_7_value
+				   	);
+           $(".item-wrap").append(htm);
+           detailIndex = index+1;
+		}
+		/*else{
+		   detailIndex = index;
+		   return false;
+		}*/
+    });
+	var loadhtm = "";
+	if(curdata.length <= curidx+10){
+		loadhtm = "<div class=\"loadmore\" onClick=\"showNextPageInfo();\">已全部加载完毕</div>";
+	}else{
+		loadhtm = "<div class=\"loadmore\" onClick=\"showNextPageInfo();\">加载更多</div>";
+	}
+	$(".item-wrap").append(loadhtm);
+	
+	viewer = new Viewer(document.getElementById('list-container-id'), {
+		url: 'data-original'
+	});
 }
 
 function generateRightItem(title,subhead,imgSrc,imgThumbSrc,detail1,detail2,detail3,detail4,detail5,detail6){
@@ -826,12 +903,6 @@ function generateRightItem(title,subhead,imgSrc,imgThumbSrc,detail1,detail2,deta
 
 
 function turnback(){
-//	generateMarker(_data, _level);
-//	console.log(_key);
-//	console.log(_cacheKey);
-//	console.log(_currentLevel);
-//	console.log(_nextLevel);
-//	console.log(_level);
 	if(!_key){
 		return null;
 	}else{
@@ -842,6 +913,5 @@ function turnback(){
 
 
 function changelabel(e){
-	console.log(e);
 	e.stopPropagation;
 }
