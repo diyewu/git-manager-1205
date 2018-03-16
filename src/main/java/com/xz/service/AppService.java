@@ -48,6 +48,7 @@ public class AppService implements InitializingBean{
 		keyList.add("longitude");
 		keyList.add("latitude");
 //		keyList.add("detail_address");
+		levelMap.put(0, 0);
 		levelMap.put(1, 2);
 		levelMap.put(2, 4);
 		levelMap.put(3, 6);
@@ -340,6 +341,7 @@ public class AppService implements InitializingBean{
 		String tempKey = "";
 		String nextLevelKey = "";
 		String id = "";
+		String zeroStr = "";
 		for (int i = 0; i < resultList.size(); i++) {
 			areaBean = new AreaBean();
 			resultmap = resultList.get(i);
@@ -347,6 +349,10 @@ public class AppService implements InitializingBean{
 				researchNo = resultmap.get("research_no")+"";
 				if(StringUtils.isNotBlank(currentKey)){//从第二级开始
 					tempKey = StringUtils.substring(researchNo, 0, levelMap.get(currentLevelInt));
+					zeroStr = StringUtils.substring(researchNo, levelMap.get(currentLevelInt-1), levelMap.get(currentLevelInt));
+					if("00".equals(zeroStr)||"000".equals(zeroStr)){
+						generateCod(tempKey, resultList, cacheKey, (currentLevelInt+1)+"");
+					}
 					if(currentLevelInt != 6){//2.3.4.5
 						if(currentKey.equals(tempKey)){//匹配,找下一级
 							nextLevelKey = StringUtils.substring(researchNo, 0, levelMap.get(currentLevelInt+1));
@@ -402,6 +408,11 @@ public class AppService implements InitializingBean{
 					}
 				}else{//第一级
 					tempKey = StringUtils.substring(researchNo, 0, levelMap.get(currentLevelInt+1));
+					zeroStr = StringUtils.substring(researchNo, levelMap.get(currentLevelInt), levelMap.get(currentLevelInt+1));
+					if("00".equals(zeroStr)||"000".equals(zeroStr)){
+						tempKey = StringUtils.substring(researchNo, 0, levelMap.get(currentLevelInt+2));
+						generateCod(tempKey, resultList, cacheKey, (currentLevelInt+1)+"");
+					}
 					id = resultmap.get("id")+"";
 					try {
 						longitudeF = resultmap.get("longitude")==null?0:Double.parseDouble(resultmap.get("longitude")+"");
