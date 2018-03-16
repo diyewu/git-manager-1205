@@ -47,11 +47,14 @@ public class AppService implements InitializingBean{
 		keyList.add("question_type");
 		keyList.add("longitude");
 		keyList.add("latitude");
+//		keyList.add("detail_address");
+		levelMap.put(0, 0);
 		levelMap.put(1, 2);
 		levelMap.put(2, 4);
 		levelMap.put(3, 6);
 		levelMap.put(4, 9);
 		levelMap.put(5, 12);
+		levelMap.put(6, 16);
 		
 		lvlMap.put("first_area", "second_area");
 		lvlMap.put("second_area", "third_area");
@@ -260,19 +263,23 @@ public class AppService implements InitializingBean{
 				sb.append(" select ");
 				String aliasName = "";
 				String questionAttr = "";
+				boolean hasLatInfo = false;
 				for (int i = 0; i < attributeList.size(); i++) {
 					aliasName = (String)attributeList.get(i).get("alias_name");
 					if(StringUtils.isNotBlank(aliasName)){
-						/**
-						 * keyList={first_area,second_area,third_area,forth_area,latitude,longitude}
-						 */
 						if(keyList.contains(aliasName)){
+							if("longitude".equals(aliasName)){
+								hasLatInfo = true;
+							}
 							sb.append(" pd.ext"+attributeList.get(i).get("attribute_index") +" as " + aliasName +",");
 							if("question_type".equals(aliasName)){
 								questionAttr = "pd.ext"+attributeList.get(i).get("attribute_index");
 							}
 						}
 					}
+				}
+				if(!hasLatInfo){//没有设置经纬度信息，则去查找详细地址 映射的经纬度
+					sb.append(" pd.longitude,pd.latitude, ");
 				}
 				
 				if(StringUtils.isNotBlank(questionAttr)){
@@ -334,6 +341,7 @@ public class AppService implements InitializingBean{
 		String tempKey = "";
 		String nextLevelKey = "";
 		String id = "";
+		String zeroStr = "";
 		for (int i = 0; i < resultList.size(); i++) {
 			areaBean = new AreaBean();
 			resultmap = resultList.get(i);
@@ -341,7 +349,11 @@ public class AppService implements InitializingBean{
 				researchNo = resultmap.get("research_no")+"";
 				if(StringUtils.isNotBlank(currentKey)){//从第二级开始
 					tempKey = StringUtils.substring(researchNo, 0, levelMap.get(currentLevelInt));
-					if(currentLevelInt != 5){//2.3.4
+					zeroStr = StringUtils.substring(researchNo, levelMap.get(currentLevelInt-1), levelMap.get(currentLevelInt));
+					if("00".equals(zeroStr)||"000".equals(zeroStr)){
+						generateCod(tempKey, resultList, cacheKey, (currentLevelInt+1)+"");
+					}
+					if(currentLevelInt != 6){//2.3.4.5
 						if(currentKey.equals(tempKey)){//匹配,找下一级
 							nextLevelKey = StringUtils.substring(researchNo, 0, levelMap.get(currentLevelInt+1));
 							id = resultmap.get("id")+"";
@@ -368,7 +380,7 @@ public class AppService implements InitializingBean{
 						}else{
 							continue;
 						}
-					}else{//第五级
+					}else{//第六级
 						if(currentKey.equals(tempKey)){//匹配,找下一级
 							try {
 								longitudeF = resultmap.get("longitude")==null?0:Double.parseDouble(resultmap.get("longitude")+"");
@@ -385,7 +397,8 @@ public class AppService implements InitializingBean{
 							smap.put("preKey", currentKey);
 							smap.put("preLevel", currentLevelInt);
 							smap.put("cacheKey", cacheKey);
-							smap.put("text", "问题分类:"+(StringUtils.isBlank(researchNoMap.get(resultmap.get("question_type")))?resultmap.get("question_type"):researchNoMap.get(resultmap.get("question_type"))));
+//							smap.put("text", "问题类型:"+(StringUtils.isBlank(researchNoMap.get(resultmap.get("question_type")))?resultmap.get("question_type"):researchNoMap.get(resultmap.get("question_type"))));
+							smap.put("text", (StringUtils.isBlank(researchNoMap.get(resultmap.get("question_type")))?resultmap.get("question_type"):researchNoMap.get(resultmap.get("question_type"))));
 							smap.put("longitude", longitudeF);
 							smap.put("latitude", latitudeF);
 							smap.put("ids", resultmap.get("id"));
@@ -395,6 +408,11 @@ public class AppService implements InitializingBean{
 					}
 				}else{//第一级
 					tempKey = StringUtils.substring(researchNo, 0, levelMap.get(currentLevelInt+1));
+					zeroStr = StringUtils.substring(researchNo, levelMap.get(currentLevelInt), levelMap.get(currentLevelInt+1));
+					if("00".equals(zeroStr)||"000".equals(zeroStr)){
+						tempKey = StringUtils.substring(researchNo, 0, levelMap.get(currentLevelInt+2));
+						generateCod(tempKey, resultList, cacheKey, (currentLevelInt+1)+"");
+					}
 					id = resultmap.get("id")+"";
 					try {
 						longitudeF = resultmap.get("longitude")==null?0:Double.parseDouble(resultmap.get("longitude")+"");
@@ -421,7 +439,7 @@ public class AppService implements InitializingBean{
 				break;
 			}
 		}
-		if(currentLevelInt != 5){
+		if(currentLevelInt != 6){
 			if(areaMap != null && !areaMap.isEmpty()){
 				Map<String,Object> sMap = new HashMap<String, Object>();
 				for (Map.Entry<String,AreaBean> entry : areaMap.entrySet()) {
@@ -452,6 +470,59 @@ public class AppService implements InitializingBean{
 			}
 //			System.out.println(sList);
 		}
+		
+		if(currentLevelInt == 6){
+			if(sList != null && sList.size()>0){
+				Map<String,Object> tempMap = new HashMap<String, Object>();
+				Map<String,Object> tempMap1 = new HashMap<String, Object>();
+				Map<String,Object> tempMap2 = new HashMap<String, Object>();
+				String longitude = "";
+				String latitude = "";
+				String text = "";
+				String stext = "";
+				String ids = "";
+				
+				for (int i = 0; i < sList.size(); i++) {
+					stext = "";
+					tempMap = new HashMap<String, Object>();
+					tempMap = sList.get(i);
+					longitude = tempMap.get("longitude")+"";
+					latitude = tempMap.get("latitude")+"";
+					if(!tempMap1.containsKey(longitude+latitude)){//不存在
+						tempMap1.put(longitude+latitude, tempMap);
+					}else{//已经存在，则合并
+						tempMap2 = new HashMap<String, Object>();
+						tempMap2 = (Map<String, Object>) tempMap1.get(longitude+latitude);
+						text = (String)tempMap.get("text");
+						ids = (String)tempMap.get("ids");
+						stext =tempMap2.get("text")+"";
+//						tempMap.put("text", tempMap2.get("text")+","+text);
+//						tempMap.put("text", (stext.contains("问题类型：")?"":"问题类型：")+(stext.contains(text)?stext:stext+","+text));
+						tempMap.put("text", stext.contains(text)?stext:stext+","+text);
+						tempMap.put("ids", tempMap2.get("ids")+","+ids);
+						tempMap.put("totalitem", (Integer.parseInt(tempMap2.get("totalitem")+""))+1);
+						tempMap1.put(longitude+latitude, tempMap);
+						
+					}
+				}
+				sList = new ArrayList<Map<String,Object>>();
+				if(!tempMap1.isEmpty()){
+					sList = new ArrayList<Map<String,Object>>();
+					Map<String, Object> ttmap = new HashMap<String, Object>();
+					for (Map.Entry<String,Object> entry : tempMap1.entrySet()) {
+//						System.out.println("Key = " + entry.getKey() + ", Value = " + entry.getValue());
+//						text = "问题类型:"; 
+						text = ""; 
+						ttmap = (Map<String, Object>) entry.getValue();
+						text += (String) ttmap.get("text");
+						ttmap.put("text", text);
+						sList.add(ttmap);
+					}
+				}
+				
+			}
+		}
+		System.out.println(sList);
 		return sList;
 	}
 	public List<Map<String, Object>> turnback(String cacheKey,String key,String currentLevel){
@@ -815,5 +886,11 @@ public class AppService implements InitializingBean{
 		List<Map<String, Object>> list = jdbcTemplate.queryForList(sql, name);
 		return list;
 	}
+	
+	public void updateWxBind(String userId ,String appId){
+		String sql = " update web_user_login set wx_appid = ? ,wx_bind_time = NOW() where id = ? ";
+		jdbcTemplate.update(sql, appId,userId);
+	}
+	
 	
 }

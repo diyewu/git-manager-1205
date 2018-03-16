@@ -61,15 +61,18 @@ public class WebController extends BaseController {
 		String userName = request.getParameter("userName");
 		String userPwd = request.getParameter("userPwd");
 		String imgCode = request.getParameter("imgCode");
+		String ignoreImgCode = request.getParameter("ignoreImgCode");
 		String msg = null;
 		HttpSession session = request.getSession(); 
 		String serverCode = (String) session.getAttribute(SessionConstant.WEB_IMG_CODE);
-		if(StringUtils.isNotBlank(imgCode)){
-			if(!imgCode.toLowerCase().equals(serverCode)){
-				msg = "验证码错误！";
+		if(!"true".equals(ignoreImgCode)){
+			if(StringUtils.isNotBlank(imgCode)){
+				if(!imgCode.toLowerCase().equals(serverCode)){
+					msg = "验证码错误！";
+				}
+			}else{
+				msg = "验证码为空！";
 			}
-		}else{
-			msg = "验证码为空！";
 		}
 		if(msg == null){
 			if(StringUtils.isBlank(userName)){

@@ -1,8 +1,12 @@
 package com.xz.service;
 
 import java.awt.image.BufferedImage;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.net.URLEncoder;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -44,76 +48,90 @@ public class ProjectServices {
 	
 	@Transactional
 	public String importProjectData(HttpSession session,File file,String title,String createUser){
-		ArrayList<ArrayList<Object>> list = new ArrayList<ArrayList<Object>>();
 		String msg = null;
 		String type = "5";//导入项目数据
-		try {
-			 list = ExcelReadUtils.readAllRows(file);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		if (list == null || list.size() == 0) {
-			msg = "请检查上传附件内容，数据为空！";
-			insertOperateHistory(session, type, msg);
-			return null;
-		}
-		if(StringUtils.isBlank(title)){
-			title = list.get(0).get(0)+"";
-		}
-		if(StringUtils.isBlank(title)){
-			msg = "格式有误，请确认第一行第一列为项目标题！";
-			insertOperateHistory(session, type, msg);
-			return null;
-		}
-		//插入项目主表数据
 		String projectId = SortableUUID.randomUUID();
-		String mainSql = " insert into project_main(id,project_name,create_time,create_user_id,file_path)values(?,?,NOW(),?,?) ";
-		jdbcTemplate.update(mainSql, projectId,title,createUser,file.getPath());
-		
-		//插入项目属性表数据
-		ArrayList<Object> attrList = list.get(1);
-		if(attrList == null || attrList.size() == 0){
-			insertOperateHistory(session, type, msg);
-			msg = "格式有误，请确认第二行数据不能为空！";
-			return null ;
-		}
-		int attrSize = attrList.size();
-		String attrSql = " insert into project_attribute(id,project_id,attribute_name,attribute_index)VALUES(?,?,?,?) ";
-		for (int i = 0; i < attrSize; i++) {
-			jdbcTemplate.update(attrSql, SortableUUID.randomUUID(),projectId,attrList.get(i)+"",i+1);
-		}
-		//插入项目详细数据,从第三行还是为详细数据
-		List<String> params = new ArrayList<String>();
-		List<String> marks = new ArrayList<String>();
-		StringBuilder sb = new StringBuilder(); 
-		attrList = new ArrayList<Object>();
-		for(int i=0;i<list.size();i++){
-			if(i>1){//从第三行开始
-				attrList = list.get(i);
-				if(attrList != null && attrList.size() != 0){
-					sb = new StringBuilder();
-					params = new ArrayList<String>();
-					marks = new ArrayList<String>();
-					sb.append(" insert into project_detail(id,project_id ");
-					marks.add("?");
-					marks.add("?");
-					params.add(SortableUUID.randomUUID());
-					params.add(projectId);
-					for(int k =0;k<attrList.size();k++){
-						sb.append(",ext"+(k+1));
-						params.add(attrList.get(k)+"");
+		try{
+			ArrayList<ArrayList<Object>> list = new ArrayList<ArrayList<Object>>();
+			try {
+				 list = ExcelReadUtils.readAllRows(file);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			if (list == null || list.size() == 0) {
+				msg = "请检查上传附件内容，数据为空！";
+				insertOperateHistory(session, type, msg);
+				return null;
+			}
+			if(StringUtils.isBlank(title)){
+				title = list.get(0).get(0)+"";
+			}
+			if(StringUtils.isBlank(title)){
+				msg = "格式有误，请确认第一行第一列为项目标题！";
+				insertOperateHistory(session, type, msg);
+				return null;
+			}
+			//插入项目主表数据
+//			String projectId = SortableUUID.randomUUID();
+			String mainSql = " insert into project_main(id,project_name,create_time,create_user_id,file_path)values(?,?,NOW(),?,?) ";
+			jdbcTemplate.update(mainSql, projectId,title,createUser,file.getPath());
+			
+			//插入项目属性表数据
+			ArrayList<Object> attrList = list.get(1);
+			if(attrList == null || attrList.size() == 0){
+				insertOperateHistory(session, type, msg);
+				msg = "格式有误，请确认第二行数据不能为空！";
+				return null ;
+			}
+			int attrSize = attrList.size();
+			String attrSql = " insert into project_attribute(id,project_id,attribute_name,attribute_index)VALUES(?,?,?,?) ";
+			for (int i = 0; i < attrSize; i++) {
+				jdbcTemplate.update(attrSql, SortableUUID.randomUUID(),projectId,attrList.get(i)+"",i+1);
+			}
+			//插入项目详细数据,从第三行还是为详细数据
+			List<String> params = new ArrayList<String>();
+			List<String> marks = new ArrayList<String>();
+			StringBuilder sb = new StringBuilder(); 
+			attrList = new ArrayList<Object>();
+			for(int i=0;i<list.size();i++){
+				boolean allNull = true;
+				if(i>1){//从第三行开始
+					attrList = list.get(i);
+					if(attrList != null && attrList.size() != 0){
+						sb = new StringBuilder();
+						params = new ArrayList<String>();
+						marks = new ArrayList<String>();
+						sb.append(" insert into project_detail(id,project_id ");
 						marks.add("?");
+						marks.add("?");
+						params.add(SortableUUID.randomUUID());
+						params.add(projectId);
+						for(int k =0;k<attrList.size();k++){
+							sb.append(",ext"+(k+1));
+							params.add(attrList.get(k)+"");
+							marks.add("?");
+							
+							if(StringUtils.isNotBlank(attrList.get(k)+"") && !"null".equals(attrList.get(k)+"")){
+								allNull = false;
+							}
+						}
+						if(allNull){
+							continue;
+						}
+	//					System.out.println(params);
+						sb.append(")values("+StringUtils.join(marks.toArray(), ",")+")");
+						jdbcTemplate.update(sb.toString(), params.toArray());
+					}else{
+						msg = "格式有误，请确认第三行数据不能为空！";
+						insertOperateHistory(session, type, msg);
+						return null;
 					}
-//					System.out.println(params);
-					sb.append(")values("+StringUtils.join(marks.toArray(), ",")+")");
-					jdbcTemplate.update(sb.toString(), params.toArray());
-				}else{
-					msg = "格式有误，请确认第三行数据不能为空！";
-					insertOperateHistory(session, type, msg);
-					return null;
 				}
 			}
-		}
+			}catch(Exception e){
+				msg = e.getMessage();
+				throw new RuntimeException("运行出错："+msg);
+			}
 		insertOperateHistory(session, type, msg);
 		return projectId;
 	}
@@ -417,13 +435,97 @@ public class ProjectServices {
 	
 	
 	public void updateAttrType(String id,String typeName,String infoTypeName){
-		StringBuilder sb = new StringBuilder();
 		String sql = " update project_attribute set "
 				+ "attribute_type = (select id from project_attribute_type where type_name = ? and type = 0 ) "
 				+ ",attribute_info_type = (select id from project_attribute_type where type_name = ? and type = 1 ) "
 				+ "where project_attribute.id = ? ";
 		jdbcTemplate.update(sql,typeName,infoTypeName,id);
 	}
+	public void geoDetailAddr(String attrId,HttpSession session ,String apikey){
+		String attrSql = " select * from project_attribute where id = ? ";
+		List<Map<String, Object>> attrList = jdbcTemplate.queryForList(attrSql, attrId);
+		if (attrList != null && attrList.size() > 0) {
+			String projectId = (String)attrList.get(0).get("project_id");
+			String index = attrList.get(0).get("attribute_index")+"";
+			String detailSql = "select id, ext"+index+" from project_detail where project_id = ?";
+			List<Map<String, Object>> detailList = jdbcTemplate.queryForList(detailSql, projectId);
+			if (detailList != null && detailList.size() > 0) {
+				String address = "";
+				String key = "ext"+index;
+				Map<String, String> respMap = new HashMap<String, String>();
+				String longitude = "";
+				String latitude = "";
+				String id = "";
+				String insSql = " update project_detail set latitude = ? ,longitude = ? where id = ? ";
+				String type = "0";
+				String msg = null;
+				for (int i = 0; i < detailList.size(); i++) {
+					longitude = "";
+					latitude = "";
+					id = "";
+					respMap = new HashMap<String, String>();
+					address = (String)detailList.get(i).get(key);
+					id = (String)detailList.get(i).get("id");
+					if(StringUtils.isNotBlank(address) && !"null".equals(address)){
+						respMap = getGeocoderLatitude(address, apikey);
+					}
+					longitude = respMap.get("longitude");
+					latitude = respMap.get("latitude");
+					if(StringUtils.isNotBlank(latitude) && StringUtils.isNotBlank(latitude) && StringUtils.isNotBlank(longitude)){
+						jdbcTemplate.update(insSql, latitude,longitude,id);
+					}else{
+						msg = address+" 解析出错.";
+						operateHistoryService.insertOH(session, "38", msg, 1);
+						type = "1";
+					}
+				}
+				if("0".equals(type)){
+					operateHistoryService.insertOH(session, "38", msg, 0);
+				}
+			}
+		}
+		
+	}
+	
+	
+	
+	public static Map<String,String> getGeocoderLatitude(String address,String key) {
+		Map<String,String> map = new HashMap<String, String>();
+		BufferedReader in = null;
+		try {
+			address = URLEncoder.encode(address, "UTF-8");
+			URL tirc = new URL("http://api.map.baidu.com/geocoder/v2/?address=" + address + "&output=json&ak=" + key+"&callback=showLocation");
+			in = new BufferedReader(new InputStreamReader(tirc.openStream(), "UTF-8"));
+			String res;
+			StringBuilder sb = new StringBuilder("");
+			while ((res = in.readLine()) != null) {
+				sb.append(res.trim());
+			}
+			String str = sb.toString();
+			if (StringUtils.isNotEmpty(str)) {
+				int lngStart = str.indexOf("lng\":");
+				int lngEnd = str.indexOf(",\"lat");
+				int latEnd = str.indexOf("},\"precise");
+				if (lngStart > 0 && lngEnd > 0 && latEnd > 0) {
+					String lng = str.substring(lngStart + 5, lngEnd);
+					String lat = str.substring(lngEnd + 7, latEnd);
+					map.put("longitude", lng);//经度
+					map.put("latitude", lat);//纬度
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				in.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		System.out.println(map);
+		return map;
+	}
+	
 	public Page<Map<String, Object>> getAttrType(int type){
 		Page<Map<String, Object>> page = new Page<Map<String, Object>>(0, 1010, false);
 		String sql = " select id as value,type_name as text from project_attribute_type where type = ? ";
@@ -593,10 +695,21 @@ public class ProjectServices {
 				String sql = " INSERT into project_searchno_dictionary(search_no,search_name,create_date,update_date)VALUES(?,?,NOW(),NOW()) ";
 				String checkSql = " select * from project_searchno_dictionary where search_no = ? or search_name = ? ";
 				List<Map<String, Object>> checkList = new ArrayList<Map<String,Object>>();
+				boolean allnull = true;
 				for(int i=1;i<list.size();i++){
+					allnull = true;
 					objList = list.get(i);
 					searchNo = objList.get(0)+"";
 					searchName = objList.get(1)+"";
+					if(StringUtils.isNotBlank(searchNo) && !"null".equals(searchNo)){
+						allnull = false;
+					}
+					if(StringUtils.isNotBlank(searchName) && !"null".equals(searchName)){
+						allnull = false;
+					}
+					if(allnull){
+						continue;
+					}
 					checkList = jdbcTemplate.queryForList(checkSql, searchNo,searchName);
 					if (checkList == null || checkList.size() == 0) {
 						jdbcTemplate.update(sql, searchNo,searchName);
