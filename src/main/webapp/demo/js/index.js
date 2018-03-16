@@ -168,7 +168,7 @@
 		function(result){
 			if(result.success == true){//登陆成功
 				var data = result.data;
-				generateMarker(data,12);
+				generateMarker(data,11);
 			}else {
 			}
 		},'json');
@@ -182,15 +182,15 @@
 			if(result.success == true){//登陆成功
 				var data = result.data;
 //				generateCluster(data);
-				generateMarker(data,12);
+				generateMarker(data,11);
 			}else {
 			}
 		},'json');
 	}
 	var overlays = new Array();
 	function generateMarker(array,level){
-		if(level == 12){
-			cachezoom = 12;
+		if(level == 11){
+			cachezoom = 11;
 		}
 		for(var k in overlays){
 			map.removeOverlay(overlays[k]);
@@ -229,7 +229,7 @@
 	       		var nextLevel = array[i].nextLevel;
 	       		var ids = array[i].ids;
 	       		myCompOverlay.addEventListener("click", function(){
-	       			if(currentLevel != '7'){
+	       			if(currentLevel < '7'){
 	       				$(".item-wrap").empty();
 	       				$('#finditemlength').html(0);
 	       				if ($('.expander').hasClass("fadeOut")) {
@@ -372,7 +372,7 @@
     	var k =0;
     	for (var i in array) {
 			if(k == 0){
-				map.centerAndZoom(new BMap.Point(array[i].longitude , array[i].latitude), 12);
+				map.centerAndZoom(new BMap.Point(array[i].longitude , array[i].latitude), 11);
 			}
     	   pt = new BMap.Point(array[i].longitude , array[i].latitude);
     	   var marker = new BMap.Marker(pt);
@@ -425,7 +425,7 @@
 	function setPlace(detailAddress){// 创建地址解析器实例
 		myGeo.getPoint(detailAddress, function(point){
 			if (point) {
-			    map.centerAndZoom(point, 12);
+			    map.centerAndZoom(point, 11);
 			    //map.addOverlay(new BMap.Marker(point));
 			}else{
 				alert("没有查询到相关信息");
@@ -438,10 +438,10 @@
 		setPlace(input);
 	}
 	
-	var cachezoom = 12;
+	var cachezoom = 11;
 	function initMap(){
 		map = new BMap.Map("allmap",{enableMapClick:false});    // 创建Map实例
-    	map.centerAndZoom(new BMap.Point(121.47, 31.23), 12);  // 初始化地图,设置中心点坐标和地图级别
+    	map.centerAndZoom(new BMap.Point(121.47, 31.23), 11);  // 初始化地图,设置中心点坐标和地图级别
     	map.addControl(new BMap.MapTypeControl());   //添加地图类型控件
     	map.addControl(new BMap.NavigationControl({enableGeolocation:true}));
     	map.addControl(new BMap.OverviewMapControl());
@@ -477,7 +477,7 @@
 				*/
 			}else{//地图，不下钻
 			}
-			if(currentzoom == 12){
+			if(currentzoom == 11){
 				cachezoom == currentzoom;
 			}
     	});
@@ -499,7 +499,7 @@
     				backgroundColor : '#E64B4E'
     			}],
     		});
-    	markerClusterer.setMaxZoom(12);
+    	markerClusterer.setMaxZoom(11);
     	markerClusterer.setGridSize(100);
     	*/
 	}
@@ -576,7 +576,7 @@ var vm = new Vue({
     				var data = result.data;
 //    				initMap();
 //    				generateCluster(data);
-    				generateMarker(data,12);
+    				generateMarker(data,11);
     				layer.close(layindex); 
     			}else {
     			}

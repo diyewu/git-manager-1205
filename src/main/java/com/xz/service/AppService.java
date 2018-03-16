@@ -349,91 +349,97 @@ public class AppService implements InitializingBean{
 				researchNo = resultmap.get("research_no")+"";
 				if(StringUtils.isNotBlank(currentKey)){//从第二级开始
 					tempKey = StringUtils.substring(researchNo, 0, levelMap.get(currentLevelInt));
-					zeroStr = StringUtils.substring(researchNo, levelMap.get(currentLevelInt-1), levelMap.get(currentLevelInt));
-					if("00".equals(zeroStr)||"000".equals(zeroStr)){
-						generateCod(tempKey, resultList, cacheKey, (currentLevelInt+1)+"");
+					if(currentLevelInt < 6){
+						zeroStr = StringUtils.substring(researchNo, levelMap.get(currentLevelInt), levelMap.get(currentLevelInt+1));
 					}
-					if(currentLevelInt != 6){//2.3.4.5
-						if(currentKey.equals(tempKey)){//匹配,找下一级
-							nextLevelKey = StringUtils.substring(researchNo, 0, levelMap.get(currentLevelInt+1));
-							id = resultmap.get("id")+"";
-							try {
-								longitudeF = resultmap.get("longitude")==null?0:Double.parseDouble(resultmap.get("longitude")+"");
-								latitudeF = resultmap.get("latitude")==null?0:Double.parseDouble(resultmap.get("latitude")+"");
-							} catch (Exception e) {}
-							if(longitudeF == 0 || latitudeF == 0){
-								continue;
-							}
-							if(areaMap.containsKey(nextLevelKey)){
-								areaBean = areaMap.get(nextLevelKey);
-								areaBean.setTotalLongitude(areaBean.getTotalLongitude()+longitudeF);
-								areaBean.setTotalLatitude(areaBean.getTotalLatitude()+latitudeF);
-								areaBean.setCount(areaBean.getCount()+1);
-								areaBean.setIds(areaBean.getIds()+","+id);
+					if("00".equals(zeroStr)||"000".equals(zeroStr)){
+						return generateCod(tempKey+zeroStr, resultList, cacheKey, (currentLevelInt+1)+"");
+//						return null;
+					}else{
+						if(currentLevelInt != 6){//2.3.4.5
+							if(currentKey.equals(tempKey)){//匹配,找下一级
+								nextLevelKey = StringUtils.substring(researchNo, 0, levelMap.get(currentLevelInt+1));
+								id = resultmap.get("id")+"";
+								try {
+									longitudeF = resultmap.get("longitude")==null?0:Double.parseDouble(resultmap.get("longitude")+"");
+									latitudeF = resultmap.get("latitude")==null?0:Double.parseDouble(resultmap.get("latitude")+"");
+								} catch (Exception e) {}
+								if(longitudeF == 0 || latitudeF == 0){
+									continue;
+								}
+								if(areaMap.containsKey(nextLevelKey)){
+									areaBean = areaMap.get(nextLevelKey);
+									areaBean.setTotalLongitude(areaBean.getTotalLongitude()+longitudeF);
+									areaBean.setTotalLatitude(areaBean.getTotalLatitude()+latitudeF);
+									areaBean.setCount(areaBean.getCount()+1);
+									areaBean.setIds(areaBean.getIds()+","+id);
+								}else{
+									areaBean.setTotalLongitude(longitudeF);
+									areaBean.setTotalLatitude(latitudeF);
+									areaBean.setCount(1);
+									areaBean.setIds(id);
+								}
+								areaMap.put(nextLevelKey, areaBean);
 							}else{
-								areaBean.setTotalLongitude(longitudeF);
-								areaBean.setTotalLatitude(latitudeF);
-								areaBean.setCount(1);
-								areaBean.setIds(id);
-							}
-							areaMap.put(nextLevelKey, areaBean);
-						}else{
-							continue;
-						}
-					}else{//第六级
-						if(currentKey.equals(tempKey)){//匹配,找下一级
-							try {
-								longitudeF = resultmap.get("longitude")==null?0:Double.parseDouble(resultmap.get("longitude")+"");
-								latitudeF = resultmap.get("latitude")==null?0:Double.parseDouble(resultmap.get("latitude")+"");
-							} catch (Exception e) {}
-							if(longitudeF == 0 || latitudeF == 0){
 								continue;
 							}
-							smap = new HashMap<String, Object>();
-							smap.put("key",resultmap.get("question_type") );
-							smap.put("color",resultmap.get("color") );
-							smap.put("currentLevel", currentLevelInt+1);
-							smap.put("nextLevel", "");
-							smap.put("preKey", currentKey);
-							smap.put("preLevel", currentLevelInt);
-							smap.put("cacheKey", cacheKey);
-//							smap.put("text", "问题类型:"+(StringUtils.isBlank(researchNoMap.get(resultmap.get("question_type")))?resultmap.get("question_type"):researchNoMap.get(resultmap.get("question_type"))));
-							smap.put("text", (StringUtils.isBlank(researchNoMap.get(resultmap.get("question_type")))?resultmap.get("question_type"):researchNoMap.get(resultmap.get("question_type"))));
-							smap.put("longitude", longitudeF);
-							smap.put("latitude", latitudeF);
-							smap.put("ids", resultmap.get("id"));
-							smap.put("totalitem", 1);
-							sList.add(smap);
+						}else{//第六级
+							if(currentKey.equals(tempKey)){//匹配,找下一级
+								try {
+									longitudeF = resultmap.get("longitude")==null?0:Double.parseDouble(resultmap.get("longitude")+"");
+									latitudeF = resultmap.get("latitude")==null?0:Double.parseDouble(resultmap.get("latitude")+"");
+								} catch (Exception e) {}
+								if(longitudeF == 0 || latitudeF == 0){
+									continue;
+								}
+								smap = new HashMap<String, Object>();
+								smap.put("key",resultmap.get("question_type") );
+								smap.put("color",resultmap.get("color") );
+								smap.put("currentLevel", currentLevelInt+1);
+								smap.put("nextLevel", "");
+								smap.put("preKey", currentKey);
+								smap.put("preLevel", currentLevelInt);
+								smap.put("cacheKey", cacheKey);
+	//							smap.put("text", "问题类型:"+(StringUtils.isBlank(researchNoMap.get(resultmap.get("question_type")))?resultmap.get("question_type"):researchNoMap.get(resultmap.get("question_type"))));
+								smap.put("text", (StringUtils.isBlank(researchNoMap.get(resultmap.get("question_type")))?resultmap.get("question_type"):researchNoMap.get(resultmap.get("question_type"))));
+								smap.put("longitude", longitudeF);
+								smap.put("latitude", latitudeF);
+								smap.put("ids", resultmap.get("id"));
+								smap.put("totalitem", 1);
+								sList.add(smap);
+							}
 						}
 					}
 				}else{//第一级
 					tempKey = StringUtils.substring(researchNo, 0, levelMap.get(currentLevelInt+1));
 					zeroStr = StringUtils.substring(researchNo, levelMap.get(currentLevelInt), levelMap.get(currentLevelInt+1));
 					if("00".equals(zeroStr)||"000".equals(zeroStr)){
-						tempKey = StringUtils.substring(researchNo, 0, levelMap.get(currentLevelInt+2));
-						generateCod(tempKey, resultList, cacheKey, (currentLevelInt+1)+"");
-					}
-					id = resultmap.get("id")+"";
-					try {
-						longitudeF = resultmap.get("longitude")==null?0:Double.parseDouble(resultmap.get("longitude")+"");
-						latitudeF = resultmap.get("latitude")==null?0:Double.parseDouble(resultmap.get("latitude")+"");
-					} catch (Exception e) {}
-					if(longitudeF == 0 || latitudeF == 0){
-						continue;
-					}
-					if(areaMap.containsKey(tempKey)){
-						areaBean = areaMap.get(tempKey);
-						areaBean.setTotalLongitude(areaBean.getTotalLongitude()+longitudeF);
-						areaBean.setTotalLatitude(areaBean.getTotalLatitude()+latitudeF);
-						areaBean.setCount(areaBean.getCount()+1);
-						areaBean.setIds(areaBean.getIds()+","+id);
+						tempKey = StringUtils.substring(researchNo, 0, levelMap.get(currentLevelInt+1));
+						return generateCod(tempKey, resultList, cacheKey, (currentLevelInt+1)+"");
+//						return null;
 					}else{
-						areaBean.setTotalLongitude(longitudeF);
-						areaBean.setTotalLatitude(latitudeF);
-						areaBean.setCount(1);
-						areaBean.setIds(id);
+						id = resultmap.get("id")+"";
+						try {
+							longitudeF = resultmap.get("longitude")==null?0:Double.parseDouble(resultmap.get("longitude")+"");
+							latitudeF = resultmap.get("latitude")==null?0:Double.parseDouble(resultmap.get("latitude")+"");
+						} catch (Exception e) {}
+						if(longitudeF == 0 || latitudeF == 0){
+							continue;
+						}
+						if(areaMap.containsKey(tempKey)){
+							areaBean = areaMap.get(tempKey);
+							areaBean.setTotalLongitude(areaBean.getTotalLongitude()+longitudeF);
+							areaBean.setTotalLatitude(areaBean.getTotalLatitude()+latitudeF);
+							areaBean.setCount(areaBean.getCount()+1);
+							areaBean.setIds(areaBean.getIds()+","+id);
+						}else{
+							areaBean.setTotalLongitude(longitudeF);
+							areaBean.setTotalLatitude(latitudeF);
+							areaBean.setCount(1);
+							areaBean.setIds(id);
+						}
+						areaMap.put(tempKey, areaBean);
 					}
-					areaMap.put(tempKey, areaBean);
 				}
 			}else{
 				break;
