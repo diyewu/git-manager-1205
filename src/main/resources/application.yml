@@ -71,8 +71,8 @@ logging:
 #custom settings
 custom:
 #     clientFileUpladPath: E:\gistools\img/
-     clientFileUpladPath: /home/gis/temp
-#     clientFileUpladPath: F:\tempfilepath/
+#     clientFileUpladPath: /home/gis/temp
+     clientFileUpladPath: F:\tempfilepath/
 #     clientFileUpladPath: /Users/calvin/Work/Tomcat/temp/
      smtp: smtp.ym.163.com
      port: 25

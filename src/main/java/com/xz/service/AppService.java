@@ -53,6 +53,7 @@ public class AppService implements InitializingBean{
 		levelMap.put(3, 6);
 		levelMap.put(4, 9);
 		levelMap.put(5, 12);
+		levelMap.put(6, 16);
 		
 		lvlMap.put("first_area", "second_area");
 		lvlMap.put("second_area", "third_area");
@@ -346,7 +347,7 @@ public class AppService implements InitializingBean{
 				researchNo = resultmap.get("research_no")+"";
 				if(StringUtils.isNotBlank(currentKey)){//从第二级开始
 					tempKey = StringUtils.substring(researchNo, 0, levelMap.get(currentLevelInt));
-					if(currentLevelInt != 5){//2.3.4
+					if(currentLevelInt != 6){//2.3.4.5
 						if(currentKey.equals(tempKey)){//匹配,找下一级
 							nextLevelKey = StringUtils.substring(researchNo, 0, levelMap.get(currentLevelInt+1));
 							id = resultmap.get("id")+"";
@@ -373,7 +374,7 @@ public class AppService implements InitializingBean{
 						}else{
 							continue;
 						}
-					}else{//第五级
+					}else{//第六级
 						if(currentKey.equals(tempKey)){//匹配,找下一级
 							try {
 								longitudeF = resultmap.get("longitude")==null?0:Double.parseDouble(resultmap.get("longitude")+"");
@@ -427,7 +428,7 @@ public class AppService implements InitializingBean{
 				break;
 			}
 		}
-		if(currentLevelInt != 5){
+		if(currentLevelInt != 6){
 			if(areaMap != null && !areaMap.isEmpty()){
 				Map<String,Object> sMap = new HashMap<String, Object>();
 				for (Map.Entry<String,AreaBean> entry : areaMap.entrySet()) {
@@ -459,7 +460,7 @@ public class AppService implements InitializingBean{
 //			System.out.println(sList);
 		}
 		
-		if(currentLevelInt == 5){
+		if(currentLevelInt == 6){
 			if(sList != null && sList.size()>0){
 				Map<String,Object> tempMap = new HashMap<String, Object>();
 				Map<String,Object> tempMap1 = new HashMap<String, Object>();

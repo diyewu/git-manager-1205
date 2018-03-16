@@ -200,13 +200,6 @@
     	_level = level;
     	for (var i in array) {
     		pt = new BMap.Point(array[i].longitude , array[i].latitude);
-			if(k == 0){
-				if(array[i].nextLevel){
-					map.centerAndZoom(pt, level);
-				}else{
-					map.centerAndZoom(pt, 17);
-				}
-			}
 //    	   var marker = new BMap.Marker(pt);
     	   var mouseoverTxt = array[i].text + " 共" + array[i].totalitem + "条问题点" ;
 //    	   var tcolor = "rgba(0,153,51, 0.9)";
@@ -214,6 +207,16 @@
     	   if(array[i].color){
     		   tcolor = array[i].color;
     	   }
+    	   if(k == 0){
+				map.centerAndZoom(pt, level);
+				/*
+				if(array[i].nextLevel){
+					map.centerAndZoom(pt, level);
+				}else{
+					map.centerAndZoom(pt, 18);
+				}
+				*/
+			}
     	   var myCompOverlay = new ComplexCustomOverlay(pt, array[i].text,mouseoverTxt,tcolor,"rgba(254,116,66, 0.8)");
     	   divIdIndex++;
     	   map.addOverlay(myCompOverlay);
@@ -226,7 +229,7 @@
 	       		var nextLevel = array[i].nextLevel;
 	       		var ids = array[i].ids;
 	       		myCompOverlay.addEventListener("click", function(){
-	       			if(currentLevel != '6'){
+	       			if(currentLevel != '7'){
 	       				$(".item-wrap").empty();
 	       				$('#finditemlength').html(0);
 	       				if ($('.expander').hasClass("fadeOut")) {
@@ -240,7 +243,7 @@
 	       				showInfo(ids);
 	       			}
 	       		});
-          })();  
+          })();
     	   k++;
     	}
 	}
@@ -288,13 +291,6 @@
 				var data = result.data;
 				if(data){
 					_key = data[0].preKey;
-					_currentLevel = data[0].preLevel;
-					generateMarker(data,level-1);
-					var ids ="";
-					for (var i in data) {
-						ids = ids + data[i].ids+",";
-					}
-					showInfo(ids);
 					if(!_key){
 						if ($('.expander').hasClass("fadeOut")) {
 							$('#autoShowList').trigger("click");
@@ -302,6 +298,20 @@
 						$(".item-wrap").empty();
 						$('#finditemlength').html(0);
 					}
+					_currentLevel = data[0].preLevel;
+					generateMarker(data,level-1);
+					var ids ="";
+					for (var i in data) {
+						ids = ids + data[i].ids+",";
+					}
+					showInfo(ids);
+//					if(!_key){
+//						if ($('.expander').hasClass("fadeOut")) {
+//							$('#autoShowList').trigger("click");
+//						}
+//						$(".item-wrap").empty();
+//						$('#finditemlength').html(0);
+//					}
 				}
 			}else {
 				
@@ -893,10 +903,6 @@ function generateRightItem(title,subhead,imgSrc,imgThumbSrc,detail1,detail2,deta
 
 
 function turnback(){
-//	if ($('#autoShowList').hasClass("fadeOut")) {
-//		$('#autoShowList').trigger("click");
-//	}
-
 	if(!_key){
 		return null;
 	}else{
