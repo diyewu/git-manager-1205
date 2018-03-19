@@ -10,13 +10,6 @@ public class MainTest {
 	public static void main(String[] args) {
 		splitTest();
 	}
-	
-	
-	
-	public static void subtest(){
-		String a = "0001020010010001PP";
-		
-	}
 	public static void formatTest(){
 		DecimalFormat df = new DecimalFormat("#.00000");
 		double longitudeF = 121.411;

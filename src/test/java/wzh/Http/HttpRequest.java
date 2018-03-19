@@ -16,7 +16,7 @@ public class HttpRequest {
 //        System.out.println(s);
         
         //发送 POST 请求  	login	getMenu	getMapInfo	getCoordinateInfo  getNextMapInfoByKey 	getPreMapInfoByKey
-        String sr=HttpRequest.sendPost("http://localhost:8095/gismgr/app/login/", 
+        String sr=HttpRequest.sendPost("http://localhost:8085/gismgr/app/getPreMapInfoByKey/", 
         		"userName=admin&userPwd=admin&"
         		+ "jsonIds=[{\"attributes\": [{\"attribute_id\": \"00151520636359000004005056c00001\",\"conditions\": [{\"condition_id\": \"1655\"},{\"condition_id\": \"1656\"}]},{\"attribute_id\": \"00151520636359500012005056c00001\",\"conditions\": [{\"condition_id\": \"1647\"},{\"condition_id\": \"1648\"}]}],\"project_id\": \"00151520636358600000005056c00001\"}]"
         		+ "&key=0709&cacheKey=1f460db1fc5f47e9afc6a332f7a6d230&currentLevel=2"
