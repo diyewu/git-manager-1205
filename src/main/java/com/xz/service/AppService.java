@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.regex.Pattern;
 
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.InitializingBean;
@@ -342,11 +343,22 @@ public class AppService implements InitializingBean{
 		String nextLevelKey = "";
 		String id = "";
 		String zeroStr = "";
+		String projectCode = "";
 		for (int i = 0; i < resultList.size(); i++) {
 			areaBean = new AreaBean();
 			resultmap = resultList.get(i);
 			if(resultmap.containsKey("research_no")){
 				researchNo = resultmap.get("research_no")+"";
+				if (i == 0) {
+					try {
+						projectCode = researchNo.substring(researchNo.length() - 2, researchNo.length());
+						if(isInteger(projectCode)){
+							projectCode = "";
+						}
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
 				if(StringUtils.isNotBlank(currentKey)){//从第二级开始
 					tempKey = StringUtils.substring(researchNo, 0, levelMap.get(currentLevelInt));
 					if(currentLevelInt < 6){
@@ -464,7 +476,7 @@ public class AppService implements InitializingBean{
 						sMap.put("preLevel", 0);
 					}
 					sMap.put("cacheKey", cacheKey);
-					sMap.put("text", (StringUtils.isBlank(researchNoMap.get(entry.getKey()))?entry.getKey():researchNoMap.get(entry.getKey())));
+					sMap.put("text", (StringUtils.isBlank(researchNoMap.get(entry.getKey()+projectCode))?(entry.getKey()+projectCode):researchNoMap.get(entry.getKey()+projectCode)));
 					sMap.put("longitude", areaBean.getTotalLongitude()/areaBean.getCount());
 					sMap.put("latitude", areaBean.getTotalLatitude()/areaBean.getCount());
 					sMap.put("ids", areaBean.getIds());
@@ -531,6 +543,11 @@ public class AppService implements InitializingBean{
 		System.out.println(sList);
 		return sList;
 	}
+	
+	public static boolean isInteger(String str) {  
+        Pattern pattern = Pattern.compile("^[-\\+]?[\\d]*$");  
+        return pattern.matcher(str).matches();  
+  }
 	public List<Map<String, Object>> turnback(String cacheKey,String key,String currentLevel){
 //		List<Map<String, Object>> resultList = cacheMap.get(cacheKey);
 		List<Map<String, Object>> resultList = (List<Map<String, Object>>)AgingCache.getCacheInfo(cacheKey).getValue();
