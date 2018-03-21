@@ -693,7 +693,7 @@ public class ProjectServices {
 				String searchNo = "";
 				String searchName = "";
 				String sql = " INSERT into project_searchno_dictionary(search_no,search_name,create_date,update_date)VALUES(?,?,NOW(),NOW()) ";
-				String checkSql = " select * from project_searchno_dictionary where search_no = ? or search_name = ? ";
+				String checkSql = " select * from project_searchno_dictionary where search_no = ? and search_name = ? ";
 				List<Map<String, Object>> checkList = new ArrayList<Map<String,Object>>();
 				boolean allnull = true;
 				for(int i=1;i<list.size();i++){

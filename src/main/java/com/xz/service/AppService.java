@@ -499,6 +499,7 @@ public class AppService implements InitializingBean{
 				String text = "";
 				String stext = "";
 				String ids = "";
+				String ttext ="";
 				
 				for (int i = 0; i < sList.size(); i++) {
 					stext = "";
@@ -516,7 +517,15 @@ public class AppService implements InitializingBean{
 						stext =tempMap2.get("text")+"";
 //						tempMap.put("text", tempMap2.get("text")+","+text);
 //						tempMap.put("text", (stext.contains("问题类型：")?"":"问题类型：")+(stext.contains(text)?stext:stext+","+text));
-						tempMap.put("text", stext.contains(text)?stext:stext+","+text);
+//						ttext = StringUtils.isNotBlank(stext)&&stext.contains(text)?stext:stext+","+text;
+						if(StringUtils.isNotBlank(stext) && StringUtils.isNotBlank(text)){
+							if(stext.contains(text)){
+								ttext = stext;
+							}else{
+								ttext = stext+","+text;
+							}
+						}
+						tempMap.put("text", ttext);
 						tempMap.put("ids", tempMap2.get("ids")+","+ids);
 						tempMap.put("totalitem", (Integer.parseInt(tempMap2.get("totalitem")+""))+1);
 						tempMap1.put(longitude+latitude, tempMap);
