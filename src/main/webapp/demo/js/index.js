@@ -8,7 +8,9 @@
 	var _ids;
 	var divIdIndex = 0;
 	var viewer ;
+	var hasSelect = false;
 	$(document).ready(function() { 
+//		console.log(vm.cascaderData);
 		// 百度地图API功能
 		initMap();
     	//===================
@@ -299,19 +301,20 @@
 						$('#finditemlength').html(0);
 					}
 					_currentLevel = data[0].preLevel;
-					generateMarker(data,level-1);
-					var ids ="";
-					for (var i in data) {
-						ids = ids + data[i].ids+",";
+					if(_currentLevel == 0){
+						if(!hasSelect){
+							initProjectMarker();
+						}else{
+							getMapInfoBySelectDetail();
+						}
+					}else{
+						generateMarker(data,level-1);
+						var ids ="";
+						for (var i in data) {
+							ids = ids + data[i].ids+",";
+						}
+						showInfo(ids);
 					}
-					showInfo(ids);
-//					if(!_key){
-//						if ($('.expander').hasClass("fadeOut")) {
-//							$('#autoShowList').trigger("click");
-//						}
-//						$(".item-wrap").empty();
-//						$('#finditemlength').html(0);
-//					}
 				}
 			}else {
 				
@@ -520,32 +523,7 @@ var vm = new Vue({
         show:false,
         selectedIndex:[],//最终结果的数组
       //三级联动数据
-        cascaderData:[{
-    		"checked":false,
-    		"children":[
-    			{
-    				"checked":false,
-    				"children":[
-    					{
-    						"checked":false,
-    						"children":null,
-    						"id":"2048",
-    						"leaf":true,
-    						"menu_name":"吴秋明",
-    						"parent_id":"00151382364464901262005056c00001"
-    					}
-    				],
-    				"id":"00151382364464901262005056c00001",
-    				"leaf":false,
-    				"menu_name":"检查人员",
-    				"parent_id":"00151382364464001251005056c00001"
-    			}
-    		],
-    		"id":"00151382364464001251005056c00001",
-    		"leaf":false,
-    		"menu_name":"2017年10月上海城管小区问题清单",
-    		"parent_id":null
-    	}]
+        cascaderData:[]
         
     },
     mounted() {
@@ -558,9 +536,11 @@ var vm = new Vue({
     	cascadeClose :function(){//联动关闭
 //    		console.log(JSON.stringify(this.cascaderData));
     		//loading层
-    		var layindex = layer.load(1, {
-    		  shade: [0.8,'#fff'] //0.1透明度的白色背景
-    		});
+//    		var layindex = layer.load(1, {
+//    		  shade: [0.8,'#fff'] //0.1透明度的白色背景
+//    		});
+    		getMapInfoBySelectDetail();
+    		/*
     		var jsonparam = JSON.stringify(this.cascaderData);
             this.cascaderStatus = false;
             this.firstIndex = '';
@@ -581,7 +561,7 @@ var vm = new Vue({
     			}else {
     			}
     		},'json');
-            
+            */
         },
         
         cascadeOpen: function(){//联动打开
@@ -764,6 +744,33 @@ var vm = new Vue({
     }
 })
 
+function getMapInfoBySelectDetail(){
+	hasSelect = true;
+	var layindex = layer.load(1, {
+	  shade: [0.8,'#fff'] //0.1透明度的白色背景
+	});
+	var jsonparam = JSON.stringify(vm.cascaderData);
+	vm.cascaderStatus = false;
+	vm.firstIndex = '';
+	vm.secondIndex = '';
+    $.post(path+"/webctrl/getMapInfo/", 
+	{
+    	jsonIds:jsonparam
+	},
+	function(result){
+//		console.log(result);
+		if(result.success == true){//登陆成功
+			//TODO 解析坐标点到地图上
+			var data = result.data;
+//			initMap();
+//			generateCluster(data);
+			generateMarker(data,11);
+			layer.close(layindex); 
+		}else {
+		}
+	},'json');
+}
+
 function showDetail(title,subhead,imgSrc,detail1,detail2,detail3,detail4,detail5,detail6){
 	$("#detailimg").attr("src",imgSrc);
 	$("#detailtitle").html(title);
@@ -903,13 +910,22 @@ function generateRightItem(title,subhead,imgSrc,imgThumbSrc,detail1,detail2,deta
 
 
 function turnback(){
+//	console.log(vm.cascaderData);
 	if(!_key){
 		return null;
 	}else{
-		showPreLevel(_level, _key, _cacheKey, _currentLevel);
+		console.log("_currentLevel="+_currentLevel);
+		if(_currentLevel >1){
+			showPreLevel(_level, _key, _cacheKey, _currentLevel);
+		}else{//返回到第一级时，改为初始化
+			if(!hasSelect){
+				initProjectMarker();
+			}else{
+				getMapInfoBySelectDetail();
+			}
+		}
 	}
 }
-
 
 
 function changelabel(e){

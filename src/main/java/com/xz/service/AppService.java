@@ -566,11 +566,16 @@ public class AppService implements InitializingBean{
 		int fatherLvl = currentLevelInt - 1;
 		String tempKey = "";
 		String researchNo = "";
+		String zeroStr = "";
 		for(int i=0;i<resultList.size();i++){
 			map = resultList.get(i);
 			researchNo = map.get("research_no")+"";
 			tempKey = StringUtils.substring(researchNo, 0, levelMap.get(currentLevelInt));
 			if(key.equals(tempKey)){
+				zeroStr = StringUtils.substring(researchNo, levelMap.get(fatherLvl), levelMap.get(currentLevelInt));
+				if("00".equals(zeroStr) || "000".equals(zeroStr)){
+					return turnback(cacheKey, tempKey.substring(0, tempKey.length()-zeroStr.length()), (currentLevelInt-1)+"");
+				}
 				if(fatherLvl != 0){
 					fatherKey = StringUtils.substring(researchNo, 0, levelMap.get(fatherLvl));
 				}else{
