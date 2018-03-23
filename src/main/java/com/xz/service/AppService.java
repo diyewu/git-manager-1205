@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.regex.Pattern;
 
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.InitializingBean;
@@ -342,13 +343,26 @@ public class AppService implements InitializingBean{
 		String nextLevelKey = "";
 		String id = "";
 		String zeroStr = "";
+		String projectCode = "";
 		for (int i = 0; i < resultList.size(); i++) {
 			areaBean = new AreaBean();
 			resultmap = resultList.get(i);
 			if(resultmap.containsKey("research_no")){
 				researchNo = resultmap.get("research_no")+"";
+				if (i == 0) {
+					try {
+						projectCode = researchNo.substring(researchNo.length() - 2, researchNo.length());
+						if(isInteger(projectCode)){
+							projectCode = "";
+						}
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
 				if(StringUtils.isNotBlank(currentKey)){//从第二级开始
 					tempKey = StringUtils.substring(researchNo, 0, levelMap.get(currentLevelInt));
+					if(!currentKey.equals(tempKey))
+						continue;
 					if(currentLevelInt < 6){
 						zeroStr = StringUtils.substring(researchNo, levelMap.get(currentLevelInt), levelMap.get(currentLevelInt+1));
 					}
@@ -464,7 +478,7 @@ public class AppService implements InitializingBean{
 						sMap.put("preLevel", 0);
 					}
 					sMap.put("cacheKey", cacheKey);
-					sMap.put("text", (StringUtils.isBlank(researchNoMap.get(entry.getKey()))?entry.getKey():researchNoMap.get(entry.getKey())));
+					sMap.put("text", (StringUtils.isBlank(researchNoMap.get(entry.getKey()+projectCode))?(entry.getKey()+projectCode):researchNoMap.get(entry.getKey()+projectCode)));
 					sMap.put("longitude", areaBean.getTotalLongitude()/areaBean.getCount());
 					sMap.put("latitude", areaBean.getTotalLatitude()/areaBean.getCount());
 					sMap.put("ids", areaBean.getIds());
@@ -487,6 +501,7 @@ public class AppService implements InitializingBean{
 				String text = "";
 				String stext = "";
 				String ids = "";
+				String ttext ="";
 				
 				for (int i = 0; i < sList.size(); i++) {
 					stext = "";
@@ -504,7 +519,15 @@ public class AppService implements InitializingBean{
 						stext =tempMap2.get("text")+"";
 //						tempMap.put("text", tempMap2.get("text")+","+text);
 //						tempMap.put("text", (stext.contains("问题类型：")?"":"问题类型：")+(stext.contains(text)?stext:stext+","+text));
-						tempMap.put("text", stext.contains(text)?stext:stext+","+text);
+//						ttext = StringUtils.isNotBlank(stext)&&stext.contains(text)?stext:stext+","+text;
+						if(StringUtils.isNotBlank(stext) && StringUtils.isNotBlank(text)){
+							if(stext.contains(text)){
+								ttext = stext;
+							}else{
+								ttext = stext+","+text;
+							}
+						}
+						tempMap.put("text", ttext);
 						tempMap.put("ids", tempMap2.get("ids")+","+ids);
 						tempMap.put("totalitem", (Integer.parseInt(tempMap2.get("totalitem")+""))+1);
 						tempMap1.put(longitude+latitude, tempMap);
@@ -531,6 +554,11 @@ public class AppService implements InitializingBean{
 		System.out.println(sList);
 		return sList;
 	}
+	
+	public static boolean isInteger(String str) {  
+        Pattern pattern = Pattern.compile("^[-\\+]?[\\d]*$");  
+        return pattern.matcher(str).matches();  
+  }
 	public List<Map<String, Object>> turnback(String cacheKey,String key,String currentLevel){
 //		List<Map<String, Object>> resultList = cacheMap.get(cacheKey);
 		List<Map<String, Object>> resultList = (List<Map<String, Object>>)AgingCache.getCacheInfo(cacheKey).getValue();
@@ -540,11 +568,16 @@ public class AppService implements InitializingBean{
 		int fatherLvl = currentLevelInt - 1;
 		String tempKey = "";
 		String researchNo = "";
+		String zeroStr = "";
 		for(int i=0;i<resultList.size();i++){
 			map = resultList.get(i);
 			researchNo = map.get("research_no")+"";
 			tempKey = StringUtils.substring(researchNo, 0, levelMap.get(currentLevelInt));
 			if(key.equals(tempKey)){
+				zeroStr = StringUtils.substring(researchNo, levelMap.get(fatherLvl), levelMap.get(currentLevelInt));
+				if("00".equals(zeroStr) || "000".equals(zeroStr)){
+					return turnback(cacheKey, tempKey.substring(0, tempKey.length()-zeroStr.length()), (currentLevelInt-1)+"");
+				}
 				if(fatherLvl != 0){
 					fatherKey = StringUtils.substring(researchNo, 0, levelMap.get(fatherLvl));
 				}else{
@@ -816,7 +849,8 @@ public class AppService implements InitializingBean{
 	
 	
 	public List<Map<String, Object>> getCoordinateInfo(String detailId){
-		String attrSql = " SELECT pa.id, pat.alias_name, pa.attribute_index, pa.attribute_name FROM project_attribute_type pat LEFT JOIN ( SELECT * FROM project_attribute WHERE project_id = ( SELECT project_id FROM project_detail WHERE id = ? )) pa ON pa.attribute_info_type = pat.id WHERE pat.type = 1 and pa.id is not null ORDER BY alias_name ";
+//		String attrSql = " SELECT pa.id, pat.alias_name, pa.attribute_index, pa.attribute_name FROM project_attribute_type pat LEFT JOIN ( SELECT * FROM project_attribute WHERE project_id = ( SELECT project_id FROM project_detail WHERE id = ? )) pa ON pa.attribute_info_type = pat.id WHERE pat.type = 1 and pa.id is not null ORDER BY alias_name ";
+		String attrSql = " SELECT pa.id, pat.alias_name, pa.attribute_index, pa.attribute_name FROM ( SELECT * FROM project_attribute_type WHERE type = 1 and alias_name is not null) pat LEFT JOIN ( SELECT * FROM project_attribute WHERE project_id = ( SELECT project_id FROM project_detail WHERE id = ? ) AND id IS NOT NULL ) pa ON pa.attribute_info_type = pat.id WHERE 1 = 1 ORDER BY alias_name ";
 		List<Map<String, Object>> list = jdbcTemplate.queryForList(attrSql, detailId);
 		if(list == null || list.size()==0){
 			return null;

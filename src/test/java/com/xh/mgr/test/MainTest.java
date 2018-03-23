@@ -10,6 +10,9 @@ public class MainTest {
 	public static void main(String[] args) {
 		splitTest();
 	}
+	
+	
+	
 	public static void formatTest(){
 		DecimalFormat df = new DecimalFormat("#.00000");
 		double longitudeF = 121.411;
@@ -20,8 +23,14 @@ public class MainTest {
 	}
 	
 	public static void splitTest(){
-		String s = "F:\\tempfilepath\\20180110\\1515577741795201612\\201611\\照片 (3).jpg";
-		System.out.println(StringUtils.split(s, ".")[0]);
+//		String s = "310000000000";
+//		String zero = "00";
+//		String resp = s.substring(0, s.length()-zero.length());
+//		System.out.println(resp);
+		String s = "3100000000000013BZ";
+		int a =12;
+		int b =16;
+		
 	}
 	public static void listTest(){
 		List<String> list = new ArrayList<String>();
