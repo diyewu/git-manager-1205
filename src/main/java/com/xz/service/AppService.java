@@ -361,6 +361,8 @@ public class AppService implements InitializingBean{
 				}
 				if(StringUtils.isNotBlank(currentKey)){//从第二级开始
 					tempKey = StringUtils.substring(researchNo, 0, levelMap.get(currentLevelInt));
+					if(!currentKey.equals(tempKey))
+						continue;
 					if(currentLevelInt < 6){
 						zeroStr = StringUtils.substring(researchNo, levelMap.get(currentLevelInt), levelMap.get(currentLevelInt+1));
 					}
