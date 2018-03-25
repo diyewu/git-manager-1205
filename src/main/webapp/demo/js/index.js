@@ -113,6 +113,22 @@
 //                content: '<div><img src="../demo/img/20180116230158.png" width="100%" height="100%"/></div>'
 //            });
         	window.location= path+"/demo/app/gisapp.apk";
+//        	$(".modal-suspend").show();
+//        	$("#imgbox").show(300);
+//        	var w = $("#imgbox").width();
+//        	var h = $("#imgbox img").height();
+//        	layer.open({
+//    	        type: 1,
+//    	        title: false,
+//    	        closeBtn: 0,
+//    	        skin:'touming',
+//    	        area: [w,h],
+//    	        shadeClose: true,
+//    	        scrollbar: false, 
+//    	        content: $("#imgbox")
+//    	    });
+        	
+        	
         });
         var tipindex;
         $(".go-to-list").mouseenter(function(){
@@ -771,6 +787,7 @@ function getMapInfoBySelectDetail(){
 	},'json');
 }
 
+/*
 function showDetail(title,subhead,imgSrc,detail1,detail2,detail3,detail4,detail5,detail6){
 	$("#detailimg").attr("src",imgSrc);
 	$("#detailtitle").html(title);
@@ -793,6 +810,7 @@ function showDetail(title,subhead,imgSrc,detail1,detail2,detail3,detail4,detail5
 	if("null：null" != detail6&& "undefined：undefined"!= detail6){
 		$("#detailitem6").html(detail6);
 	}
+//	$('#imgbox').removeClass("hide");
     layer.open({
         type: 1,
         title: false,
@@ -800,9 +818,74 @@ function showDetail(title,subhead,imgSrc,detail1,detail2,detail3,detail4,detail5
         area: ['40rem', '32rem'],
         shadeClose: true,
         scrollbar: false, 
-        content: $('.detail')
+        content: $('#imgbox')
     });
 }
+*/
+
+function showDetail(title,subhead,imgSrc,detail1,detail2,detail3,detail4,detail5,detail6){
+	clearBoxImg();
+	var htm = "<li class=\"feature\"><span class=\"label\"></span><span class=\"desc\">#detail</span></li>";
+	$("#boximage").attr("src",imgSrc);
+	$("#boximagehide").attr("src",imgSrc);
+	$("#boximagehide").show();
+	$("#download").attr("href",imgSrc);
+	$("#download").attr("download",title+".jpg");
+	
+//	$("#boximage").load(function(){
+//		console.log($(this).width());    
+//		console.log($(this).width());    
+//	});
+
+
+	$(".box-title").html(title);
+//	$("#detailsubhead").html(subhead);
+	
+	if("null：null" != detail1 && "undefined：undefined"!= detail1){
+		$(".box-content").append(htm.replace("#detail", detail1));
+	}
+	if("null：null" != detail2 && "undefined：undefined"!= detail2){
+		$(".box-content").append(htm.replace("#detail", detail2));
+	}
+	if("null：null" != detail3 && "undefined：undefined"!= detail3){
+		$(".box-content").append(htm.replace("#detail", detail3));
+	}
+	if("null：null" != detail4 && "undefined：undefined"!= detail4){
+		$(".box-content").append(htm.replace("#detail", detail4));
+	}
+	if("null：null" != detail5 && "undefined：undefined"!= detail5){
+		$(".box-content").append(htm.replace("#detail", detail5));
+	}
+	if("null：null" != detail6&& "undefined：undefined"!= detail6){
+		$(".box-content").append(htm.replace("#detail", detail6));
+	}
+	
+	$("#boximagehide")[0].onload=function(){
+		var that = this;
+		console.log($(that)[0].offsetWidth);
+		$(".imgbox").css("width", $(that)[0].offsetWidth);
+		$("#boximagehide").hide();
+		$(".modal-suspend").show();
+		$("#imgbox").show(300);
+		if($(".imgtext").is(":hidden")){
+	          //当前是hide状态
+			$(".imgtext").slideToggle(100);
+	    }else{
+	        //当前是show状态
+	    }
+	}
+//	showImg();
+//	document.getElementById('boximage').onload=function(){
+//        // 加载完成 
+//		console.log($(this));
+//		console.log($(this)["0"].clientWidth);
+//		
+//		$(".imgbox").css("width", this.width);
+//		$(".modal-suspend").show();
+//		$("#imgbox").show(300);
+//	};
+}
+
 
 var detailData = null;
 var detailIndex = 0;
@@ -930,4 +1013,23 @@ function turnback(){
 
 function changelabel(e){
 	e.stopPropagation;
+}
+
+
+function showImg(w){
+	const width = $(".imgbox img").width();
+//	console.log(w);
+	$(".imgbox").css("width", width);
+	$(".modal-suspend").show();
+	$("#imgbox").show(300);
+}
+function hideImg(){
+	$(".modal-suspend").hide();
+	$("#imgbox").hide(300);
+}
+
+function clearBoxImg(){
+	$("#boximage").attr("src","");
+	$(".box-title").html("");
+	$(".box-content").empty();
 }

@@ -26,15 +26,13 @@ String showName = realName == null?loginName:realName;
 <script src="plugins/layer/layer.js"></script>
 <script src="js/common.js"></script>
 <link rel="stylesheet" href="css/index.css">
+<link rel="stylesheet" href="css/style-box.css">
 <link rel="stylesheet" href="css/checkbox.css">
 <link rel="stylesheet" href="css/index_cascade.css">
-<link rel="stylesheet" type="text/css"
-	href="plugins/earthmap/css/demo.css" />
-<link rel="stylesheet" type="text/css"
-	href="plugins/earthmap/css/layerown.css" />
+<link rel="stylesheet" type="text/css" href="plugins/earthmap/css/demo.css" />
+<link rel="stylesheet" type="text/css" href="plugins/earthmap/css/layerown.css" />
 <script type="text/javascript" src="plugins/earthmap/js/layerown.js"></script>
-<link rel="stylesheet" type="text/css"
-	href="plugins/earthmap/css/component.css" />
+<link rel="stylesheet" type="text/css" href="plugins/earthmap/css/component.css" />
 <link rel="stylesheet" type="text/css" href="plugins/slider/slider.css" />
 <!-- <link rel="stylesheet" type="text/css" href="css/loader.css"> -->
 
@@ -52,6 +50,70 @@ String showName = realName == null?loginName:realName;
     var path = "<%=path%>";
     var basePath = "<%=basePath%>";
     var showName = "<%=showName%>";
+	$(document).ready(function() {
+		var clientHeight = $(window).height();
+		$("#boximage").height(clientHeight*0.75);
+		$("#boximagehide").height(clientHeight*0.75);
+	
+		$(".modal-suspend").hide();
+		$(".modal-suspend").click(function(){
+			$(this).hide();
+			$("#imgbox").hide(800);
+		});
+		//$(".imgtext").hide();
+		$(".imgbox").hover(function() {
+			//$(".imgtext").slideToggle(500);
+		});
+		$("#imgbox img").click(function(){
+			$(".imgtext").slideToggle(500);
+		});
+		$(".fa.fa-download").click(function(){
+			$(".imgtext").slideToggle(500);
+		})
+		$(".fa.fa-close").click(function(){
+			hideImg();
+		})
+		/*
+		const width = $(".imgbox img").width();
+		console.log(width);
+		$(".imgbox").css("width", width);
+		*/
+
+		let zoom_n = 1;
+		$('#zoom-out').click(() => {
+			zoom_n += 0.1;
+			$('#imgbox').css({
+				"transform" : "scale(" + zoom_n + ")",
+				"-moz-transform" : "scale(" + zoom_n + ")",
+				"-ms-transform" : "scale(" + zoom_n + ")",
+				"-o-transform" : "scale(" + zoom_n + ")",
+				"-webkit-transform" : "scale(" + zoom_n + ")"
+			})
+		});
+		$("#zoom-in").click(() => {
+			zoom_n -= 0.1;
+			zoom_n = zoom_n <= 0.1 ? 0.1 : zoom_n;
+			$("#imgbox").css({
+				"transform" : "scale(" + zoom_n + ")",
+				"-moz-transform" : "scale(" + zoom_n + ")",
+				"-ms-transform" : "scale(" + zoom_n + ")",
+				"-o-transform" : "scale(" + zoom_n + ")",
+				"-webkit-transform" : "scale(" + zoom_n + ")"
+			});
+		});
+		var spin_n = 0;
+		$("#rotate-right").click(() => {
+			spin_n += 90;
+			$("#imgbox img").css({
+				"transform" : "rotate(" + spin_n + "deg)",
+				"-moz-transform" : "rotate(" + spin_n + "deg)",
+				"-ms-transform" : "rotate(" + spin_n + "deg)",
+				"-o-transform" : "rotate(" + spin_n + "deg)",
+				"-webkit-transform" : "rotate(" + spin_n + "deg)"
+			});
+		});
+		$("#imgbox").hide();
+	});
 </script>
 <style type="text/css">
 
@@ -201,6 +263,7 @@ String showName = realName == null?loginName:realName;
 					<div class="loadmore" onClick="showNextPageInfo();">已加载全部</div>
 				</div>
 			</div>
+			<!--
 			<div class="detail" style="display:none;overflow:hidden;">
 				<div class="imgBox">
 					<img id='detailimg' style="width:100%;height:100%;"
@@ -226,12 +289,39 @@ String showName = realName == null?loginName:realName;
 					</div>
 				</div>
 			</div>
+			-->
+	
+				<img id="boximagehide" src="" style="display:none;overflow:hidden;z-index:-9999">
+			<div id="imgbox" class="imgbox box-container">
+				<img id="boximage" src="" height="">
+				<!--<img src="img/shu2.jpg" height="500px">-->
+				<div class="imgtext">
+					<div class="box-title"></div>
+					<div class="toolbar">
+						<i class="fa fa-search-plus" aria-hidden="true" id="zoom-out"></i>
+						<i class="fa fa-search-minus" aria-hidden="true" id="zoom-in"></i>
+						<i class="fa fa-repeat" aria-hidden="true" id="rotate-right"></i>
+						<a class="fa fa-cloud-download" aria-hidden="true" id="download" href="" download=""></a>
+						<i class="fa fa-download" aria-hidden="true" id="boxtextclose"></i>
+						<i class="fa fa-close" aria-hidden="true" id="imgboxclose"></i>
+					</div>
+					<ul class="box-content">
+						<!-- 
+						<li class="feature"><span class="label"></span>	<span class="desc"></span></li>
+						 -->
+					</ul>
+				</div>
+			</div>
+
+
+
 		</div>
+		<div class="modal-suspend" style="width: 10000px; height: 200000px; opacity: 0.3; display: none;"></div>
 </body>
 <script src="js/viewer.min.js"></script>
 <script src="js/vue.min.js"></script>
 <script src="plugins/earthmap/js/classie.js"></script>
 <script src="plugins/slider/wySilder.min.js" type="text/javascript"></script>
-<script src="js/index.js"></script>
+<script src="js/index.js?t=new Date()"></script>
 
 </html>

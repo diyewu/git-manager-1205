@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -400,6 +401,62 @@ public class AppController extends BaseController{
 				}
 			}
         }
+//        operateHistoryService.insertOH(request, "32", ServerResult.getCodeMsg(code, msg), "success".equals(msg)?1:0, 2);
+	}
+	/**
+	 * APP 根据详细信息ID获取图片信息
+	 * @param request
+	 * @param response
+	 */
+	@RequestMapping("getImgBydetailIdIo")
+	@ResponseBody
+	public void getImgBydetailIdIo(HttpServletRequest request,HttpServletResponse response){
+		response.setHeader("Pragma", "No-cache"); 
+		response.setHeader("Cache-Control", "no-cache"); 
+		response.setDateHeader("Expires", 0); 
+		response.setContentType("image/jpeg"); 
+		String detailId = request.getParameter("id");
+		String type = request.getParameter("type");
+		if(StringUtils.isBlank(detailId)){
+			return;
+		}
+		List<Map<String, Object>> list = appService.getImgPath(detailId);
+		File imgfile = null;
+		if(list != null && list.size()>0){
+			String path = list.get(0).get("img_path")==null?"":list.get(0).get("img_path")+"";
+			if(StringUtils.isNotBlank(path)){
+				if("thumb".equals(type)){
+					String[] imgs = StringUtils.split(path, ".");
+					imgfile = new File(imgs[0]+"_thumb."+imgs[1]);
+				}else{
+					imgfile = new File(path);
+				}
+			}
+		}
+		if(imgfile != null){
+			OutputStream os = null;
+			FileInputStream fos = null;
+			try {
+				os = response.getOutputStream();
+				byte[] buffer = new byte[2048];
+				fos = new FileInputStream(imgfile.getPath());// 打开图片文件
+				int count;
+				while ((count = fos.read(buffer)) > 0) {
+					os.write(buffer, 0, count);
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			} finally{
+				try {
+					if (os != null)
+						os.close();
+					if (fos != null)
+						fos.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
 //        operateHistoryService.insertOH(request, "32", ServerResult.getCodeMsg(code, msg), "success".equals(msg)?1:0, 2);
 	}
 	
