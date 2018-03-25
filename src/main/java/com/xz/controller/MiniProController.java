@@ -108,7 +108,7 @@ public class MiniProController extends BaseController{
 		//绑定微信
 		String wxcode = request.getParameter("code");
 		String randomkey = request.getParameter("randomkey");
-		System.out.println("wxcode="+wxcode);
+//		System.out.println("wxcode="+wxcode);
 		if(StringUtils.isNotBlank(wxcode)){
 			String appid = customConfig.getAppid();
 			String secret = customConfig.getSecret();

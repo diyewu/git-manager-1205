@@ -551,7 +551,7 @@ public class AppService implements InitializingBean{
 				
 			}
 		}
-		System.out.println(sList);
+//		System.out.println(sList);
 		return sList;
 	}
 	
