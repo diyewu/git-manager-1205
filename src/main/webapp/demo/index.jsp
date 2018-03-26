@@ -51,6 +51,10 @@ String showName = realName == null?loginName:realName;
     var basePath = "<%=basePath%>";
     var showName = "<%=showName%>";
 	$(document).ready(function() {
+		var clientHeight = $(window).height();
+		$("#boximage").height(clientHeight*0.75);
+		$("#boximagehide").height(clientHeight*0.75);
+	
 		$(".modal-suspend").hide();
 		$(".modal-suspend").click(function(){
 			$(this).hide();
@@ -64,15 +68,16 @@ String showName = realName == null?loginName:realName;
 			$(".imgtext").slideToggle(500);
 		});
 		$(".fa.fa-download").click(function(){
-			alert(123);
 			$(".imgtext").slideToggle(500);
 		})
 		$(".fa.fa-close").click(function(){
-			$("#imgbox").hide();
+			hideImg();
 		})
+		/*
 		const width = $(".imgbox img").width();
 		console.log(width);
 		$(".imgbox").css("width", width);
+		*/
 
 		let zoom_n = 1;
 		$('#zoom-out').click(() => {
@@ -285,9 +290,10 @@ String showName = realName == null?loginName:realName;
 				</div>
 			</div>
 			-->
-
+	
+				<img id="boximagehide" src="" style="display:none;overflow:hidden;z-index:-9999">
 			<div id="imgbox" class="imgbox box-container">
-				<img id="boximage" src="img/heng2.png" height="500px">
+				<img id="boximage" src="" height="">
 				<!--<img src="img/shu2.jpg" height="500px">-->
 				<div class="imgtext">
 					<div class="box-title"></div>
@@ -295,7 +301,7 @@ String showName = realName == null?loginName:realName;
 						<i class="fa fa-search-plus" aria-hidden="true" id="zoom-out"></i>
 						<i class="fa fa-search-minus" aria-hidden="true" id="zoom-in"></i>
 						<i class="fa fa-repeat" aria-hidden="true" id="rotate-right"></i>
-						<a class="fa fa-cloud-download" aria-hidden="true" id="download" href="img/shu1.jpg" download="img.zip"> </a>
+						<a class="fa fa-cloud-download" aria-hidden="true" id="download" href="" download=""></a>
 						<i class="fa fa-download" aria-hidden="true" id="boxtextclose"></i>
 						<i class="fa fa-close" aria-hidden="true" id="imgboxclose"></i>
 					</div>

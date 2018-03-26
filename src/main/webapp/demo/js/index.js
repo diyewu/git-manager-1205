@@ -827,6 +827,17 @@ function showDetail(title,subhead,imgSrc,detail1,detail2,detail3,detail4,detail5
 	clearBoxImg();
 	var htm = "<li class=\"feature\"><span class=\"label\"></span><span class=\"desc\">#detail</span></li>";
 	$("#boximage").attr("src",imgSrc);
+	$("#boximagehide").attr("src",imgSrc);
+	$("#boximagehide").show();
+	$("#download").attr("href",imgSrc);
+	$("#download").attr("download",title+".jpg");
+	
+//	$("#boximage").load(function(){
+//		console.log($(this).width());    
+//		console.log($(this).width());    
+//	});
+
+
 	$(".box-title").html(title);
 //	$("#detailsubhead").html(subhead);
 	
@@ -848,7 +859,31 @@ function showDetail(title,subhead,imgSrc,detail1,detail2,detail3,detail4,detail5
 	if("null：null" != detail6&& "undefined：undefined"!= detail6){
 		$(".box-content").append(htm.replace("#detail", detail6));
 	}
-	showImg();
+	
+	$("#boximagehide")[0].onload=function(){
+		var that = this;
+		console.log($(that)[0].offsetWidth);
+		$(".imgbox").css("width", $(that)[0].offsetWidth);
+		$("#boximagehide").hide();
+		$(".modal-suspend").show();
+		$("#imgbox").show(300);
+		if($(".imgtext").is(":hidden")){
+	          //当前是hide状态
+			$(".imgtext").slideToggle(100);
+	    }else{
+	        //当前是show状态
+	    }
+	}
+//	showImg();
+//	document.getElementById('boximage').onload=function(){
+//        // 加载完成 
+//		console.log($(this));
+//		console.log($(this)["0"].clientWidth);
+//		
+//		$(".imgbox").css("width", this.width);
+//		$(".modal-suspend").show();
+//		$("#imgbox").show(300);
+//	};
 }
 
 
@@ -981,7 +1016,10 @@ function changelabel(e){
 }
 
 
-function showImg(){
+function showImg(w){
+	const width = $(".imgbox img").width();
+//	console.log(w);
+	$(".imgbox").css("width", width);
 	$(".modal-suspend").show();
 	$("#imgbox").show(300);
 }
@@ -993,4 +1031,5 @@ function hideImg(){
 function clearBoxImg(){
 	$("#boximage").attr("src","");
 	$(".box-title").html("");
+	$(".box-content").empty();
 }

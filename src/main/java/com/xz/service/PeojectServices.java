@@ -93,7 +93,7 @@ public class PeojectServices {
 						params.add(attrList.get(k)+"");
 						marks.add("?");
 					}
-					System.out.println(params);
+//					System.out.println(params);
 					sb.append(")values("+StringUtils.join(marks.toArray(), ",")+")");
 					jdbcTemplate.update(sb.toString(), params.toArray());
 				}else{
@@ -122,9 +122,9 @@ public class PeojectServices {
 			attributeIndex = attrList.get(0).get("attribute_index")+"";
 			detailSql=detailSql.replace("__index", attributeIndex);
 			jdbcTemplate.update(detailSql, list.get(i),projectId);
-			System.out.println(detailSql);
-			System.out.println(list.get(i));
-			System.out.println(projectId);
+//			System.out.println(detailSql);
+//			System.out.println(list.get(i));
+//			System.out.println(projectId);
 		}
 		
 	}
