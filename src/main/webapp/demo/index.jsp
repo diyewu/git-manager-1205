@@ -234,8 +234,9 @@ String showName = realName == null?loginName:realName;
 						<div class="no-login">
 							<a class="login login-user-btn btn-login "><%=showName%></a> | 
 							<i style="color: #3086c3;" class=" fa fa-address-card" aria-hidden="true"></i>
-							<a	href="../demo/resetpwd/resetPwd1.jsp" target="_blank"
-								class="register">密码管理</a>
+							<a	href="../demo/resetpwd/resetPwd1.jsp" target="_blank" class="register">密码管理</a> | 
+							<i style="color: #3086c3;" class=" fa fa-sign-out" aria-hidden="true"></i>
+							<a	href="login.jsp" target="_self" class="register">注销</a>
 						</div>
 						<div class="logged" style="display: none;">
 							<a class="user-name" href=""></a> <a href="" class="">退出</a>

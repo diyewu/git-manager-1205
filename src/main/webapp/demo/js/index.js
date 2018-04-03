@@ -468,7 +468,7 @@
     	map.enableScrollWheelZoom(true);     //开启鼠标滚轮缩放
     	
 //    	map.setMapType(BMAP_HYBRID_MAP);
-    	map.setMapStyle({style:'grayscale'});
+//    	map.setMapStyle({style:'grayscale'});//灰度地图
     	
     	
     	map.addEventListener("zoomend", function(){//监听地图放大缩小事件
