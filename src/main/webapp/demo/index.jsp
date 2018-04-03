@@ -136,8 +136,8 @@ String showName = realName == null?loginName:realName;
 	<div id="container" class="container intro-effect-push">
 		<header class="header" style="z-index:10;top:0;left:0;">
 			<div class="video-class" id="playearthmap">
-				<video autoplay muted style="width:100%" onended="endPlay();";>
-					<source src="img/dfmz.mp4" type="video/mp4">
+				<video autoplay muted style="width:100%" onended="endPlay();">
+					<source src="img/14.mp4" type="video/mp4">
 				</video>
 			</div>
 		</header>
