@@ -15,7 +15,7 @@ public class MiniProHttpTest {
 		Map<String, Object> params = new HashMap<String, Object>();
 		params.put("userName", "admin");
 		params.put("userPwd", "admin");
-		params.put("code", "011KYMn91e3U4Q1Vq4o91bxCn91KYMnC");
+//		params.put("code", "011KYMn91e3U4Q1Vq4o91bxCn91KYMnC");
 		String resp = HttpUtil.httpPostRequest(url, params);
 		System.out.println(resp);
 	}

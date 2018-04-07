@@ -12,9 +12,9 @@
 	$(document).ready(function() { 
 //		console.log(vm.cascaderData);
 		// 百度地图API功能
+		$('#autoShowList').trigger("click");
 		initMap();
     	//===================
-		$('#autoShowList').trigger("click");
 		
         $('body').addClass('loaded');
         
@@ -958,18 +958,18 @@ function foreachData(curdata,curidx){
 	}
 	$(".item-wrap").append(loadhtm);
 	
-	viewer = new Viewer(document.getElementById('list-container-id'), {
-		url: 'data-original'
-	});
+//	viewer = new Viewer(document.getElementById('list-container-id'), {
+//		url: 'data-original'
+//	});
 }
 
 function generateRightItem(title,subhead,imgSrc,imgThumbSrc,detail1,detail2,detail3,detail4,detail5,detail6){
 	var html = "";
-	html += "<div class=\"list-item\" >";
+	html += "<div class=\"list-item\" style='cursor: pointer;' onClick=\"showDetail('"+title+"','"+subhead+"','"+imgSrc
+	+"','"+detail1+"','"+detail2+"','"+detail3+"','"+detail4+"','"+detail5+"','"+detail6+"')\" >";
 	html += "	<img alt=\""+title+"\" class=\"nullclass\" onerror=\"this.src='./img/white1.png';this.onerror=null;\" data-original=\""+imgSrc+"\"	src=\""+imgThumbSrc+"\">";
 	html += "	<div class=\"right-info\">";
-	html += "		<div style='cursor: pointer;'  onClick=\"showDetail('"+title+"','"+subhead+"','"+imgSrc
-	+"','"+detail1+"','"+detail2+"','"+detail3+"','"+detail4+"','"+detail5+"','"+detail6+"')\">";
+	html += "		<div >";
 	html += "			<span class=\"title\"> <a>"+title+"</a>";
 	html += "			</span> <span class=\"villa-name\" >"+subhead+"</span>";
 //	html += "			<span class=\"sale-status\" >正常</span>";

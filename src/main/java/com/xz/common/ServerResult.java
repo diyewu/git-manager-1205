@@ -24,6 +24,8 @@ public class ServerResult {
 	public final static int RESULT_SUCCESS = 0;// success
 	public final static int RESULT_SERVER_ERROR = 1;//未知服务器错误
 	
+	public final static String RESULT_SERVER_ERROR_MSG = "未知服务器错误";
+	
 	public final static int RESULT_MISSSING_TOKEN = 10000;
 	public final static String RESULT_MISSSING_TOKEN_MSG = "缺少token参数";
 	

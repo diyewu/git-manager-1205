@@ -20,7 +20,7 @@ String showName = realName == null?loginName:realName;
 <link href="plugins/font-awesome-4.7.0/css/font-awesome.min.css"
 	rel="stylesheet">
 <script src="plugins/bootstrap-3.3.7-dist/js/bootstrap.min.js"></script>
-<script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=plEzfOG4jm58EGxEsHw4kCPoG3UjOcNv"></script>
+<script type="text/javascript" src="https://api.map.baidu.com/api?v=2.0&ak=plEzfOG4jm58EGxEsHw4kCPoG3UjOcNv"></script>
 <!--<script type="text/javascript" src="https://api.map.baidu.com/api?v=2.0&ak=key&s=1"></script>-->
 <!--<script type="text/javascript" src="http://api.map.baidu.com/api?v=1.2"></script>-->
 <script src="plugins/layer/layer.js"></script>
@@ -136,8 +136,8 @@ String showName = realName == null?loginName:realName;
 	<div id="container" class="container intro-effect-push">
 		<header class="header" style="z-index:10;top:0;left:0;">
 			<div class="video-class" id="playearthmap">
-				<video autoplay muted style="width:100%" onended="endPlay();";>
-					<source src="img/dfmz.mp4" type="video/mp4">
+				<video autoplay muted style="width:100%" onended="endPlay();">
+					<source src="img/14.mp4" type="video/mp4">
 				</video>
 			</div>
 		</header>

@@ -23,12 +23,16 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.alibaba.fastjson.JSONArray;
 import com.xz.common.ServerResult;
 import com.xz.entity.AppLoginBean;
+import com.xz.entity.AppMenu;
 import com.xz.entity.CustomConfig;
 import com.xz.model.json.AppJsonModel;
+import com.xz.model.json.JsonModel;
 import com.xz.service.AppService;
 import com.xz.service.OperateHistoryService;
+import com.xz.service.WebService;
 import com.xz.utils.AgingCache;
 import com.xz.utils.HttpUtil;  
 /**
@@ -40,6 +44,9 @@ import com.xz.utils.HttpUtil;
 public class MiniProController extends BaseController{
 	@Autowired
 	private AppService appService;
+	
+	@Autowired
+	private WebService webService;
 	
 	@Autowired  
     private CustomConfig customConfig; 
@@ -108,7 +115,7 @@ public class MiniProController extends BaseController{
 		//绑定微信
 		String wxcode = request.getParameter("code");
 		String randomkey = request.getParameter("randomkey");
-//		System.out.println("wxcode="+wxcode);
+		System.out.println("wxcode="+wxcode);
 		if(StringUtils.isNotBlank(wxcode)){
 			String appid = customConfig.getAppid();
 			String secret = customConfig.getSecret();
@@ -145,6 +152,7 @@ public class MiniProController extends BaseController{
 		AppLoginBean appLoginBean = new AppLoginBean();
 		if(code == 0){
 			token = UUID.randomUUID().toString().replaceAll("-", "");
+			System.out.println("token="+token);
 //			String userId = list.get(0).get("id")+"";
 			String roleId = list.get(0).get("user_role")+"";
 			String realName = list.get(0).get("real_name")+"";
@@ -158,6 +166,211 @@ public class MiniProController extends BaseController{
 		operateHistoryService.insertOHAPP(request,appLoginBean.getUserId() ,"28", ServerResult.getCodeMsg(code, msg)+",openId="+randomkey, "success".equals(msg)?1:0, 2);
 		return new AppJsonModel(code, ServerResult.getCodeMsg(code, msg), resultMap);
 	}
+	
+	
+	/**
+	 * mini 获取菜单信息
+	 * @param request
+	 * @return
+	 */
+	@RequestMapping("getMenuByUserRole")
+	@ResponseBody
+	public AppJsonModel getMenuByUserRole(HttpServletRequest request){
+		int code = 0;
+		String msg = null;
+		String randomKey = request.getParameter("randomKey");
+		String token = request.getParameter("token");
+		List<String> paramList = new ArrayList<String>();
+		paramList.add(token);
+		paramList.add(randomKey);
+		AppLoginBean appLoginBean = new AppLoginBean();
+		code = miniGlobalCheck(paramList, token, randomKey,appLoginBean);
+		List<Map<String, Object>> list = new ArrayList<Map<String,Object>>();
+		if(code == 0){
+			list = webService.getObjectList(appLoginBean.getUserRoleId());
+		}
+		return new AppJsonModel(code, ServerResult.getCodeMsg(code, msg), list);
+	}
+	
+	/**
+	 * 根据登陆角色，获取初始化项目信息，数据信息为所有有权限项目数据
+	 * @param request
+	 * @return
+	 */
+	@RequestMapping("getMapInfoByuserRole")
+	@ResponseBody
+	public AppJsonModel getMapInfoByuserRole(HttpServletRequest request){
+		int code = 0;
+		String msg = null;
+		String randomKey = request.getParameter("randomKey");
+		String token = request.getParameter("token");
+		List<String> paramList = new ArrayList<String>();
+		paramList.add(token);
+		paramList.add(randomKey);
+		AppLoginBean appLoginBean = new AppLoginBean();
+		code = miniGlobalCheck(paramList, token, randomKey,appLoginBean);
+		List<AppMenu> list = new ArrayList<AppMenu>();
+		if(code == 0){
+			list = appService.getMenulist(appLoginBean.getUserRoleId());
+		}
+		List<Map<String, Object>> info = new ArrayList<Map<String,Object>>();
+		if(list != null && list.size()>0){
+			ObjectMapper mapper = new ObjectMapper();
+			try {
+				String jsonIds = mapper.writeValueAsString(list);
+				if(StringUtils.isNotBlank(jsonIds)){
+					JSONArray projectArray = JSONArray.parseArray(jsonIds);
+					info = appService.analyzeJson(projectArray, "is_check");
+				}
+				
+			} catch (Exception e) {
+				e.printStackTrace();
+//				msg = e.getMessage();
+				code = ServerResult.RESULT_SERVER_ERROR;
+			}
+		}
+		return new AppJsonModel(code, ServerResult.getCodeMsg(code, msg), info);
+	}
+	/**
+	 * 根据选择菜单获取项目数据信息
+	 * @param request
+	 * @return
+	 */
+	@RequestMapping("getMapInfoByMenuInfo")
+	@ResponseBody
+	public AppJsonModel getMapInfoByMenuInfo(HttpServletRequest request){
+		int code = 0;
+		String msg = null;
+		String randomKey = request.getParameter("randomKey");
+		String token = request.getParameter("token");
+		String jsonIds = request.getParameter("jsonIds");
+		List<String> paramList = new ArrayList<String>();
+		paramList.add(token);
+		paramList.add(randomKey);
+		paramList.add(jsonIds);
+		AppLoginBean appLoginBean = new AppLoginBean();
+		code = miniGlobalCheck(paramList, token, randomKey,appLoginBean);
+		List<Map<String, Object>> list = new ArrayList<Map<String,Object>>();
+		if(code == 0){
+			JSONArray projectArray = JSONArray.parseArray(jsonIds);
+			list = appService.analyzeJson(projectArray, "status");
+		}
+		return new AppJsonModel(code, ServerResult.getCodeMsg(code, msg), list);
+	}
+	
+	/**
+	 * 根据用户选择的坐标点，获取该坐标点的下一级坐标
+	 * @param request
+	 * @return
+	 */
+	@RequestMapping("getNextMapInfoByKey")
+	@ResponseBody
+	public AppJsonModel getNextMapInfoByKey(HttpServletRequest request){
+		int code = 0;
+		String msg = null;
+		String randomKey = request.getParameter("randomKey");
+		String token = request.getParameter("token");
+		String cacheKey = request.getParameter("cacheKey");
+		String key = request.getParameter("key");
+		String currentLevel = request.getParameter("currentLevel");
+		List<String> paramList = new ArrayList<String>();
+		paramList.add(token);
+		paramList.add(randomKey);
+		paramList.add(cacheKey);
+		paramList.add(currentLevel);
+		AppLoginBean appLoginBean = new AppLoginBean();
+		code = miniGlobalCheck(paramList, token, randomKey,appLoginBean);
+		List<Map<String, Object>> info = new ArrayList<Map<String,Object>>();
+		if(code == 0){
+			List<Map<String, Object>> tlist = (List<Map<String, Object>>)AgingCache.getCacheInfo(cacheKey).getValue();
+			info = appService.generateCod(key,tlist, cacheKey,currentLevel);
+		}
+		return new AppJsonModel(code, ServerResult.getCodeMsg(code, msg), info);
+	}
+	
+	/**
+	 * 返回上一级坐标
+	 * @param request
+	 * @return
+	 */
+	@RequestMapping("getPreMapInfoByKey")
+	@ResponseBody
+	public AppJsonModel getPreMapInfoByKey(HttpServletRequest request){
+		int code = 0;
+		String msg = null;
+		String randomKey = request.getParameter("randomKey");
+		String token = request.getParameter("token");
+		
+		String cacheKey = request.getParameter("cacheKey");
+		String key = request.getParameter("key");
+		String currentLevel = request.getParameter("currentLevel");
+		
+		List<String> paramList = new ArrayList<String>();
+		paramList.add(token);
+		paramList.add(randomKey);
+		paramList.add(cacheKey);
+		paramList.add(currentLevel);
+		AppLoginBean appLoginBean = new AppLoginBean();
+		code = miniGlobalCheck(paramList, token, randomKey,appLoginBean);
+		List<Map<String, Object>> info = new ArrayList<Map<String,Object>>();
+		if(code == 0){
+			info = appService.turnback(cacheKey, key, currentLevel);
+		}
+		return new AppJsonModel(code, ServerResult.getCodeMsg(code, msg), info);
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	/**
+	 * 根据用户点击地图的点传递project_detail的ID获取详细信息
+	 * @param request
+	 * @return
+	 */
+	@RequestMapping("getCoordinateInfo")
+	@ResponseBody
+	public AppJsonModel getCoordinateInfo(HttpServletRequest request){
+		int code = 0;
+		String msg = null;
+		String randomKey = request.getParameter("randomKey");
+		String token = request.getParameter("token");
+		String coordinateId = request.getParameter("ids");
+		List<String> paramList = new ArrayList<String>();
+		paramList.add(token);
+		paramList.add(randomKey);
+		paramList.add(coordinateId);
+		AppLoginBean appLoginBean = new AppLoginBean();
+		code = miniGlobalCheck(paramList, token, randomKey,appLoginBean);
+		List<Map<String, Object>> list = new ArrayList<Map<String,Object>>();
+		if(code == 0){
+			try {
+				list = appService.getCoordinateInfoByIds(coordinateId);
+			} catch (Exception e) {
+				e.printStackTrace();
+				msg = e.getMessage();
+			}
+		}
+		return new AppJsonModel(code, ServerResult.getCodeMsg(code, msg), list);
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	
 
 	/**
