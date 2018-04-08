@@ -66,7 +66,7 @@ public class MiniProController extends BaseController{
 		String userPwd = request.getParameter("userPwd");
 //		String openId = request.getHeader("openId");
 		String token = "";
-		String msg = "success";
+		String msg = null;
 		int code = 0;
 		Map<String,String> resultMap = new HashMap<String, String>();
 		List<Map<String, Object>> list = new ArrayList<Map<String,Object>>();
@@ -163,7 +163,7 @@ public class MiniProController extends BaseController{
 			appLoginBean.setUserRoleId(roleId);
 			AgingCache.putCacheInfo(randomkey, appLoginBean,30);
 		}
-		operateHistoryService.insertOHAPP(request,appLoginBean.getUserId() ,"28", ServerResult.getCodeMsg(code, msg)+",openId="+randomkey, "success".equals(msg)?1:0, 2);
+//		operateHistoryService.insertOHAPP(request,appLoginBean.getUserId() ,"28", ServerResult.getCodeMsg(code, msg)+",openId="+randomkey, "success".equals(msg)?1:0, 2);
 		return new AppJsonModel(code, ServerResult.getCodeMsg(code, msg), resultMap);
 	}
 	
@@ -202,7 +202,7 @@ public class MiniProController extends BaseController{
 	public AppJsonModel getMapInfoByuserRole(HttpServletRequest request){
 		int code = 0;
 		String msg = null;
-		String randomKey = request.getParameter("randomKey");
+		String randomKey = request.getParameter("randomkey");
 		String token = request.getParameter("token");
 		List<String> paramList = new ArrayList<String>();
 		paramList.add(token);
