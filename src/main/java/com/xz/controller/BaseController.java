@@ -110,6 +110,7 @@ public class BaseController {
 		
 	}
 	protected int miniGlobalCheck(List<String> paramList,String token,String randomKey,AppLoginBean appLoginBean) {
+		System.out.println("miniGlobalCheck__token="+token);
 		int code = 0;
 		if(paramList != null && paramList.size()>0){
 			for(String param:paramList){

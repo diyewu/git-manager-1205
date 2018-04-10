@@ -236,7 +236,7 @@ public class AppController extends BaseController{
 						param.put(AttriId, conditionList);
 					}
 				}
-				list = appService.getMapInfo(projectId, param,null,"0");
+				list = appService.getMapInfo(projectId, param,null,"0",null);
 				if (list != null && list.size() > 0) {
 					info.addAll(list);
 				}
@@ -276,7 +276,7 @@ public class AppController extends BaseController{
 		List<Map<String, Object>> info = new ArrayList<Map<String,Object>>();
 		if(code == 0){
 			List<Map<String, Object>> tlist = (List<Map<String, Object>>)AgingCache.getCacheInfo(cacheKey).getValue();
-			info = appService.generateCod(key,tlist, cacheKey,currentLevel);
+			info = appService.generateCod(key,tlist, cacheKey,currentLevel,null);
 		}
 //		operateHistoryService.insertOH(request, "31", ServerResult.getCodeMsg(code, msg), "success".equals(msg)?1:0, 2);
 		operateHistoryService.insertOHAPP(request,appLoginBean.getUserId() ,"31", ServerResult.getCodeMsg(code, msg)+",phoneId="+phoneId, "success".equals(msg)?1:0, 2);
@@ -487,7 +487,7 @@ public class AppController extends BaseController{
 		
 		List<Map<String, Object>> info = new ArrayList<Map<String,Object>>();
 		if(code == 0){
-			info = appService.turnback(cacheKey, key, currentLevel);
+			info = appService.turnback(cacheKey, key, currentLevel,null);
 		}
 //		operateHistoryService.insertOH(request, "34", ServerResult.getCodeMsg(code, msg), "success".equals(msg)?1:0, 2);
 		operateHistoryService.insertOHAPP(request,appLoginBean.getUserId() ,"34", ServerResult.getCodeMsg(code, msg)+",phoneId="+phoneId, "success".equals(msg)?1:0, 2);

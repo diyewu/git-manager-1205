@@ -178,16 +178,16 @@ public class MiniProController extends BaseController{
 	public AppJsonModel getMenuByUserRole(HttpServletRequest request){
 		int code = 0;
 		String msg = null;
-		String randomKey = request.getParameter("randomKey");
+		String randomKey = request.getParameter("randomkey");
 		String token = request.getParameter("token");
 		List<String> paramList = new ArrayList<String>();
 		paramList.add(token);
 		paramList.add(randomKey);
 		AppLoginBean appLoginBean = new AppLoginBean();
 		code = miniGlobalCheck(paramList, token, randomKey,appLoginBean);
-		List<Map<String, Object>> list = new ArrayList<Map<String,Object>>();
+		List<AppMenu> list = new ArrayList<AppMenu>();
 		if(code == 0){
-			list = webService.getObjectList(appLoginBean.getUserRoleId());
+			list = appService.getMenulist(appLoginBean.getUserRoleId());
 		}
 		return new AppJsonModel(code, ServerResult.getCodeMsg(code, msg), list);
 	}
@@ -220,7 +220,7 @@ public class MiniProController extends BaseController{
 				String jsonIds = mapper.writeValueAsString(list);
 				if(StringUtils.isNotBlank(jsonIds)){
 					JSONArray projectArray = JSONArray.parseArray(jsonIds);
-					info = appService.analyzeJson(projectArray, "is_check");
+					info = appService.analyzeJson(projectArray, "is_check","mini");
 				}
 				
 			} catch (Exception e) {
@@ -241,7 +241,7 @@ public class MiniProController extends BaseController{
 	public AppJsonModel getMapInfoByMenuInfo(HttpServletRequest request){
 		int code = 0;
 		String msg = null;
-		String randomKey = request.getParameter("randomKey");
+		String randomKey = request.getParameter("randomkey");
 		String token = request.getParameter("token");
 		String jsonIds = request.getParameter("jsonIds");
 		List<String> paramList = new ArrayList<String>();
@@ -253,7 +253,7 @@ public class MiniProController extends BaseController{
 		List<Map<String, Object>> list = new ArrayList<Map<String,Object>>();
 		if(code == 0){
 			JSONArray projectArray = JSONArray.parseArray(jsonIds);
-			list = appService.analyzeJson(projectArray, "status");
+			list = appService.analyzeJson(projectArray, "status","mini");
 		}
 		return new AppJsonModel(code, ServerResult.getCodeMsg(code, msg), list);
 	}
@@ -268,7 +268,7 @@ public class MiniProController extends BaseController{
 	public AppJsonModel getNextMapInfoByKey(HttpServletRequest request){
 		int code = 0;
 		String msg = null;
-		String randomKey = request.getParameter("randomKey");
+		String randomKey = request.getParameter("randomkey");
 		String token = request.getParameter("token");
 		String cacheKey = request.getParameter("cacheKey");
 		String key = request.getParameter("key");
@@ -283,7 +283,7 @@ public class MiniProController extends BaseController{
 		List<Map<String, Object>> info = new ArrayList<Map<String,Object>>();
 		if(code == 0){
 			List<Map<String, Object>> tlist = (List<Map<String, Object>>)AgingCache.getCacheInfo(cacheKey).getValue();
-			info = appService.generateCod(key,tlist, cacheKey,currentLevel);
+			info = appService.generateCod(key,tlist, cacheKey,currentLevel,"mini");
 		}
 		return new AppJsonModel(code, ServerResult.getCodeMsg(code, msg), info);
 	}
@@ -298,7 +298,7 @@ public class MiniProController extends BaseController{
 	public AppJsonModel getPreMapInfoByKey(HttpServletRequest request){
 		int code = 0;
 		String msg = null;
-		String randomKey = request.getParameter("randomKey");
+		String randomKey = request.getParameter("randomkey");
 		String token = request.getParameter("token");
 		
 		String cacheKey = request.getParameter("cacheKey");
@@ -314,16 +314,10 @@ public class MiniProController extends BaseController{
 		code = miniGlobalCheck(paramList, token, randomKey,appLoginBean);
 		List<Map<String, Object>> info = new ArrayList<Map<String,Object>>();
 		if(code == 0){
-			info = appService.turnback(cacheKey, key, currentLevel);
+			info = appService.turnback(cacheKey, key, currentLevel,"mini");
 		}
 		return new AppJsonModel(code, ServerResult.getCodeMsg(code, msg), info);
 	}
-	
-	
-	
-	
-	
-	
 	
 	
 	/**
@@ -336,7 +330,7 @@ public class MiniProController extends BaseController{
 	public AppJsonModel getCoordinateInfo(HttpServletRequest request){
 		int code = 0;
 		String msg = null;
-		String randomKey = request.getParameter("randomKey");
+		String randomKey = request.getParameter("randomkey");
 		String token = request.getParameter("token");
 		String coordinateId = request.getParameter("ids");
 		List<String> paramList = new ArrayList<String>();
