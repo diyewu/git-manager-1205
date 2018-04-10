@@ -997,7 +997,7 @@ function turnback(){
 	if(!_key){
 		return null;
 	}else{
-		console.log("_currentLevel="+_currentLevel);
+//		console.log("_currentLevel="+_currentLevel);
 		if(_currentLevel >1){
 			showPreLevel(_level, _key, _cacheKey, _currentLevel);
 		}else{//返回到第一级时，改为初始化

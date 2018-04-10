@@ -183,7 +183,7 @@ public class WebController extends BaseController {
 		List<Map<String, Object>> info = new ArrayList<Map<String,Object>>();
 		if(StringUtils.isNotBlank(jsonIds)){
 			JSONArray projectArray = JSONArray.parseArray(jsonIds);
-			info = appService.analyzeJson(projectArray, "status");
+			info = appService.analyzeJson(projectArray, "status",null);
 		}else{
 			msg = "参数有误！";
 		}
@@ -240,7 +240,7 @@ public class WebController extends BaseController {
 				String jsonIds = mapper.writeValueAsString(list);
 				if(StringUtils.isNotBlank(jsonIds)){
 					JSONArray projectArray = JSONArray.parseArray(jsonIds);
-					info = appService.analyzeJson(projectArray, "is_check");
+					info = appService.analyzeJson(projectArray, "is_check",null);
 				}
 				
 			} catch (Exception e) {
@@ -276,7 +276,7 @@ public class WebController extends BaseController {
 //				System.out.println(jsonIds);
 				if(StringUtils.isNotBlank(jsonIds)){
 					JSONArray projectArray = JSONArray.parseArray(jsonIds);
-					info = appService.analyzeJson(projectArray, "is_check");
+					info = appService.analyzeJson(projectArray, "is_check",null);
 				}
 				
 			} catch (Exception e) {
@@ -318,7 +318,7 @@ public class WebController extends BaseController {
 				String jsonIds = mapper.writeValueAsString(list);
 				if(StringUtils.isNotBlank(jsonIds)){
 					JSONArray projectArray = JSONArray.parseArray(jsonIds);
-					info = appService.analyzeJson(projectArray, "is_check");
+					info = appService.analyzeJson(projectArray, "is_check",null);
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -346,7 +346,7 @@ public class WebController extends BaseController {
 		List<Map<String, Object>> info = new ArrayList<Map<String,Object>>();
 		if(StringUtils.isNotBlank(userRole)){
 			List<Map<String, Object>> tlist = (List<Map<String, Object>>)AgingCache.getCacheInfo(cacheKey).getValue();
-			info = appService.generateCod(key,tlist, cacheKey,currentLevel);
+			info = appService.generateCod(key,tlist, cacheKey,currentLevel,null);
 		}else{
 			msg = "尚未登陆！";
 		}
@@ -372,7 +372,7 @@ public class WebController extends BaseController {
 		String msg = null;
 		List<Map<String, Object>> info = new ArrayList<Map<String,Object>>();
 		if(StringUtils.isNotBlank(userRole)){
-			info = appService.turnback(cacheKey, key, currentLevel);
+			info = appService.turnback(cacheKey, key, currentLevel,null);
 		}else{
 			msg = "尚未登陆！";
 		}

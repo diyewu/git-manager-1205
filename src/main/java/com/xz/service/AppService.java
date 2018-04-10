@@ -245,7 +245,7 @@ public class AppService implements InitializingBean{
 	}
 	
 	public List<Map<String,Object>> getMapInfo(String projectId,Map<String,
-			List<String>> param,String cacheKey,String currentLevel){
+			List<String>> param,String cacheKey,String currentLevel,String sourceType){
 		if(StringUtils.isBlank(cacheKey)){
 			String attriSql = " select attribute_index from project_attribute where id = ? ";
 			List<Map<String, Object>> list = new ArrayList<Map<String,Object>>();
@@ -313,7 +313,7 @@ public class AppService implements InitializingBean{
 					String tkey = UUID.randomUUID().toString().replaceAll("-", "");
 //					cacheMap.put(tkey, resultList);
 					AgingCache.putCacheInfo(tkey, resultList,60);
-					List<Map<String, Object>> cod = generateCod(null,resultList,tkey,currentLevel);
+					List<Map<String, Object>> cod = generateCod(null,resultList,tkey,currentLevel,sourceType);
 					return cod;
 				}
 			}
@@ -322,14 +322,14 @@ public class AppService implements InitializingBean{
 			List<Map<String, Object>> tlist = (List<Map<String, Object>>)AgingCache.getCacheInfo(cacheKey).getValue();
 			if (tlist != null && tlist.size() > 0) {
 				AgingCache.updateCacheTimeOut(cacheKey);
-				List<Map<String, Object>> cod = generateCod(null,tlist,cacheKey,currentLevel);
+				List<Map<String, Object>> cod = generateCod(null,tlist,cacheKey,currentLevel,sourceType);
 				return cod;
 			}
 		}
 		return null;
 	}
 	public List<Map<String,Object>> generateCod(String currentKey,List<Map<String, Object>> resultList,
-			String cacheKey,String currentLevel ){
+			String cacheKey,String currentLevel,String type){
 		Map<String,AreaBean> areaMap = new HashMap<String, AreaBean>();
 		int currentLevelInt = Integer.parseInt(currentLevel);
 		AreaBean areaBean = new AreaBean();
@@ -367,7 +367,7 @@ public class AppService implements InitializingBean{
 						zeroStr = StringUtils.substring(researchNo, levelMap.get(currentLevelInt), levelMap.get(currentLevelInt+1));
 					}
 					if("00".equals(zeroStr)||"000".equals(zeroStr)){
-						return generateCod(tempKey+zeroStr, resultList, cacheKey, (currentLevelInt+1)+"");
+						return generateCod(tempKey+zeroStr, resultList, cacheKey, (currentLevelInt+1)+"",type);
 //						return null;
 					}else{
 						if(currentLevelInt != 6){//2.3.4.5
@@ -420,6 +420,21 @@ public class AppService implements InitializingBean{
 								smap.put("latitude", latitudeF);
 								smap.put("ids", resultmap.get("id"));
 								smap.put("totalitem", 1);
+								if("mini".equals(type)){
+									Map<String,Object> callout = new HashMap<String, Object>();
+									callout.put("content", (StringUtils.isBlank(researchNoMap.get(resultmap.get("question_type")))?resultmap.get("question_type"):researchNoMap.get(resultmap.get("question_type"))));
+									callout.put("fontSize","20");
+									callout.put("color","#fff");
+									callout.put("display","ALWAYS");
+									callout.put("borderRadius","5%");
+									callout.put("bgColor","#23aef4");
+									smap.put("callout",callout);
+									smap.put("iconPath","../../img/marker_red.png");
+									smap.put("iconTapPath","../../img/marker_red.png");
+//									level,key,cacheKey,currentLevel,nextLevel
+									String markerId = (currentLevelInt+1)+"_"+resultmap.get("question_type")+"_"+cacheKey+"_"+currentLevelInt+"_0_"+resultmap.get("id");
+									smap.put("id",markerId);
+								}
 								sList.add(smap);
 							}
 						}
@@ -429,7 +444,7 @@ public class AppService implements InitializingBean{
 					zeroStr = StringUtils.substring(researchNo, levelMap.get(currentLevelInt), levelMap.get(currentLevelInt+1));
 					if("00".equals(zeroStr)||"000".equals(zeroStr)){
 						tempKey = StringUtils.substring(researchNo, 0, levelMap.get(currentLevelInt+1));
-						return generateCod(tempKey, resultList, cacheKey, (currentLevelInt+1)+"");
+						return generateCod(tempKey, resultList, cacheKey, (currentLevelInt+1)+"",type);
 //						return null;
 					}else{
 						id = resultmap.get("id")+"";
@@ -466,9 +481,13 @@ public class AppService implements InitializingBean{
 					areaBean = new AreaBean();
 					areaBean = entry.getValue();
 					sMap.put("key", entry.getKey());
+					int currentLevelMini = 1;
+					int nextLevelMini = 2;
 					if(StringUtils.isNotBlank(currentKey)){
 						sMap.put("currentLevel", currentLevelInt+1);
+						currentLevelMini = currentLevelInt+1;
 						sMap.put("nextLevel", currentLevelInt+2);
+						nextLevelMini = currentLevelInt+2;
 						sMap.put("preKey", StringUtils.substring(currentKey, 0,levelMap.get(currentLevelInt)));
 						sMap.put("preLevel", currentLevelInt);
 					}else{
@@ -484,6 +503,21 @@ public class AppService implements InitializingBean{
 					sMap.put("ids", areaBean.getIds());
 					sMap.put("totalitem", areaBean.getCount());
 					sMap.put("color","" );
+					if("mini".equals(type)){
+						Map<String,Object> callout = new HashMap<String, Object>();
+						callout.put("content", (StringUtils.isBlank(researchNoMap.get(entry.getKey()+projectCode))?(entry.getKey()+projectCode):researchNoMap.get(entry.getKey()+projectCode)));
+						callout.put("fontSize","20");
+						callout.put("color","#fff");
+						callout.put("display","ALWAYS");
+						callout.put("borderRadius","5%");
+						callout.put("bgColor","#23aef4");
+						sMap.put("callout",callout);
+						sMap.put("iconPath","../../img/marker_red.png");
+						sMap.put("iconTapPath","../../img/marker_red.png");
+//						level,key,cacheKey,currentLevel,nextLevel
+						String markerId = currentLevelMini+"_"+entry.getKey()+"_"+cacheKey+"_"+currentLevelInt+"_"+nextLevelMini;
+						sMap.put("id",markerId);
+					}
 					sList.add(sMap);
 					sMap = new HashMap<String, Object>();
 				}
@@ -559,7 +593,7 @@ public class AppService implements InitializingBean{
         Pattern pattern = Pattern.compile("^[-\\+]?[\\d]*$");  
         return pattern.matcher(str).matches();  
   }
-	public List<Map<String, Object>> turnback(String cacheKey,String key,String currentLevel){
+	public List<Map<String, Object>> turnback(String cacheKey,String key,String currentLevel,String sourceType ){
 //		List<Map<String, Object>> resultList = cacheMap.get(cacheKey);
 		List<Map<String, Object>> resultList = (List<Map<String, Object>>)AgingCache.getCacheInfo(cacheKey).getValue();
 		Map<String, Object> map = new HashMap<String, Object>();
@@ -576,7 +610,7 @@ public class AppService implements InitializingBean{
 			if(key.equals(tempKey)){
 				zeroStr = StringUtils.substring(researchNo, levelMap.get(fatherLvl), levelMap.get(currentLevelInt));
 				if("00".equals(zeroStr) || "000".equals(zeroStr)){
-					return turnback(cacheKey, tempKey.substring(0, tempKey.length()-zeroStr.length()), (currentLevelInt-1)+"");
+					return turnback(cacheKey, tempKey.substring(0, tempKey.length()-zeroStr.length()), (currentLevelInt-1)+"",sourceType);
 				}
 				if(fatherLvl != 0){
 					fatherKey = StringUtils.substring(researchNo, 0, levelMap.get(fatherLvl));
@@ -586,7 +620,7 @@ public class AppService implements InitializingBean{
 				break;
 			}
 		}
-		List<Map<String, Object>> list = this.generateCod(fatherKey, resultList, cacheKey, fatherLvl+"");
+		List<Map<String, Object>> list = this.generateCod(fatherKey, resultList, cacheKey, fatherLvl+"",sourceType);
 		return list;
 	}
 	
@@ -715,7 +749,7 @@ public class AppService implements InitializingBean{
 	 * @param checkFlag
 	 * @return
 	 */
-	public List<Map<String, Object>> analyzeJson(JSONArray projectArray,String checkFlag){
+	public List<Map<String, Object>> analyzeJson(JSONArray projectArray,String checkFlag,String sourceType){
 		List<Map<String, Object>> info = new ArrayList<Map<String,Object>>();
 		List<Map<String, Object>> list = new ArrayList<Map<String,Object>>();
 		String projectId = "";
@@ -767,7 +801,7 @@ public class AppService implements InitializingBean{
 					}
 				}
 				if (param != null && param.size() > 0) {
-					list = this.getMapInfo(projectId, param, null,"0");
+					list = this.getMapInfo(projectId, param, null,"0",sourceType);
 					if (list != null && list.size() > 0) {
 						info.addAll(list);
 					}

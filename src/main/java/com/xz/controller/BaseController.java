@@ -109,6 +109,39 @@ public class BaseController {
 		return code;
 		
 	}
+	protected int miniGlobalCheck(List<String> paramList,String token,String randomKey,AppLoginBean appLoginBean) {
+		System.out.println("miniGlobalCheck__token="+token);
+		int code = 0;
+		if(paramList != null && paramList.size()>0){
+			for(String param:paramList){
+				if(StringUtils.isBlank(param)){
+					code = ServerResult.RESULT_ERROE_PARAM;
+					break;
+				}
+			}
+		}
+		if(code == 0){
+			String lastToken = "";
+			try {
+				AppLoginBean appLoginBeanTemp = (AppLoginBean) AgingCache.getCacheInfo(randomKey).getValue();
+				appLoginBean.setUserId(appLoginBeanTemp.getUserId());
+				appLoginBean.setToken(appLoginBeanTemp.getToken());
+				appLoginBean.setUserRoleId(appLoginBeanTemp.getUserRoleId());
+			} catch (Exception e) {
+				code = ServerResult.RESULT_TOKEN_OVERTIME;
+			}
+			if (code == 0) {
+				AgingCache.updateCacheTimeOut(randomKey);
+				lastToken = appLoginBean.getToken();
+				if(!token.equals(lastToken)){
+					code = ServerResult.RESULT_TOKEN_CHECK_ERROR;
+				}
+			}
+		}
+		
+		return code;
+		
+	}
 	
 	
 	

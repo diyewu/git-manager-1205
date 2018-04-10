@@ -87,6 +87,13 @@ public class AuthInterceptor implements HandlerInterceptor {
 				return false;
 			}
 			return true;
+		}else if(requestURI.contains("/mini/")){
+			String randomKey = request.getParameter("randomKey");
+			String token = request.getParameter("token");
+			if(StringUtils.isBlank(randomKey) && StringUtils.isBlank(token)){
+				return false;
+			}
+			return true;
 		}else{
 			//后台和WEB PC请求
 			String adminUserId = (String)session.getAttribute("userId");
