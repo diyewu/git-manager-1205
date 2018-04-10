@@ -32,6 +32,7 @@ import com.xz.model.json.AppJsonModel;
 import com.xz.model.json.JsonModel;
 import com.xz.service.AppService;
 import com.xz.service.OperateHistoryService;
+import com.xz.service.ProjectServices;
 import com.xz.service.WebService;
 import com.xz.utils.AgingCache;
 import com.xz.utils.HttpUtil;  
@@ -47,6 +48,9 @@ public class MiniProController extends BaseController{
 	
 	@Autowired
 	private WebService webService;
+
+	@Autowired
+	private ProjectServices projectServices;
 	
 	@Autowired  
     private CustomConfig customConfig; 
@@ -349,6 +353,39 @@ public class MiniProController extends BaseController{
 			}
 		}
 		return new AppJsonModel(code, ServerResult.getCodeMsg(code, msg), list);
+	}
+	
+	/**
+	 * 根据用户输入信息搜索经纬度
+	 * @param request
+	 * @return
+	 */
+	@RequestMapping("getGeocoderLatitude")
+	@ResponseBody
+	public AppJsonModel getGeocoderLatitude(HttpServletRequest request){
+		int code = 0;
+		String msg = null;
+		String randomKey = request.getParameter("randomkey");
+		String token = request.getParameter("token");
+		String address = request.getParameter("address");
+		List<String> paramList = new ArrayList<String>();
+		paramList.add(token);
+		paramList.add(randomKey);
+		paramList.add(address);
+		AppLoginBean appLoginBean = new AppLoginBean();
+		code = miniGlobalCheck(paramList, token, randomKey,appLoginBean);
+		List<Map<String, Object>> list = new ArrayList<Map<String,Object>>();
+		Map<String, String> map = new HashMap<String, String>();
+		if(code == 0){
+			String key = customConfig.getBaiduapikey();
+			try {
+				map = projectServices.getGeocoderLatitude(address, key);
+			} catch (Exception e) {
+				e.printStackTrace();
+				msg = e.getMessage();
+			}
+		}
+		return new AppJsonModel(code, ServerResult.getCodeMsg(code, msg), map);
 	}
 	
 	

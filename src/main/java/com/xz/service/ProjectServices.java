@@ -489,7 +489,7 @@ public class ProjectServices {
 	
 	
 	
-	public static Map<String,String> getGeocoderLatitude(String address,String key) {
+	public Map<String,String> getGeocoderLatitude(String address,String key) {
 		Map<String,String> map = new HashMap<String, String>();
 		BufferedReader in = null;
 		try {
