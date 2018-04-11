@@ -316,6 +316,7 @@ public class MiniProController extends BaseController{
 		paramList.add(currentLevel);
 		AppLoginBean appLoginBean = new AppLoginBean();
 		code = miniGlobalCheck(paramList, token, randomKey,appLoginBean);
+		
 		List<Map<String, Object>> info = new ArrayList<Map<String,Object>>();
 		if(code == 0){
 			info = appService.turnback(cacheKey, key, currentLevel,"mini");
